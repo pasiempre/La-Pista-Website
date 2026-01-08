@@ -12,6 +12,10 @@ const rateLimit = require('express-rate-limit');
 
 // Initialize
 const app = express();
+
+// Trust proxy - required for rate limiting behind DigitalOcean/load balancers
+app.set('trust proxy', 1);
+
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
