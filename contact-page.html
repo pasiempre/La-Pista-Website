@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - LaPista.ATX</title>
+<meta name="description" content="Get in touch with LaPista.ATX. Questions about games, partnerships, or hosting? We'd love to hear from you.">
+<meta name="keywords" content="contact LaPista, Austin soccer contact, pickup soccer Austin">
+<meta property="og:title" content="Contact LaPista.ATX">
+<meta property="og:description" content="Questions, feedback, or want to host a game? We're here.">
+<meta property="og:image" content="/LaPista Logo 1.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+</head>
+  <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+    <!-- Mobile Menu Panel -->
+    <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between p-6 border-b border-zinc-800">
+        <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">LaPista<span class="text-green-500">.ATX</span></span>
+        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
+          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+        <nav class="flex flex-col gap-4">
+          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Games</a>
+          <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">About</a>
+          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">FAQ</a>
+          <a href="contact-page.html" class="text-3xl font-black text-green-500 uppercase italic font-display tracking-tight">Contact</a>
+        </nav>
+        <div class="border-t border-zinc-800 pt-8 mt-auto">
+          <div class="flex gap-4">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="lucide:instagram"></span>
+            </a>
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:whatsapp"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Navbar (Standalone) -->
+    <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()">
+          <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+        </button>
+        <a href="index.html" class="flex items-center group">
+          <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <nav class="hidden md:flex items-center gap-6 mr-4">
+          <a href="index.html#schedule" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            Games
+          </a>
+          <a href="about-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            About
+          </a>
+          <a href="faq-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            FAQ
+          </a>
+          <a href="contact-page.html" class="text-xs font-bold uppercase tracking-wide text-green-600 transition-colors">
+            Contact
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 md:px-6 py-12 md:py-16 relative z-10">
+      <!-- Hero Section -->
+      <div class="text-center max-w-2xl mx-auto mb-12 md:mb-16">
+        <h1 class="text-5xl md:text-7xl font-black text-zinc-900 uppercase tracking-tighter italic font-display leading-[0.9] mb-6">
+          Get In Touch
+        </h1>
+        <p class="text-lg text-zinc-500 font-medium">
+          Questions, feedback, or want to host a game? We're here.
+        </p>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-16 md:mb-20">
+        <!-- Left: Form -->
+        <div class="md:col-span-7">
+          <div class="bg-white border border-zinc-200 rounded-xl shadow-sm p-6 md:p-8">
+            <form id="contact-form" class="space-y-6" onsubmit="handleContactSubmit(event)">
+              <div class="grid grid-cols-1 gap-6">
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Name
+                  </label>
+                  <input type="text" name="name" id="contact-name" required="" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="Your name">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Email
+                  </label>
+                  <input type="email" name="email" id="contact-email" required="" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="you@example.com">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Subject
+                  </label>
+                  <div class="relative">
+                    <select name="subject" id="contact-subject" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all appearance-none cursor-pointer">
+                      <option>General Inquiry</option>
+                      <option>Game Question</option>
+                      <option>Partnership</option>
+                      <option>Feedback</option>
+                      <option>Other</option>
+                    </select>
+                    <span class="iconify absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" data-icon="lucide:chevron-down"></span>
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Message
+                  </label>
+                  <textarea name="message" id="contact-message" required="" rows="5" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400 resize-none" placeholder="How can we help?"></textarea>
+                </div>
+              </div>
+              <button type="submit" id="contact-submit" class="w-full py-4 bg-zinc-900 hover:bg-green-600 text-white font-black uppercase tracking-widest text-sm rounded shadow-lg shadow-zinc-900/10 transition-all transform hover:-translate-y-0.5">
+                Submit Message
+              </button>
+              <!-- Inline Error Message -->
+              <div id="contact-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <span class="iconify text-red-500" data-icon="lucide:alert-circle"></span>
+                  <p id="contact-error-text" class="text-sm font-medium text-red-700">Failed to send message.</p>
+                </div>
+                <p class="text-xs text-red-600 mt-2">Please try again or email us directly at <a href="mailto:lapista.atx@gmail.com" class="underline">lapista.atx@gmail.com</a></p>
+              </div>
+            </form>
+            <div id="contact-success" class="hidden text-center py-8">
+              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="iconify text-green-600 text-3xl" data-icon="lucide:check"></span>
+              </div>
+              <h3 class="text-xl font-bold text-zinc-900 mb-2">Message Sent!</h3>
+              <p class="text-zinc-500">We'll get back to you soon.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Info -->
+        <div class="md:col-span-5 space-y-6">
+          <div class="space-y-4">
+            <a href="mailto:lapista.atx@gmail.com" class="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5 hover:border-green-500 transition-all group shadow-sm">
+              <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-600 flex items-center justify-center shrink-0 group-hover:bg-green-50 group-hover:text-green-600 transition-colors">
+                <span class="iconify text-xl" data-icon="lucide:mail"></span>
+              </div>
+              <div>
+                <h3 class="font-bold text-zinc-900 uppercase text-xs tracking-wide mb-0.5">
+                  Email
+                </h3>
+                <p class="text-zinc-500 text-sm font-medium">
+                  lapista.atx@gmail.com
+                </p>
+              </div>
+            </a>
+
+            <a href="https://instagram.com/lapista.atx" target="_blank" class="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5 hover:border-green-500 transition-all group shadow-sm">
+              <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-600 flex items-center justify-center shrink-0 group-hover:bg-green-50 group-hover:text-green-600 transition-colors">
+                <span class="iconify text-xl" data-icon="lucide:instagram"></span>
+              </div>
+              <div>
+                <h3 class="font-bold text-zinc-900 uppercase text-xs tracking-wide mb-0.5">
+                  Instagram
+                </h3>
+                <p class="text-zinc-500 text-sm font-medium">@lapista.atx</p>
+              </div>
+            </a>
+
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex items-center gap-4 bg-white border border-zinc-200 rounded-xl p-5 hover:border-green-500 transition-all group shadow-sm">
+              <div class="w-12 h-12 rounded-full bg-zinc-50 text-zinc-600 flex items-center justify-center shrink-0 group-hover:bg-green-50 group-hover:text-green-600 transition-colors">
+                <span class="iconify text-xl" data-icon="mdi:whatsapp"></span>
+              </div>
+              <div>
+                <h3 class="font-bold text-zinc-900 uppercase text-xs tracking-wide mb-0.5">
+                  WhatsApp
+                </h3>
+                <p class="text-zinc-500 text-sm font-medium">
+                  Join Community Chat
+                </p>
+              </div>
+            </a>
+          </div>
+
+          <div class="bg-zinc-50 border border-zinc-200 border-dashed rounded-xl p-5">
+            <div class="flex items-start gap-3">
+              <span class="iconify text-green-600 mt-0.5 shrink-0" data-icon="lucide:clock"></span>
+              <p class="text-sm font-medium text-zinc-500 leading-relaxed">
+                We typically respond within 24 hours.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Section -->
+      <div class="space-y-6">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display border-b border-zinc-200 pb-2">
+          Service Area
+        </h3>
+        <div class="bg-white border border-zinc-200 rounded-xl p-1 overflow-hidden shadow-sm h-96 relative group">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d110204.62947098544!2d-97.7431!3d30.2672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644b599a0cc032f%3A0x5d9b464bd469d57a!2sAustin%2C%20TX!5e0!3m2!1sen!2sus!4v1709420000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0; filter: grayscale(100%) contrast(1.2) opacity(0.8);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="group-hover:grayscale-0 transition-all duration-700"></iframe>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer (Standard) -->
+    <footer class="bg-zinc-900 text-white pt-16 pb-8 border-t border-zinc-800 mt-auto">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-zinc-800 pb-12">
+          <div class="col-span-1">
+            <span class="font-display font-bold text-2xl tracking-tighter text-white">
+              LaPista
+              <span class="text-green-500">.ATX</span>
+            </span>
+            <p class="text-zinc-500 text-sm mt-4 leading-relaxed">
+              Connecting Austin's soccer community, one game at a time.
+            </p>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Explore
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Games
+                </a>
+              </li>
+              <li>
+                <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Venues
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Support
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                  Contact
+                </a>
+              </li>
+              <li>
+                <a href="terms.html" class="hover:text-green-500 transition-colors">
+                  Terms
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Follow
+            </h4>
+            <div class="flex gap-4">
+              <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="lucide:instagram"></span>
+              </a>
+              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="mdi:whatsapp"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide">
+          <div>© 2025 LaPista.ATX</div>
+          <div class="flex gap-6 mt-4 md:mt-0">
+            <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/config.js"></script>
+    <script>
+      async function handleContactSubmit(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById('contact-submit');
+        const originalText = submitBtn.textContent;
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const subject = document.getElementById('contact-subject').value;
+        const message = document.getElementById('contact-message').value.trim();
+        
+        try {
+          const apiUrl = (typeof LAPISTA_CONFIG !== 'undefined' && LAPISTA_CONFIG.API_URL)
+            ? LAPISTA_CONFIG.API_URL
+            : window.location.origin;
+          const response = await fetch(`${apiUrl}/api/contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, subject, message })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to send message');
+          }
+          
+          // Show success message
+          document.getElementById('contact-form').classList.add('hidden');
+          document.getElementById('contact-success').classList.remove('hidden');
+          
+        } catch (err) {
+          console.error('Contact form error:', err);
+          
+          // Show inline error message
+          const errorDiv = document.getElementById('contact-error');
+          const errorText = document.getElementById('contact-error-text');
+          errorText.textContent = err.message || 'Failed to send message.';
+          errorDiv.classList.remove('hidden');
+          
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+      
+      function toggleMobileMenu() {
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const panel = document.getElementById('mobile-menu-panel');
+        overlay.classList.toggle('hidden');
+        panel.classList.toggle('-translate-x-full');
+      }
+    </script>
+  
+</body></html>

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Details - LaPista.ATX</title>
+<meta name="description" content="RSVP for pickup soccer in Austin. View game details, add guests, and secure your spot. Pay online or at the game.">
+<meta name="keywords" content="pickup soccer, Austin TX, RSVP, soccer games, futbol">
+<meta property="og:title" content="Book Your Spot - LaPista.ATX">
+<meta property="og:description" content="Reserve your spot for pickup soccer in Austin. $5.99 per person.">
+<meta property="og:image" content="/LaPista Logo 1.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+</head>
+  <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+    <!-- Mobile Menu Panel -->
+    <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between p-6 border-b border-zinc-800">
+        <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">LaPista<span class="text-green-500">.ATX</span></span>
+        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
+          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+        <nav class="flex flex-col gap-4">
+          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Games</a>
+          <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">About</a>
+          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">FAQ</a>
+          <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Contact</a>
+        </nav>
+        <div class="border-t border-zinc-800 pt-8 mt-auto">
+          <div class="flex gap-4">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="lucide:instagram"></span>
+            </a>
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:whatsapp"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Navbar (Standalone) -->
+    <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()">
+          <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+        </button>
+        <a href="index.html" class="flex items-center group">
+          <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <nav class="hidden md:flex items-center gap-6 mr-4">
+          <a href="index.html#schedule" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            Games
+          </a>
+          <a href="about-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            About
+          </a>
+          <a href="faq-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            FAQ
+          </a>
+          <a href="contact-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            Contact
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
+      <!-- Error State: Game Not Found (hidden by default) -->
+      <div id="game-error-state" class="hidden">
+        <div class="text-center py-16">
+          <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="iconify text-red-500 text-4xl" data-icon="lucide:calendar-x"></span>
+          </div>
+          <h1 class="text-3xl md:text-4xl font-black text-zinc-900 uppercase tracking-tighter italic font-display mb-4">
+            Game Not Found
+          </h1>
+          <p class="text-zinc-500 font-medium mb-8 max-w-md mx-auto">
+            Sorry, we couldn't find this game. It may have been cancelled or the link is incorrect.
+          </p>
+          <a href="index.html#schedule" class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-bold text-sm uppercase tracking-wide transition-all">
+            <span class="iconify" data-icon="lucide:arrow-left" data-width="1.2em"></span>
+            View All Games
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Content (hidden when error) -->
+      <div id="game-content">
+        <!-- 1. Breadcrumb -->
+        <div class="mb-8">
+          <a href="index.html" class="inline-flex items-center gap-1 text-xs font-bold text-zinc-400 hover:text-zinc-900 uppercase tracking-wide transition-colors group">
+            <span class="iconify group-hover:-translate-x-1 transition-transform" data-icon="lucide:arrow-left" data-width="1.2em"></span>
+            Back to Schedule
+          </a>
+        </div>
+
+        <!-- 2. Game Header -->
+      <div class="mb-10 pb-6 border-b border-zinc-200 border-dashed">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-green-50 text-green-600 border border-green-200 uppercase tracking-wider">
+                Open for RSVP
+              </span>
+              <span class="text-xs font-bold text-zinc-400 font-display">
+                GAME ID: LP-2025-001
+              </span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter italic font-display leading-[0.9]">
+              Sunday Pickup
+            </h1>
+          </div>
+          <div class="text-left md:text-right">
+            <div class="text-xl font-bold text-zinc-900 font-display uppercase tracking-tight">
+              January 5, 2025
+            </div>
+            <div class="flex items-center md:justify-end gap-2 text-zinc-500 font-mono text-sm mt-1">
+              <span class="iconify" data-icon="lucide:clock" data-width="1.2em"></span>
+              8:00 PM - 9:00 PM
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Game Info Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <!-- Left Column: Venue -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display">
+            Venue Information
+          </h3>
+          <div class="bg-white border border-zinc-200 rounded-lg p-1 overflow-hidden shadow-sm">
+            <!-- Map Embed -->
+            <div class="w-full h-48 bg-zinc-100 rounded relative overflow-hidden group">
+              <iframe id="venue-map" src="" width="100%" height="100%" style="border:0; filter: grayscale(100%) contrast(1.2) opacity(0.8);" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="group-hover:grayscale-0 transition-all duration-500"></iframe>
+              <div id="venue-map-label" class="absolute bottom-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm pointer-events-none">
+                Loading...
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <div id="venue-name" class="font-bold text-zinc-900 uppercase">
+                Loading...
+              </div>
+              <div id="venue-address" class="text-sm text-zinc-500 font-medium">
+                Loading address...
+              </div>
+            </div>
+            <a id="venue-directions" href="#" target="_blank" class="text-xs font-bold text-green-600 uppercase hover:underline flex items-center gap-1">
+              Get Directions
+              <span class="iconify" data-icon="lucide:external-link" data-width="1em"></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column: Details Card -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display">
+            Game Details
+          </h3>
+          <div class="bg-white border border-zinc-200 rounded-lg p-6 shadow-sm h-full flex flex-col justify-center gap-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+
+            <div class="relative z-10 flex items-center justify-between border-b border-zinc-100 pb-4">
+              <span class="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                Price Per Person
+              </span>
+              <span class="text-3xl font-black text-green-600 tracking-tight font-display">
+                $5.99
+              </span>
+            </div>
+
+            <div class="relative z-10 space-y-2">
+              <div class="flex justify-between items-end">
+                <span class="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                  Availability
+                </span>
+                <span id="filled-text" class="text-sm font-bold text-zinc-900">
+                  0 of 24 FILLED
+                </span>
+              </div>
+              <div class="h-3 w-full bg-zinc-100 rounded-full overflow-hidden border border-zinc-100">
+                <div id="progress-bar" class="h-full bg-green-500 w-0 relative overflow-hidden transition-all duration-500">
+                  <div class="absolute inset-0 bg-white/20" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+                </div>
+              </div>
+              <div id="spots-remaining" class="text-[10px] text-zinc-400 font-medium text-right pt-1">
+                24 spots remaining
+              </div>
+            </div>
+
+            <div class="relative z-10 pt-2 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-200 flex items-center justify-center shrink-0">
+                <span class="iconify text-xl text-zinc-400" data-icon="lucide:users" data-width="1.2em"></span>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                  Skill Level
+                </div>
+                <div class="text-sm font-bold text-zinc-900 uppercase">
+                  Open to all skill levels
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. What to Expect -->
+      <div class="mb-12">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
+          What to Expect
+        </h3>
+        <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
+          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                Bring shin guards (recommended)
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                Arrive 10 minutes before kickoff
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                All skill levels welcome - no ego
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                Water available on site
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                Turf shoes or firm ground cleats
+              </span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="text-sm font-medium text-zinc-700">
+                Bibs provided by host
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5. WhatsApp Group -->
+      <div class="mb-12">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 opacity-10 pointer-events-none">
+            <span class="iconify text-9xl text-green-600 transform translate-x-1/4 -translate-y-1/4" data-icon="mdi:whatsapp"></span>
+          </div>
+
+          <div class="relative z-10">
+            <h3 class="text-xl font-bold text-green-800 uppercase font-display mb-2">
+              Game Chat
+            </h3>
+            <p class="text-sm font-medium text-green-700 max-w-md">
+              Join the game chat for live updates, carpooling, and to connect
+              with other players before the match.
+            </p>
+          </div>
+
+          <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="relative z-10 shrink-0 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide px-6 py-3 rounded-md shadow-sm transition-all flex items-center gap-2 group">
+            <span class="iconify text-xl" data-icon="mdi:whatsapp"></span>
+            Join WhatsApp Group
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. RSVP Form -->
+      <div class="mb-16">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="h-px flex-1 bg-zinc-200"></div>
+          <h2 id="form-section-title" class="text-2xl font-black text-zinc-900 uppercase tracking-tighter italic font-display">
+            Reserve Your Spot
+          </h2>
+          <div class="h-px flex-1 bg-zinc-200"></div>
+        </div>
+
+        <!-- Waitlist Section (shown when game is full) -->
+        <div id="waitlist-section" class="hidden bg-amber-50 border border-amber-200 rounded-xl overflow-hidden mb-6">
+          <div class="bg-amber-100 px-6 py-4 border-b border-amber-200">
+            <div class="flex items-center gap-3">
+              <span class="iconify text-amber-600 text-2xl" data-icon="lucide:clock"></span>
+              <div>
+                <h3 class="text-lg font-black text-amber-800 uppercase tracking-tight font-display">Game Full</h3>
+                <p class="text-sm text-amber-700 font-medium">Join the waitlist to get notified if a spot opens up.</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <form id="waitlist-form" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Name</label>
+                  <input type="text" id="waitlist-name" required 
+                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                         placeholder="Your name">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Email</label>
+                  <input type="email" id="waitlist-email" required 
+                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                         placeholder="your@email.com">
+                </div>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Phone (optional)</label>
+                <input type="tel" id="waitlist-phone" 
+                       class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                       placeholder="(512) 555-0123">
+              </div>
+              <div id="waitlist-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
+              <div id="waitlist-success" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm font-medium">
+                <div class="flex items-center gap-2">
+                  <span class="iconify" data-icon="lucide:check-circle"></span>
+                  <span>You're on the waitlist! We'll email you if a spot opens.</span>
+                </div>
+              </div>
+              <button type="submit" id="waitlist-btn" 
+                      class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-widest text-sm rounded transition-all">
+                Join Waitlist
+              </button>
+              <p class="text-xs text-center text-amber-600 font-medium">
+                <span id="waitlist-count">0</span> people on waitlist
+              </p>
+            </form>
+          </div>
+        </div>
+
+        <div id="rsvp-form-container" class="bg-white border border-zinc-200 rounded-xl shadow-sm overflow-hidden">
+          <div class="p-6 md:p-8">
+            <form id="rsvp-form" class="space-y-6">
+              <!-- Game ID (hidden) -->
+              <input type="hidden" id="gameId" name="gameId" value="LP-001">
+              
+              <!-- Personal Info -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    First Name
+                  </label>
+                  <input type="text" id="firstName" name="firstName" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="Lionel" required="">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Last Name
+                  </label>
+                  <input type="text" id="lastName" name="lastName" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="Messi" required="">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Email Address
+                  </label>
+                  <input type="email" id="email" name="email" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="leo@example.com" required="">
+                </div>
+                <div class="space-y-1">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    Phone Number
+                  </label>
+                  <input type="tel" id="phone" name="phone" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="(512) 555-0123" required="">
+                </div>
+              </div>
+
+              <!-- Guests Section -->
+              <div id="guests-section" class="pt-2">
+                <div id="guests-container" class="space-y-4">
+                  <!-- Guest rows will be added here dynamically -->
+                </div>
+                
+                <button type="button" id="add-guest-btn" onclick="addGuest()" class="mt-4 text-xs font-bold text-green-600 hover:text-green-700 uppercase tracking-wide flex items-center gap-2 transition-colors">
+                  <span class="iconify" data-icon="lucide:plus-circle" data-width="1.2em"></span>
+                  <span id="add-guest-text">Add a Guest (<span id="guests-remaining">4</span> max)</span>
+                </button>
+                
+                <p id="no-spots-warning" class="hidden mt-2 text-xs text-amber-600 font-medium">
+                  ⚠️ Not enough spots available to add more guests.
+                </p>
+              </div>
+
+              <div class="border-t border-dashed border-zinc-200 my-4"></div>
+
+              <!-- Summary & Payment -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Order Summary -->
+                <div class="bg-zinc-50 rounded-lg p-4 border border-zinc-100">
+                  <h4 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 font-display">
+                    Order Summary
+                  </h4>
+                  <div class="flex justify-between items-center text-sm font-medium text-zinc-600 mb-2">
+                    <span>Standard Admission x <span id="playerCount">1</span></span>
+                    <span>$<span id="subtotal">5.99</span></span>
+                  </div>
+                  <div class="flex justify-between items-center text-sm font-medium text-zinc-600 mb-2">
+                    <span>Service Fee</span>
+                    <span>$0.00</span>
+                  </div>
+                  <div class="border-t border-zinc-200 my-2"></div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold text-zinc-900 uppercase">
+                      Total Due
+                    </span>
+                    <span class="text-lg font-black text-green-600">$<span id="totalAmount">5.99</span></span>
+                  </div>
+                </div>
+
+                <!-- Payment & Waiver -->
+                <div class="space-y-4">
+                  <div class="space-y-2">
+                    <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                      Payment Method
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                      <label class="cursor-pointer" onclick="document.getElementById('payOnline').checked = true; updatePaymentUI('online');">
+                        <input type="radio" name="payment" id="payOnline" value="online" class="peer sr-only" checked="">
+                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300">
+                          Pay Now
+                        </div>
+                      </label>
+                      <label class="cursor-pointer" onclick="document.getElementById('payCash').checked = true; updatePaymentUI('cash');">
+                        <input type="radio" name="payment" id="payCash" value="cash" class="peer sr-only">
+                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300">
+                          Pay at Game
+                        </div>
+                      </label>
+                    </div>
+                    <p id="cash-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
+                      💵 Bring exact cash (<span class="cash-total">$5.99</span>) to the game. Your spot is reserved.
+                    </p>
+                  </div>
+
+                  <div class="flex items-start gap-3 pt-2">
+                    <input type="checkbox" id="waiver" name="waiver" class="mt-1 rounded border-zinc-300 text-green-600 focus:ring-green-500" required="">
+                    <label for="waiver" class="text-xs text-zinc-500 font-medium leading-relaxed">
+                      I have read and agree to the
+                      <a href="waiver.html" target="_blank" class="text-green-600 underline hover:text-green-700 font-bold">
+                        Liability Waiver
+                      </a>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Error Message -->
+              <div id="form-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
+
+              <button type="submit" id="rsvp-submit-btn" class="w-full py-4 bg-zinc-900 hover:bg-green-600 text-white font-black uppercase tracking-widest text-sm rounded shadow-lg shadow-zinc-900/10 transition-all transform hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
+                Pay Now &amp; Confirm
+              </button>
+              <p class="text-[10px] text-center text-zinc-400 font-medium">
+                You'll receive a confirmation email shortly.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+      </div><!-- Close game-content -->
+    </main>
+
+    <!-- Footer (Standard) -->
+    <footer class="bg-zinc-900 text-white pt-16 pb-8 border-t border-zinc-800 mt-auto">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-zinc-800 pb-12">
+          <div class="col-span-1">
+            <span class="font-display font-bold text-2xl tracking-tighter text-white">
+              LaPista
+              <span class="text-green-500">.ATX</span>
+            </span>
+            <p class="text-zinc-500 text-sm mt-4 leading-relaxed">
+              Connecting Austin's soccer community, one game at a time.
+            </p>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Explore
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Games
+                </a>
+              </li>
+              <li>
+                <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Venues
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Support
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                  Contact
+                </a>
+              </li>
+              <li>
+                <a href="terms.html" class="hover:text-green-500 transition-colors">
+                  Terms
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Follow
+            </h4>
+            <div class="flex gap-4">
+              <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="lucide:instagram"></span>
+              </a>
+              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="mdi:whatsapp"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide">
+          <div>© 2025 LaPista.ATX</div>
+          <div class="flex gap-6 mt-4 md:mt-0">
+            <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Use shared configuration
+      const API_URL = LAPISTA_CONFIG.API_URL;
+      const MAX_GUESTS = LAPISTA_CONFIG.MAX_GUESTS;
+      const PRICE_PER_PERSON = LAPISTA_CONFIG.PRICE_PER_PERSON;
+
+      // Get gameId from URL or default to LP-001
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameId = urlParams.get('gameId') || 'LP-001';
+      
+      // Update hidden form field with correct gameId
+      document.getElementById('gameId').value = gameId;
+
+      // Global state
+      let gameData = null;
+      let guests = [];
+
+      // Show error state when game not found
+      function showGameError() {
+        document.getElementById('game-content').classList.add('hidden');
+        document.getElementById('game-error-state').classList.remove('hidden');
+        document.title = 'Game Not Found - LaPista.ATX';
+      }
+
+      // Load game data from API
+      async function loadGameData() {
+        try {
+          const response = await fetch(`${API_URL}/api/games/${gameId}`);
+          if (!response.ok) {
+            showGameError();
+            return;
+          }
+          gameData = await response.json();
+          
+          // Update page title
+          document.title = `${gameData.title} - LaPista.ATX`;
+          
+          // Update game header (find elements by context since no IDs)
+          const h1 = document.querySelector('main h1');
+          if (h1) h1.textContent = gameData.title;
+          
+          // Update date display
+          const dateDiv = document.querySelector('.text-xl.font-bold.text-zinc-900.font-display');
+          if (dateDiv && gameData.date) {
+            dateDiv.textContent = new Date(gameData.date).toLocaleDateString('en-US', { 
+              month: 'long', day: 'numeric', year: 'numeric' 
+            });
+          }
+          
+          // Update time
+          const timeDiv = document.querySelector('.font-mono.text-sm');
+          if (timeDiv && gameData.time) {
+            timeDiv.innerHTML = `<span class="iconify" data-icon="lucide:clock" data-width="1.2em"></span> ${gameData.time}`;
+          }
+          
+          // Update price display
+          const priceEl = document.querySelector('.text-3xl.font-black.text-green-600');
+          if (priceEl) priceEl.textContent = `$${gameData.price.toFixed(2)}`;
+          
+          // Update venue information
+          updateVenueDisplay();
+          
+          // Update availability gauge
+          updateAvailabilityDisplay();
+          
+          // Check if game is full and show waitlist
+          if (gameData.spotsRemaining === 0) {
+            showWaitlistSection();
+          }
+          
+          // Update totals
+          updateTotals();
+          
+          // Update guest button availability
+          updateGuestButtonState();
+
+        } catch (err) {
+          console.error('Failed to load game:', err);
+        }
+      }
+
+      // Update venue display with Google Maps embed
+      function updateVenueDisplay() {
+        if (!gameData || !gameData.venue) return;
+        
+        const venue = gameData.venue;
+        
+        // Update venue name
+        const venueName = document.getElementById('venue-name');
+        if (venueName) venueName.textContent = venue.name;
+        
+        // Update venue address
+        const venueAddress = document.getElementById('venue-address');
+        if (venueAddress) venueAddress.textContent = venue.address;
+        
+        // Update map label
+        const mapLabel = document.getElementById('venue-map-label');
+        if (mapLabel) {
+          // Extract short name (first part before "Fields" or full name)
+          const shortName = venue.name.replace(' Fields', '').replace(' Park', '');
+          mapLabel.textContent = shortName;
+        }
+        
+        // Update directions link
+        const directionsLink = document.getElementById('venue-directions');
+        if (directionsLink && venue.mapsUrl) {
+          directionsLink.href = venue.mapsUrl;
+        } else if (directionsLink && venue.address) {
+          // Fallback: generate Google Maps URL from address
+          directionsLink.href = `https://maps.google.com/?q=${encodeURIComponent(venue.address)}`;
+        }
+        
+        // Update Google Maps embed iframe
+        const mapIframe = document.getElementById('venue-map');
+        if (mapIframe && venue.address) {
+          // Create Google Maps embed URL from address (free embed format, no API key needed)
+          const encodedAddress = encodeURIComponent(venue.address);
+          const embedUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
+          mapIframe.src = embedUrl;
+        }
+      }
+
+      // Update availability display
+      function updateAvailabilityDisplay() {
+        if (!gameData) return;
+        
+        const filled = gameData.capacity - gameData.spotsRemaining;
+        
+        // Update filled text
+        const filledText = document.getElementById('filled-text');
+        if (filledText) filledText.textContent = `${filled} of ${gameData.capacity} FILLED`;
+        
+        // Update progress bar
+        const progressBar = document.getElementById('progress-bar');
+        if (progressBar) {
+          const percentage = (filled / gameData.capacity) * 100;
+          progressBar.style.width = `${percentage}%`;
+        }
+        
+        // Update remaining text
+        const remainingText = document.getElementById('spots-remaining');
+        if (remainingText) remainingText.textContent = `${gameData.spotsRemaining} spots remaining`;
+      }
+
+      // Add a guest row
+      function addGuest() {
+        // Check max guests limit
+        if (guests.length >= MAX_GUESTS) {
+          console.log('Max guests reached');
+          return;
+        }
+        // Check if game data loaded and spots available
+        if (!gameData) {
+          console.log('Game data not loaded yet');
+          return;
+        }
+        // Need at least 2 spots (1 for primary + 1 for guest)
+        if (gameData.spotsRemaining < guests.length + 2) {
+          console.log('Not enough spots remaining');
+          return;
+        }
+        
+        const guestIndex = guests.length;
+        guests.push({ firstName: '', lastName: '' });
+        
+        const container = document.getElementById('guests-container');
+        const guestRow = document.createElement('div');
+        guestRow.id = `guest-row-${guestIndex}`;
+        guestRow.className = 'bg-zinc-50 border border-zinc-200 rounded-lg p-4 relative';
+        guestRow.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-zinc-500 uppercase tracking-wide">Guest ${guestIndex + 1}</span>
+            <button type="button" onclick="removeGuest(${guestIndex})" class="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide flex items-center gap-1 transition-colors">
+              <span class="iconify" data-icon="lucide:x" data-width="1em"></span>
+              Remove
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wide">First Name</label>
+              <input type="text" 
+                     id="guest-${guestIndex}-firstName" 
+                     onchange="updateGuestData(${guestIndex}, 'firstName', this.value)"
+                     class="w-full bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm font-medium text-zinc-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" 
+                     placeholder="First name" 
+                     required>
+            </div>
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wide">Last Name</label>
+              <input type="text" 
+                     id="guest-${guestIndex}-lastName" 
+                     onchange="updateGuestData(${guestIndex}, 'lastName', this.value)"
+                     class="w-full bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm font-medium text-zinc-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" 
+                     placeholder="Last name" 
+                     required>
+            </div>
+          </div>
+        `;
+        container.appendChild(guestRow);
+        
+        updateTotals();
+        updateGuestButtonState();
+      }
+
+      // Remove a guest row
+      function removeGuest(index) {
+        guests.splice(index, 1);
+        rebuildGuestUI();
+        updateTotals();
+        updateGuestButtonState();
+      }
+
+      // Rebuild guest UI after removal (to fix indices)
+      function rebuildGuestUI() {
+        const container = document.getElementById('guests-container');
+        container.innerHTML = '';
+        
+        guests.forEach((guest, index) => {
+          const guestRow = document.createElement('div');
+          guestRow.id = `guest-row-${index}`;
+          guestRow.className = 'bg-zinc-50 border border-zinc-200 rounded-lg p-4 relative';
+          guestRow.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-zinc-500 uppercase tracking-wide">Guest ${index + 1}</span>
+              <button type="button" onclick="removeGuest(${index})" class="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide flex items-center gap-1 transition-colors">
+                <span class="iconify" data-icon="lucide:x" data-width="1em"></span>
+                Remove
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wide">First Name</label>
+                <input type="text" 
+                       id="guest-${index}-firstName" 
+                       value="${guest.firstName}"
+                       onchange="updateGuestData(${index}, 'firstName', this.value)"
+                       class="w-full bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm font-medium text-zinc-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" 
+                       placeholder="First name" 
+                       required>
+              </div>
+              <div class="space-y-1">
+                <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wide">Last Name</label>
+                <input type="text" 
+                       id="guest-${index}-lastName" 
+                       value="${guest.lastName}"
+                       onchange="updateGuestData(${index}, 'lastName', this.value)"
+                       class="w-full bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm font-medium text-zinc-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" 
+                       placeholder="Last name" 
+                       required>
+              </div>
+            </div>
+          `;
+          container.appendChild(guestRow);
+        });
+      }
+
+      // Update guest data in array
+      function updateGuestData(index, field, value) {
+        if (guests[index]) {
+          guests[index][field] = value;
+        }
+      }
+
+      // Update guest button state based on availability
+      function updateGuestButtonState() {
+        const btn = document.getElementById('add-guest-btn');
+        const warning = document.getElementById('no-spots-warning');
+        const remainingText = document.getElementById('guests-remaining');
+        const addGuestText = document.getElementById('add-guest-text');
+        
+        const guestsRemaining = MAX_GUESTS - guests.length;
+        remainingText.textContent = guestsRemaining;
+        
+        // Check if at max guests OR not enough spots
+        const spotsAvailable = gameData ? gameData.spotsRemaining - 1 - guests.length : 0;
+        
+        if (guests.length >= MAX_GUESTS) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.disabled = true;
+          addGuestText.innerHTML = 'Maximum guests reached';
+          warning.classList.add('hidden');
+        } else if (spotsAvailable <= 0) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.disabled = true;
+          warning.classList.remove('hidden');
+        } else {
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          btn.disabled = false;
+          addGuestText.innerHTML = `Add a Guest (<span id="guests-remaining">${guestsRemaining}</span> max)`;
+          warning.classList.add('hidden');
+        }
+      }
+
+      // Update totals
+      function updateTotals() {
+        const totalPlayers = 1 + guests.length;
+        const price = gameData ? gameData.price : PRICE_PER_PERSON;
+        const subtotal = totalPlayers * price;
+        const total = subtotal; // No service fee
+        
+        document.getElementById('playerCount').textContent = totalPlayers;
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('totalAmount').textContent = total.toFixed(2);
+        
+        // Update cash helper text
+        const cashHelpers = document.querySelectorAll('.cash-total');
+        cashHelpers.forEach(el => el.textContent = `$${total.toFixed(2)}`);
+      }
+
+      // Collect guest data from form
+      function collectGuestData() {
+        return guests.map((guest, index) => ({
+          firstName: document.getElementById(`guest-${index}-firstName`)?.value || guest.firstName,
+          lastName: document.getElementById(`guest-${index}-lastName`)?.value || guest.lastName
+        })).filter(g => g.firstName && g.lastName);
+      }
+
+      // Load game data on page load
+      loadGameData();
+      
+      // Check if cancelled from Stripe
+      if (urlParams.get('cancelled') === 'true') {
+        const errorDiv = document.getElementById('form-error');
+        errorDiv.textContent = 'Payment was cancelled. Your spot has not been reserved.';
+        errorDiv.classList.remove('hidden');
+        // Scroll to form
+        document.getElementById('rsvp-form').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      function updatePaymentUI(method) {
+        const btn = document.getElementById('rsvp-submit-btn');
+        const cashHelper = document.getElementById('cash-helper');
+        const cashTotal = document.querySelector('.cash-total');
+        
+        if (method === 'cash') {
+          btn.textContent = 'Reserve Spot';
+          if (cashHelper) {
+            cashHelper.classList.remove('hidden');
+            // Update the cash total display
+            if (cashTotal) {
+              const total = PRICE_PER_PERSON * (1 + guests.length);
+              cashTotal.textContent = '$' + total.toFixed(2);
+            }
+          }
+        } else {
+          btn.textContent = 'Pay Now & Confirm';
+          if (cashHelper) cashHelper.classList.add('hidden');
+        }
+      }
+
+      // Form submission handler
+      document.getElementById('rsvp-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('rsvp-submit-btn');
+        const errorDiv = document.getElementById('form-error');
+        
+        // Validate guests have names
+        const guestData = collectGuestData();
+        if (guests.length > 0 && guestData.length !== guests.length) {
+          errorDiv.textContent = 'Please fill in all guest names.';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        // 📱 Validate phone number (US format)
+        const phoneValue = document.getElementById('phone').value.trim();
+        const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+        if (!phoneRegex.test(phoneValue.replace(/\s/g, ''))) {
+          errorDiv.textContent = 'Please enter a valid phone number.';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+        
+        // Disable button and show loading
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+        errorDiv.classList.add('hidden');
+        
+        // Get form data
+        const formData = {
+          gameId: document.getElementById('gameId').value,
+          firstName: document.getElementById('firstName').value,
+          lastName: document.getElementById('lastName').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          waiverAccepted: document.getElementById('waiver').checked,
+          guests: guestData
+        };
+        
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        
+        try {
+          if (paymentMethod === 'cash') {
+            // Pay at game - direct RSVP
+            const response = await fetch(`${API_URL}/api/rsvp`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to create RSVP');
+            }
+            
+            // Redirect to confirmation page
+            window.location.href = `confirmation-page.html?code=${data.confirmationCode}`;
+            
+          } else {
+            // Pay online - Stripe checkout
+            const response = await fetch(`${API_URL}/api/checkout`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to create checkout');
+            }
+            
+            // Redirect to Stripe
+            window.location.href = data.url;
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          errorDiv.textContent = err.message || 'Something went wrong. Please try again.';
+          errorDiv.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = paymentMethod === 'cash' ? 'Reserve Spot' : 'Pay Now & Confirm';
+        }
+      });
+      
+      // Show waitlist section when game is full
+      function showWaitlistSection() {
+        document.getElementById('waitlist-section').classList.remove('hidden');
+        document.getElementById('rsvp-form-container').classList.add('hidden');
+        document.getElementById('form-section-title').textContent = 'Game Full';
+        loadWaitlistCount();
+      }
+      
+      // Load waitlist count
+      async function loadWaitlistCount() {
+        try {
+          const response = await fetch(`${API_URL}/api/waitlist/${gameId}`);
+          if (response.ok) {
+            const data = await response.json();
+            document.getElementById('waitlist-count').textContent = data.count || 0;
+          }
+        } catch (err) {
+          console.error('Failed to load waitlist count:', err);
+        }
+      }
+      
+      // Handle waitlist form submission
+      document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('waitlist-btn');
+        const errorDiv = document.getElementById('waitlist-error');
+        const successDiv = document.getElementById('waitlist-success');
+        
+        btn.disabled = true;
+        btn.textContent = 'Joining...';
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        
+        try {
+          const response = await fetch(`${API_URL}/api/waitlist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gameId: gameId,
+              name: document.getElementById('waitlist-name').value,
+              email: document.getElementById('waitlist-email').value,
+              phone: document.getElementById('waitlist-phone').value || undefined
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to join waitlist');
+          }
+          
+          // Show success
+          successDiv.classList.remove('hidden');
+          btn.textContent = 'On Waitlist!';
+          document.getElementById('waitlist-form').reset();
+          loadWaitlistCount();
+          
+        } catch (err) {
+          errorDiv.textContent = err.message;
+          errorDiv.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = 'Join Waitlist';
+        }
+      });
+    </script>
+    
+    <script>
+      function toggleMobileMenu() {
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const panel = document.getElementById('mobile-menu-panel');
+        overlay.classList.toggle('hidden');
+        panel.classList.toggle('-translate-x-full');
+      }
+    </script>
+  
+</body></html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed - LaPista.ATX</title>
+<meta name="description" content="Your RSVP is confirmed! View your booking details and get ready for game day.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+  <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-zinc-200">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <a href="index.html" class="flex items-center group">
+            <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+          </a>
+          <div class="hidden md:flex items-center gap-6">
+            <a href="index.html#schedule" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+              Games
+            </a>
+            <a href="about-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+              About
+            </a>
+            <a href="faq-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+              FAQ
+            </a>
+            <a href="contact-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+              Contact
+            </a>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="index.html" class="hidden md:flex items-center gap-2 text-xs font-bold uppercase text-zinc-900 hover:text-green-600 transition-colors">
+            <span class="iconify" data-icon="lucide:arrow-left" data-width="16"></span>
+            Back to Schedule
+          </a>
+          <button class="md:hidden text-zinc-900">
+            <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar (Kept for consistency) -->
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full relative">
+      <!-- Header -->
+
+      <!-- Confirmation Content -->
+      <div class="w-full p-4 md:p-8">
+        <div class="max-w-lg mx-auto w-full pt-8 pb-20">
+          <!-- Success Message -->
+          <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-6 relative">
+              <span class="iconify text-5xl" data-icon="lucide:check" data-width="2"></span>
+              <div class="absolute inset-0 border-4 border-green-50 rounded-full animate-ping opacity-20"></div>
+            </div>
+            <h1 class="text-5xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
+              YOU'RE
+              <span class="text-green-600">IN!</span>
+            </h1>
+            <p class="text-zinc-500 text-lg font-medium">
+              Your spot is confirmed.
+            </p>
+          </div>
+
+          <!-- Booking Summary Card -->
+          <div class="bg-white border border-zinc-200 rounded-lg shadow-sm relative overflow-hidden mb-6 group">
+            <!-- Decorative Top -->
+            <div class="h-2 bg-zinc-900 w-full"></div>
+            <div class="h-1 bg-green-500 w-full"></div>
+
+            <div class="p-8 pb-0">
+              <div class="flex justify-between items-start mb-6">
+                <div>
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                    Booking Ref
+                  </div>
+                  <div id="conf-code" class="text-2xl font-mono font-bold text-zinc-900 tracking-wider">
+                    Loading...
+                  </div>
+                </div>
+                <div id="qr-code-container" class="bg-zinc-100 p-2 rounded-md">
+                  <canvas id="qr-code" width="48" height="48"></canvas>
+                </div>
+              </div>
+
+              <h2 id="conf-game-title" class="text-3xl font-black uppercase tracking-tight italic font-display text-zinc-900 mb-1 leading-none">
+                Loading...
+              </h2>
+
+              <div class="flex items-center gap-2 text-green-600 font-bold text-sm uppercase tracking-wide mb-6">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Confirmed
+              </div>
+
+              <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                  <span class="iconify text-zinc-400 mt-0.5 shrink-0" data-icon="lucide:calendar" data-width="1.5"></span>
+                  <div>
+                    <div id="conf-date" class="text-sm font-bold text-zinc-900">
+                      --
+                    </div>
+                    <div id="conf-time" class="text-xs font-medium text-zinc-500 uppercase">
+                      --
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="iconify text-zinc-400 mt-0.5 shrink-0" data-icon="lucide:map-pin" data-width="1.5"></span>
+                  <div>
+                    <div id="conf-venue" class="text-sm font-bold text-zinc-900">
+                      --
+                    </div>
+                    <div id="conf-address" class="text-xs font-medium text-zinc-500">
+                      --
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="iconify text-zinc-400 mt-0.5 shrink-0" data-icon="lucide:users" data-width="1.5"></span>
+                  <div class="flex-1">
+                    <div id="conf-players" class="text-sm font-bold text-zinc-900">-- People</div>
+                    <div id="conf-reserved-by" class="text-xs font-medium text-zinc-500 mb-2">
+                      Reserved by --
+                    </div>
+                    <!-- Players List -->
+                    <div id="conf-players-list" class="space-y-1 hidden">
+                      <!-- Will be populated by JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Perforated Line -->
+            <div class="relative flex items-center w-full my-6">
+              <div class="w-4 h-8 bg-[#FAFAFA] rounded-r-full border-y border-r border-zinc-200 -ml-[1px]"></div>
+              <div class="flex-1 border-b-2 border-dashed border-zinc-200 h-px"></div>
+              <div class="w-4 h-8 bg-[#FAFAFA] rounded-l-full border-y border-l border-zinc-200 -mr-[1px]"></div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="px-8 pb-8 pt-0">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                    Total
+                  </div>
+                  <div id="conf-total" class="text-xl font-bold text-zinc-900">$--</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                    Status
+                  </div>
+                  <div id="conf-payment-status" class="inline-flex items-center px-2 py-1 rounded bg-green-50 text-green-700 border border-green-200 text-[10px] font-black uppercase tracking-wide">
+                    --
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <button id="add-to-calendar-btn" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-md font-bold text-sm uppercase tracking-wide transition-all shadow-md shadow-green-900/10">
+              <span class="iconify" data-icon="lucide:calendar-plus" data-width="1.5"></span>
+              Add to Calendar
+            </button>
+            <button id="share-btn" class="flex items-center justify-center gap-2 bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 py-3 px-4 rounded-md font-bold text-sm uppercase tracking-wide transition-all">
+              <span class="iconify" data-icon="lucide:share-2" data-width="1.5"></span>
+              Share Game
+            </button>
+          </div>
+
+          <div class="text-center mb-10">
+            <a href="game-details.html" class="text-xs font-bold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide inline-flex items-center gap-1 group">
+              View Game Details
+              <span class="iconify group-hover:translate-x-0.5 transition-transform" data-icon="lucide:arrow-right" data-width="1.2"></span>
+            </a>
+          </div>
+
+          <!-- Pay at Game Section (Only shows for cash payments) -->
+          <div id="pay-at-game-section" class="hidden mb-8">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="iconify text-amber-600" data-icon="lucide:wallet" data-width="1.5"></span>
+                <h3 class="text-sm font-black text-amber-800 uppercase tracking-wide font-display">
+                  Payment Due at Game
+                </h3>
+              </div>
+              <p class="text-sm text-amber-700 font-medium mb-4">
+                Bring <span id="pay-at-game-amount" class="font-bold">$5.99</span> cash to the game, or pay in advance below.
+              </p>
+              
+              <div class="border-t border-amber-200 pt-4 mt-4">
+                <p class="text-xs font-bold text-amber-600 uppercase tracking-wide mb-4 text-center">
+                  — Or Pay in Advance —
+                </p>
+                
+                <!-- CashApp QR -->
+                <div class="bg-white rounded-lg p-4 border border-amber-200 mb-4">
+                  <div class="flex flex-col items-center">
+                    <div class="w-32 h-32 bg-zinc-100 border-2 border-dashed border-zinc-300 rounded-lg flex items-center justify-center mb-3">
+                      <div class="text-center">
+                        <span class="iconify text-4xl text-zinc-400" data-icon="lucide:qr-code"></span>
+                        <p class="text-[10px] text-zinc-400 font-medium mt-1">QR Placeholder</p>
+                      </div>
+                    </div>
+                    <p class="text-sm font-bold text-zinc-900 mb-1">Scan to Pay via Cash App</p>
+                    <p class="text-xs text-zinc-500 font-medium">$LaPistaATX</p>
+                  </div>
+                </div>
+                
+                <!-- Pay Online Instead Button -->
+                <a id="pay-online-btn" href="#" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white text-center font-bold text-sm uppercase tracking-wide rounded transition-all">
+                  <span class="iconify inline-block mr-2" data-icon="lucide:credit-card" data-width="1.2"></span>
+                  Pay Online Instead
+                </a>
+                <p class="text-[10px] text-center text-amber-600 font-medium mt-2">
+                  Secure payment via Stripe
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Info -->
+          <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6 mb-8">
+            <h3 class="text-xs font-black text-zinc-900 uppercase tracking-widest mb-4 font-display flex items-center gap-2">
+              <span class="iconify text-green-600" data-icon="lucide:info" data-width="1.5"></span>
+              Important Info
+            </h3>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 mt-1.5"></span>
+                <span class="text-sm text-zinc-600 font-medium">
+                  Bring turf shoes or cleats (no metal studs).
+                </span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 mt-1.5"></span>
+                <span class="text-sm text-zinc-600 font-medium">
+                  Bring a white and a dark shirt just in case.
+                </span>
+              </li>
+              <li class="pt-2">
+                <a id="conf-maps-link" href="#" target="_blank" class="flex items-center gap-2 text-xs font-bold text-green-600 uppercase hover:underline">
+                  <span class="iconify" data-icon="lucide:map" data-width="1.2"></span>
+                  Open Location in Maps
+                </a>
+              </li>
+              <li>
+                <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex items-center gap-2 text-xs font-bold text-green-600 uppercase hover:underline">
+                  <span class="iconify" data-icon="mdi:whatsapp" data-width="1.2"></span>
+                  Join Game WhatsApp Group
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Email Note -->
+          <div class="text-center mb-8 px-4">
+            <p class="text-sm text-zinc-500 font-medium mb-1">
+              A confirmation email has been sent to
+              <span id="conf-email" class="text-zinc-900 font-bold">your email</span>
+            </p>
+            <p class="text-xs text-zinc-400">
+              Check your spam folder if you don't see it.
+            </p>
+          </div>
+
+          <!-- Cancellation -->
+          <div class="border-t border-dashed border-zinc-200 pt-6 text-center">
+            <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">
+              Need to cancel?
+            </p>
+            <a id="cancel-booking-link" href="#" class="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide border-b border-red-200 pb-0.5 hover:border-red-500 transition-all">
+              Cancel Booking
+            </a>
+            <p class="text-[10px] text-zinc-400 mt-3 font-medium">
+              Paid bookings are eligible for a full refund.
+            </p>
+          </div>
+        </div>
+
+        <!-- Minimal Footer -->
+        <footer class="text-center pb-8 pt-4">
+          <div class="flex items-center justify-center gap-4 mb-4">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="text-zinc-300 hover:text-zinc-500 transition-colors">
+              <span class="iconify" data-icon="lucide:instagram" data-width="18"></span>
+            </a>
+            <a href="mailto:lapista.atx@gmail.com" class="text-zinc-300 hover:text-zinc-500 transition-colors">
+              <span class="iconify" data-icon="lucide:mail" data-width="18"></span>
+            </a>
+          </div>
+          <div class="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+            © 2025 LaPista.ATX
+          </div>
+        </footer>
+      </div>
+    </main>
+
+    <script>
+      // Use shared configuration
+      const API_URL = LAPISTA_CONFIG.API_URL;
+
+      // Get confirmation code from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const confirmationCode = urlParams.get('code');
+
+      if (!confirmationCode) {
+        document.getElementById('conf-code').textContent = 'No code provided';
+        document.getElementById('conf-game-title').textContent = 'Invalid Booking';
+      } else {
+        // Fetch RSVP data
+        fetch(`${API_URL}/api/rsvp/${confirmationCode}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              document.getElementById('conf-code').textContent = 'Not Found';
+              document.getElementById('conf-game-title').textContent = 'Booking Not Found';
+              return;
+            }
+
+            const { rsvp, game } = data;
+            
+            // Populate confirmation details
+            document.getElementById('conf-code').textContent = '#' + rsvp.confirmationCode;
+            document.getElementById('conf-game-title').textContent = game.title;
+            document.getElementById('conf-date').textContent = new Date(game.date).toLocaleDateString('en-US', { 
+              weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+            });
+            document.getElementById('conf-time').textContent = game.time;
+            document.getElementById('conf-venue').textContent = game.venue.name;
+            document.getElementById('conf-address').textContent = game.venue.address;
+            document.getElementById('conf-players').textContent = rsvp.totalPlayers + (rsvp.totalPlayers === 1 ? ' Person' : ' People');
+            document.getElementById('conf-reserved-by').textContent = 'Reserved by ' + rsvp.player.firstName + ' ' + rsvp.player.lastName;
+            document.getElementById('conf-total').textContent = '$' + rsvp.totalAmount.toFixed(2);
+            document.getElementById('conf-email').textContent = rsvp.player.email;
+            
+            // Build players list (main player + guests)
+            const playersList = document.getElementById('conf-players-list');
+            if (rsvp.totalPlayers > 1) {
+              playersList.classList.remove('hidden');
+              
+              // Clear existing content safely
+              playersList.innerHTML = '';
+              
+              // Add main player (safe DOM creation)
+              const mainPlayerDiv = document.createElement('div');
+              mainPlayerDiv.className = 'flex items-center gap-2 text-xs';
+              
+              const mainBadge = document.createElement('span');
+              mainBadge.className = 'w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-[10px] font-bold';
+              mainBadge.textContent = '1';
+              
+              const mainName = document.createElement('span');
+              mainName.className = 'font-medium text-zinc-700';
+              mainName.textContent = `${rsvp.player.firstName} ${rsvp.player.lastName}`;
+              
+              const mainLabel = document.createElement('span');
+              mainLabel.className = 'text-zinc-400';
+              mainLabel.textContent = '(You)';
+              
+              mainPlayerDiv.appendChild(mainBadge);
+              mainPlayerDiv.appendChild(mainName);
+              mainPlayerDiv.appendChild(mainLabel);
+              playersList.appendChild(mainPlayerDiv);
+              
+              // Add guests (safe DOM creation - prevents XSS)
+              if (rsvp.guests && rsvp.guests.length > 0) {
+                rsvp.guests.forEach((guest, index) => {
+                  const guestDiv = document.createElement('div');
+                  guestDiv.className = 'flex items-center gap-2 text-xs';
+                  
+                  const guestBadge = document.createElement('span');
+                  guestBadge.className = 'w-5 h-5 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center text-[10px] font-bold';
+                  guestBadge.textContent = (index + 2).toString();
+                  
+                  const guestName = document.createElement('span');
+                  guestName.className = 'font-medium text-zinc-700';
+                  guestName.textContent = `${guest.firstName} ${guest.lastName}`;
+                  
+                  const guestLabel = document.createElement('span');
+                  guestLabel.className = 'text-zinc-400';
+                  guestLabel.textContent = '(Guest)';
+                  
+                  guestDiv.appendChild(guestBadge);
+                  guestDiv.appendChild(guestName);
+                  guestDiv.appendChild(guestLabel);
+                  playersList.appendChild(guestDiv);
+                });
+              }
+            }
+            
+            // Payment status and pay-at-game section
+            const statusEl = document.getElementById('conf-payment-status');
+            const payAtGameSection = document.getElementById('pay-at-game-section');
+            
+            if (rsvp.paymentMethod === 'online' && rsvp.paymentStatus === 'paid') {
+              statusEl.textContent = 'Paid via Card';
+              statusEl.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+            } else if (rsvp.paymentMethod === 'cash') {
+              statusEl.textContent = 'Pay at Game';
+              statusEl.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');
+              statusEl.classList.add('bg-amber-50', 'text-amber-700', 'border-amber-200');
+              
+              // Show pay-at-game section
+              payAtGameSection.classList.remove('hidden');
+              document.getElementById('pay-at-game-amount').textContent = '$' + rsvp.totalAmount.toFixed(2);
+              
+              // Set up pay online button to redirect to game details
+              document.getElementById('pay-online-btn').href = `game-details.html?gameId=${game.gameId}&upgrade=${rsvp.confirmationCode}`;
+            } else {
+              statusEl.textContent = rsvp.paymentStatus;
+            }
+
+            // Maps link
+            if (game.venue.mapsUrl) {
+              document.getElementById('conf-maps-link').href = game.venue.mapsUrl;
+            }
+            
+            // Update cancel link to use self-service cancellation page
+            const cancelLink = document.getElementById('cancel-booking-link');
+            if (cancelLink) {
+              cancelLink.href = `cancel.html?code=${rsvp.confirmationCode}`;
+            }
+            
+            // Generate QR code with confirmation URL
+            const qrCanvas = document.getElementById('qr-code');
+            const confirmationUrl = `${window.location.origin}/confirmation-page.html?code=${rsvp.confirmationCode}`;
+            QRCode.toCanvas(qrCanvas, confirmationUrl, {
+              width: 48,
+              margin: 0,
+              color: { dark: '#18181b', light: '#f4f4f5' }
+            }, function(error) {
+              if (error) console.error('QR code error:', error);
+            });
+
+            // Setup Add to Calendar button
+            const calendarBtn = document.getElementById('add-to-calendar-btn');
+            if (calendarBtn) {
+              calendarBtn.onclick = () => addToCalendar(game, rsvp);
+            }
+
+            // Setup Share button (using id for broader browser compatibility)
+            const shareBtn = document.getElementById('share-btn');
+            if (shareBtn) {
+              shareBtn.onclick = () => shareGame(game, rsvp);
+            }
+          })
+          .catch(err => {
+            console.error('Error loading confirmation:', err);
+            document.getElementById('conf-code').textContent = 'Error';
+            document.getElementById('conf-game-title').textContent = 'Failed to load';
+          });
+      }
+
+      // Add to Calendar function - generates .ics file download
+      function addToCalendar(game, rsvp) {
+        const gameDate = new Date(game.date);
+        // Parse time like "8:00 PM" into hours/minutes
+        const timeMatch = game.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (timeMatch) {
+          let hours = parseInt(timeMatch[1]);
+          const minutes = parseInt(timeMatch[2]);
+          const meridiem = timeMatch[3].toUpperCase();
+          if (meridiem === 'PM' && hours !== 12) hours += 12;
+          if (meridiem === 'AM' && hours === 12) hours = 0;
+          gameDate.setHours(hours, minutes, 0, 0);
+        }
+
+        const endDate = new Date(gameDate.getTime() + 60 * 60 * 1000); // 1 hour later
+        
+        // Format dates for ICS (YYYYMMDDTHHMMSS)
+        const formatICSDate = (date) => {
+          return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+
+        const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//LaPista.ATX//Pickup Soccer//EN
+BEGIN:VEVENT
+UID:${rsvp.confirmationCode}@lapista.atx
+DTSTAMP:${formatICSDate(new Date())}
+DTSTART:${formatICSDate(gameDate)}
+DTEND:${formatICSDate(endDate)}
+SUMMARY:${game.title} - LaPista.ATX
+DESCRIPTION:Confirmation: ${rsvp.confirmationCode}\\nPlayers: ${rsvp.totalPlayers}\\n\\nBring a white and dark shirt!
+LOCATION:${game.venue.name}, ${game.venue.address}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+        // Create blob and trigger download
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `lapista-${rsvp.confirmationCode}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      }
+
+      // Share Game function - uses Web Share API or fallback
+      function shareGame(game, rsvp) {
+        const shareUrl = `${window.location.origin}/game-details.html?gameId=${game.gameId}`;
+        const shareText = `Join me for pickup soccer at ${game.venue.name}! ${game.title} on ${new Date(game.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at ${game.time}.`;
+
+        // Try Web Share API (mobile/supported browsers)
+        if (navigator.share) {
+          navigator.share({
+            title: `${game.title} - LaPista.ATX`,
+            text: shareText,
+            url: shareUrl
+          }).catch(err => {
+            if (err.name !== 'AbortError') {
+              console.error('Share failed:', err);
+              fallbackShare(shareUrl);
+            }
+          });
+        } else {
+          // Fallback: copy to clipboard
+          fallbackShare(shareUrl);
+        }
+      }
+
+      function fallbackShare(url) {
+        navigator.clipboard.writeText(url).then(() => {
+          // Show toast notification
+          const toast = document.createElement('div');
+          toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg z-50';
+          toast.textContent = '✓ Link copied to clipboard!';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          alert('Share link: ' + url);
+        });
+      }
+    </script>
+  
+</body></html>

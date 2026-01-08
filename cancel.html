@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancel Booking - LaPista.ATX</title>
+<meta name="description" content="Cancel your RSVP for LaPista.ATX pickup soccer.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+</head>
+<body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-zinc-200">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center group">
+        <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+      </a>
+    </div>
+  </nav>
+
+  <main class="flex-1 w-full max-w-lg mx-auto px-4 py-12">
+    <!-- Loading State -->
+    <div id="loading-state" class="text-center py-16">
+      <div class="w-12 h-12 border-4 border-zinc-200 border-t-green-500 rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-zinc-500 font-medium">Loading booking details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="hidden text-center py-16">
+      <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="iconify text-red-500 text-4xl" data-icon="lucide:alert-circle"></span>
+      </div>
+      <h1 class="text-2xl font-bold text-zinc-900 mb-2">Booking Not Found</h1>
+      <p id="error-message" class="text-zinc-500 mb-6">We couldn't find this booking.</p>
+      <a href="index.html" class="inline-flex items-center gap-2 text-green-600 font-bold hover:underline">
+        <span class="iconify" data-icon="lucide:arrow-left"></span>
+        Back to Home
+      </a>
+    </div>
+
+    <!-- Cancellation Form -->
+    <div id="cancel-form-state" class="hidden">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="iconify text-amber-500 text-3xl" data-icon="lucide:alert-triangle"></span>
+        </div>
+        <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
+          Cancel Booking
+        </h1>
+        <p class="text-zinc-500">Are you sure you want to cancel?</p>
+      </div>
+
+      <!-- Booking Details -->
+      <div class="bg-white border border-zinc-200 rounded-lg p-6 mb-6">
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-sm text-zinc-500">Confirmation</span>
+            <span id="detail-code" class="text-sm font-bold text-zinc-900">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-zinc-500">Game</span>
+            <span id="detail-game" class="text-sm font-bold text-zinc-900">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-zinc-500">Date</span>
+            <span id="detail-date" class="text-sm font-bold text-zinc-900">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-zinc-500">Players</span>
+            <span id="detail-players" class="text-sm font-bold text-zinc-900">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-zinc-500">Amount</span>
+            <span id="detail-amount" class="text-sm font-bold text-zinc-900">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refund Notice -->
+      <div id="refund-notice" class="hidden bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <span class="iconify text-green-600 mt-0.5" data-icon="lucide:credit-card"></span>
+          <div>
+            <p class="text-sm font-bold text-green-800">Refund Eligible</p>
+            <p class="text-xs text-green-700">Your payment will be refunded within 5-10 business days.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Verification -->
+      <form id="cancel-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">
+            Confirm Your Email
+          </label>
+          <input type="email" id="confirm-email" required 
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none"
+                 placeholder="Enter the email used for booking">
+        </div>
+        
+        <div id="form-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
+
+        <button type="submit" id="cancel-btn" 
+                class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-sm rounded transition-all">
+          Cancel My Booking
+        </button>
+        
+        <a href="index.html" class="block text-center text-sm font-bold text-zinc-500 hover:text-zinc-700 uppercase tracking-wide">
+          Keep My Booking
+        </a>
+      </form>
+    </div>
+
+    <!-- Success State -->
+    <div id="success-state" class="hidden text-center py-8">
+      <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="iconify text-green-600 text-4xl" data-icon="lucide:check"></span>
+      </div>
+      <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
+        Cancelled
+      </h1>
+      <p class="text-zinc-500 mb-2">Your booking has been cancelled.</p>
+      <p id="refund-message" class="text-sm text-green-600 font-medium mb-8 hidden">
+        Your refund will be processed within 5-10 business days.
+      </p>
+      <a href="index.html" class="inline-flex items-center gap-2 bg-zinc-900 hover:bg-green-600 text-white py-3 px-6 rounded-md font-bold text-sm uppercase tracking-wide transition-all">
+        <span class="iconify" data-icon="lucide:calendar"></span>
+        Browse Games
+      </a>
+    </div>
+  </main>
+
+  <script>
+    const API_URL = LAPISTA_CONFIG.API_URL;
+    const urlParams = new URLSearchParams(window.location.search);
+    const confirmationCode = urlParams.get('code');
+
+    let bookingData = null;
+
+    // Show/hide states
+    function showState(state) {
+      ['loading-state', 'error-state', 'cancel-form-state', 'success-state'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(state).classList.remove('hidden');
+    }
+
+    // Load booking details
+    async function loadBooking() {
+      if (!confirmationCode) {
+        document.getElementById('error-message').textContent = 'No confirmation code provided.';
+        showState('error-state');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/rsvp/${confirmationCode}`);
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          document.getElementById('error-message').textContent = data.error || 'Booking not found.';
+          showState('error-state');
+          return;
+        }
+
+        bookingData = data;
+        const { rsvp, game } = data;
+
+        // Check if already cancelled
+        if (rsvp.status === 'cancelled') {
+          document.getElementById('error-message').textContent = 'This booking has already been cancelled.';
+          showState('error-state');
+          return;
+        }
+
+        // Populate details
+        document.getElementById('detail-code').textContent = rsvp.confirmationCode;
+        document.getElementById('detail-game').textContent = game.title;
+        document.getElementById('detail-date').textContent = new Date(game.date).toLocaleDateString('en-US', {
+          weekday: 'long', month: 'long', day: 'numeric'
+        });
+        document.getElementById('detail-players').textContent = rsvp.totalPlayers + ' player(s)';
+        document.getElementById('detail-amount').textContent = '$' + rsvp.totalAmount.toFixed(2);
+
+        // Show refund notice if paid online
+        if (rsvp.paymentMethod === 'online' && rsvp.paymentStatus === 'paid') {
+          document.getElementById('refund-notice').classList.remove('hidden');
+        }
+
+        showState('cancel-form-state');
+      } catch (err) {
+        console.error('Load error:', err);
+        document.getElementById('error-message').textContent = 'Failed to load booking details.';
+        showState('error-state');
+      }
+    }
+
+    // Handle cancellation
+    document.getElementById('cancel-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('confirm-email').value.trim();
+      const btn = document.getElementById('cancel-btn');
+      const errorDiv = document.getElementById('form-error');
+
+      btn.disabled = true;
+      btn.textContent = 'Cancelling...';
+      errorDiv.classList.add('hidden');
+
+      try {
+        const response = await fetch(`${API_URL}/api/rsvp/${confirmationCode}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to cancel');
+        }
+
+        // Show refund message if applicable
+        if (data.refund) {
+          document.getElementById('refund-message').classList.remove('hidden');
+        }
+
+        showState('success-state');
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Cancel My Booking';
+      }
+    });
+
+    // Load on page load
+    loadBooking();
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "lapista-atx",
+  "version": "1.0.0",
+  "description": "LaPista.ATX - Austin's Pickup Soccer Community",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "node api/server.js"
+  },
+  "keywords": [
+    "soccer",
+    "pickup",
+    "austin",
+    "sports"
+  ],
+  "author": "LaPista.ATX",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.1",
+    "resend": "^6.6.0",
+    "stripe": "^20.1.0"
+  }
+}

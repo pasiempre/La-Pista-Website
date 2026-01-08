@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us - LaPista.ATX</title>
+<meta name="description" content="Learn about LaPista.ATX - Austin's pickup soccer community. Founded in 2023, we organize weekly games for players of all skill levels.">
+<meta name="keywords" content="LaPista, Austin soccer, pickup soccer community, about us">
+<meta property="og:title" content="About LaPista.ATX">
+<meta property="og:description" content="Austin's pickup soccer community. No egos, just the beautiful game.">
+<meta property="og:image" content="/LaPista Logo 1.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+</head>
+  <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+    <!-- Mobile Menu Panel -->
+    <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between p-6 border-b border-zinc-800">
+        <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">LaPista<span class="text-green-500">.ATX</span></span>
+        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
+          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+        <nav class="flex flex-col gap-4">
+          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Games</a>
+          <a href="about-page.html" class="text-3xl font-black text-green-500 uppercase italic font-display tracking-tight">About</a>
+          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">FAQ</a>
+          <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Contact</a>
+        </nav>
+        <div class="border-t border-zinc-800 pt-8 mt-auto">
+          <div class="flex gap-4">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="lucide:instagram"></span>
+            </a>
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:whatsapp"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Navbar -->
+    <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()">
+          <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+        </button>
+        <a href="index.html" class="flex items-center group">
+          <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <nav class="hidden md:flex items-center gap-6 mr-4">
+          <a href="index.html#schedule" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            Games
+          </a>
+          <a href="about-page.html" class="text-xs font-bold uppercase tracking-wide text-green-600 transition-colors">
+            About
+          </a>
+          <a href="faq-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            FAQ
+          </a>
+          <a href="contact-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+            Contact
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-1 w-full relative z-10">
+      
+      <!-- Hero Section -->
+      <section class="border-b border-zinc-200 border-dashed bg-white">
+        <div class="max-w-4xl mx-auto px-4 md:px-6 pt-16 pb-12">
+          <div class="mb-4">
+            <span class="px-2 py-1 rounded text-[10px] font-black bg-zinc-100 text-zinc-500 border border-zinc-200 uppercase tracking-wider inline-block mb-4">
+              Est. 2025 • Austin, Texas
+            </span>
+          </div>
+          <h1 class="text-6xl md:text-8xl font-black text-zinc-900 uppercase tracking-tighter italic font-display leading-[0.85] mb-8">
+            About <br>
+            <span class="text-green-600">LaPista</span>
+          </h1>
+          <p class="text-lg md:text-xl text-zinc-500 max-w-2xl font-medium leading-relaxed">
+            We are redefining the pickup culture in Austin. No memberships, no commitments—just pure football for the love of the game.
+          </p>
+        </div>
+      </section>
+
+      <!-- Photo Collage Grid -->
+      <section class="max-w-6xl mx-auto px-4 md:px-6 py-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 h-96">
+          <div class="col-span-1 md:col-span-2 row-span-2 bg-zinc-200 rounded-lg overflow-hidden relative group">
+            <div class="absolute inset-0 bg-zinc-400 mix-blend-multiply opacity-20 group-hover:opacity-0 transition-opacity duration-700"></div>
+            <!-- Placeholder for Hero Image -->
+            <div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105" style="background-image: url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&amp;w=1200&amp;auto=format&amp;fit=crop');"></div>
+            <div class="absolute bottom-4 left-4">
+               <span class="text-white text-xs font-bold uppercase tracking-widest bg-zinc-900/80 px-2 py-1 rounded backdrop-blur-sm">Community First</span>
+            </div>
+          </div>
+          <div class="col-span-1 bg-zinc-100 rounded-lg overflow-hidden relative group">
+            <div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" style="background-image: url('https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&amp;w=600&amp;auto=format&amp;fit=crop');"></div>
+          </div>
+          <div class="col-span-1 bg-zinc-100 rounded-lg overflow-hidden relative group">
+             <div class="w-full h-full bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" style="background-image: url('https://images.unsplash.com/photo-1575361204480-aadea25e6e68?q=80&amp;w=600&amp;auto=format&amp;fit=crop');"></div>
+          </div>
+          <div class="col-span-2 bg-zinc-900 rounded-lg overflow-hidden relative flex items-center justify-center p-6">
+            <div class="text-center">
+              <span class="iconify text-green-500 text-4xl mb-2 mx-auto" data-icon="lucide:quote" data-width="1.5"></span>
+              <p class="text-white font-display uppercase tracking-tight text-xl italic leading-tight">"Football is the one thing that brings us all together."</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Content Sections -->
+      <div class="max-w-4xl mx-auto px-4 md:px-6 pb-20 space-y-20">
+        
+        <!-- Our Story -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div class="order-2 md:order-1">
+             <h3 class="text-xs font-black text-green-600 uppercase tracking-widest font-display mb-3">Our Story</h3>
+             <h2 class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display mb-6">Born from the <br> Sidelines</h2>
+             <div class="space-y-4 text-sm font-medium text-zinc-600 leading-relaxed">
+               <p>
+                 LaPista started in 2025 by two brothers who love the beautiful game but struggled to find quality, consistent pickup games in Austin.
+               </p>
+               <p>
+                 Tired of cancelled games, uneven teams, and expensive league fees, we decided to build a platform that strips away the bureaucracy and focuses on what matters: playing.
+               </p>
+               <p>
+                 What began as a single WhatsApp group has grown into a city-wide network of players, from beginners to former pros, united by the pitch.
+               </p>
+             </div>
+          </div>
+          <div class="order-1 md:order-2">
+            <div class="bg-white p-2 rounded-xl border border-zinc-200 rotate-2 hover:rotate-0 transition-transform duration-500 shadow-sm">
+              <div class="aspect-[4/5] bg-zinc-100 rounded-lg overflow-hidden grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Founder Placeholder -->
+                <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1533031024623-2895b6c38221?q=80&amp;w=600&amp;auto=format&amp;fit=crop');"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="border-y border-zinc-200 border-dashed py-12">
+          <div class="text-center max-w-2xl mx-auto mb-12">
+            <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-3">Our Mission</h3>
+            <h2 class="text-3xl md:text-4xl font-black text-zinc-900 uppercase tracking-tighter font-display">
+              Building Austin's <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-400">Community</span>
+            </h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white border border-zinc-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div class="w-10 h-10 rounded bg-green-50 text-green-600 flex items-center justify-center mb-4">
+                <span class="iconify text-xl" data-icon="lucide:heart-handshake" data-width="1.5"></span>
+              </div>
+              <h4 class="font-display font-bold text-lg uppercase mb-2">Inclusivity</h4>
+              <p class="text-xs text-zinc-500 font-medium leading-relaxed">
+                We believe football is for everyone. All backgrounds, all skill levels, all genders. No ego allowed on our fields.
+              </p>
+            </div>
+            <div class="bg-white border border-zinc-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div class="w-10 h-10 rounded bg-zinc-100 text-zinc-900 flex items-center justify-center mb-4">
+                <span class="iconify text-xl" data-icon="lucide:map-pin" data-width="1.5"></span>
+              </div>
+              <h4 class="font-display font-bold text-lg uppercase mb-2">Access</h4>
+              <p class="text-xs text-zinc-500 font-medium leading-relaxed">
+                We unlock underutilized urban spaces and turn them into vibrant pitches. "La Pista" means "The Court" or "The Track" – anywhere can be a game.
+              </p>
+            </div>
+            <div class="bg-white border border-zinc-200 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div class="w-10 h-10 rounded bg-zinc-100 text-zinc-900 flex items-center justify-center mb-4">
+                <span class="iconify text-xl" data-icon="lucide:zap" data-width="1.5"></span>
+              </div>
+              <h4 class="font-display font-bold text-lg uppercase mb-2">Quality</h4>
+              <p class="text-xs text-zinc-500 font-medium leading-relaxed">
+                Bibs, balls, organized teams, and dedicated hosts. We handle the logistics so you can focus on the game.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Experience (Checklist style) -->
+        <div>
+          <div class="flex flex-col md:flex-row gap-8">
+            <div class="md:w-1/2">
+              <h3 class="text-xs font-black text-green-600 uppercase tracking-widest font-display mb-3">The Experience</h3>
+              <h2 class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display mb-4">What to Expect</h2>
+              <p class="text-sm font-medium text-zinc-600 mb-6">
+                Every LaPista game follows a standard to ensure safety and fun. Here is how we do things differently.
+              </p>
+              <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold bg-zinc-900 text-white px-5 py-3 rounded hover:bg-green-600 transition-colors uppercase tracking-wide">
+                Find a Game
+                <span class="iconify" data-icon="lucide:arrow-right" data-width="1.5"></span>
+              </a>
+            </div>
+            <div class="md:w-1/2">
+               <ul class="space-y-4">
+                 <li class="flex items-start gap-4 p-4 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                   <div class="mt-1 text-green-600 shrink-0">
+                     <span class="iconify" data-icon="lucide:check-circle" data-width="1.5"></span>
+                   </div>
+                   <div>
+                     <h4 class="font-bold text-sm uppercase text-zinc-900">Dedicated Field Host</h4>
+                     <p class="text-xs text-zinc-500 mt-1">A staff member is always present to organize teams, keep time, and ensure fair play.</p>
+                   </div>
+                 </li>
+                 <li class="flex items-start gap-4 p-4 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                   <div class="mt-1 text-green-600 shrink-0">
+                     <span class="iconify" data-icon="lucide:check-circle" data-width="1.5"></span>
+                   </div>
+                   <div>
+                     <h4 class="font-bold text-sm uppercase text-zinc-900">Equipment Provided</h4>
+                     <p class="text-xs text-zinc-500 mt-1">Freshly washed bibs and match-quality balls provided at every single session.</p>
+                   </div>
+                 </li>
+                 <li class="flex items-start gap-4 p-4 bg-white border border-zinc-200 rounded-lg shadow-sm">
+                   <div class="mt-1 text-green-600 shrink-0">
+                     <span class="iconify" data-icon="lucide:check-circle" data-width="1.5"></span>
+                   </div>
+                   <div>
+                     <h4 class="font-bold text-sm uppercase text-zinc-900">Post-Game Socials</h4>
+                     <p class="text-xs text-zinc-500 mt-1">We often grab tacos or drinks after evening games. It's about the people, not just the points.</p>
+                   </div>
+                 </li>
+               </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA Band -->
+      <section class="bg-green-600 py-16 text-center px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        <div class="relative z-10 max-w-2xl mx-auto">
+          <h2 class="text-4xl font-black text-white uppercase tracking-tighter font-display italic mb-6">Ready to play?</h2>
+          <p class="text-green-100 font-medium text-sm mb-8">Join over 500+ players in Austin active on LaPista weekly.</p>
+          <div class="flex justify-center gap-4">
+            <a href="index.html#schedule" class="bg-white text-green-900 hover:bg-zinc-100 font-bold uppercase tracking-wide px-8 py-3 rounded shadow-lg transition-transform hover:-translate-y-1 text-xs">
+              View Schedule
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-900 text-white pt-16 pb-8 border-t border-zinc-800 mt-auto">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-zinc-800 pb-12">
+          <div class="col-span-1">
+            <span class="font-display font-bold text-2xl tracking-tighter text-white">
+              LaPista
+              <span class="text-green-500">.ATX</span>
+            </span>
+            <p class="text-zinc-500 text-sm mt-4 leading-relaxed">
+              Connecting Austin's soccer community, one game at a time.
+            </p>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Explore
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Games
+                </a>
+              </li>
+              <li>
+                <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                  Venues
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Support
+            </h4>
+            <ul class="space-y-3 text-sm font-medium text-zinc-400">
+              <li>
+                <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                  Contact
+                </a>
+              </li>
+              <li>
+                <a href="terms.html" class="hover:text-green-500 transition-colors">
+                  Terms
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-span-1">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+              Follow
+            </h4>
+            <div class="flex gap-4">
+              <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="lucide:instagram"></span>
+              </a>
+              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify" data-icon="mdi:whatsapp"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide">
+          <div>© 2025 LaPista.ATX</div>
+          <div class="flex gap-6 mt-4 md:mt-0">
+            <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    <script>
+      function toggleMobileMenu() {
+        const overlay = document.getElementById('mobile-menu-overlay');
+        const panel = document.getElementById('mobile-menu-panel');
+        overlay.classList.toggle('hidden');
+        panel.classList.toggle('-translate-x-full');
+      }
+    </script>
+  
+</body></html>

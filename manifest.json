@@ -1,0 +1,44 @@
+{
+  "name": "LaPista.ATX - Austin Pickup Soccer",
+  "short_name": "LaPista",
+  "description": "Austin's premier pickup soccer community. Book games, track your schedule, and connect with players.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#18181b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/LaPista Logo 1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/LaPista Logo 1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "View Games",
+      "short_name": "Games",
+      "description": "Browse upcoming soccer games",
+      "url": "/#schedule",
+      "icons": [{ "src": "/LaPista Logo 1.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Contact Us",
+      "short_name": "Contact",
+      "description": "Get in touch with LaPista",
+      "url": "/contact-page.html",
+      "icons": [{ "src": "/LaPista Logo 1.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

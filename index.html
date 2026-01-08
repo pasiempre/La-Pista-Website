@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaPista.ATX - Austin Pickup Soccer</title>
+<meta name="description" content="Join Austin's premier pickup soccer community. Weekly games at quality fields, all skill levels welcome. RSVP online, pay $5.99 per game.">
+<meta name="keywords" content="pickup soccer, Austin TX, soccer games, futbol, LaPista, recreational soccer">
+<meta property="og:title" content="LaPista.ATX - Austin Pickup Soccer">
+<meta property="og:description" content="Weekly pickup games for all skill levels. Join 500+ players in Austin's soccer community.">
+<meta property="og:image" content="/LaPista Logo 1.png">
+<meta property="og:type" content="website">
+<!-- TODO: Update og:url to your actual production domain -->
+<meta property="og:url" content="https://lapista.atx">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#18181b">
+<link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+<link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+<link rel="manifest" href="/manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/config.js"></script>
+
+<!-- Google Analytics - Uncomment and add your GA4 ID when ready -->
+<!-- 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+-->
+
+<!-- Alternative: Plausible Analytics (privacy-friendly) - Uncomment when ready -->
+<!-- <script defer data-domain="lapista.atx" src="https://plausible.io/js/script.js"></script> -->
+
+<!-- JSON-LD Structured Data for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SportsOrganization",
+  "name": "LaPista.ATX",
+  "alternateName": "LaPista ATX",
+  "url": "https://lapista.atx",
+  "logo": "https://lapista.atx/LaPista Logo 1.png",
+  "description": "Austin's premier pickup soccer community. Weekly games for all skill levels.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Austin",
+    "addressRegion": "TX",
+    "addressCountry": "US"
+  },
+  "sameAs": [
+    "https://www.instagram.com/lapista.atx"
+  ],
+  "sport": "Soccer",
+  "foundingDate": "2025",
+  "areaServed": {
+    "@type": "City",
+    "name": "Austin",
+    "containedInPlace": {
+      "@type": "State",
+      "name": "Texas"
+    }
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "LaPista.ATX",
+  "url": "https://lapista.atx",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://lapista.atx/?search={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+</head>
+  <body class="overflow-hidden flex antialiased text-base text-zinc-900 bg-[#FAFAFA] h-screen bg-noise">
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+    <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between p-6 border-b border-zinc-800">
+        <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">
+          LaPista
+          <span class="text-green-500">.ATX</span>
+        </span>
+        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
+          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+        <nav class="flex flex-col gap-4">
+          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+            Games
+          </a>
+          <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+            About
+          </a>
+          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+            FAQ
+          </a>
+          <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+            Contact
+          </a>
+        </nav>
+        <div>
+          <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+            Venues
+          </div>
+          <ul class="flex flex-col gap-3">
+            <li>
+              <a href="#schedule" class="text-sm font-bold text-zinc-300 hover:text-green-500 uppercase tracking-wide flex items-center gap-2">
+                <span class="iconify" data-icon="lucide:map-pin" data-width="14"></span>
+                Shady Lane
+              </a>
+            </li>
+            <li>
+              <a href="#schedule" class="text-sm font-bold text-zinc-300 hover:text-green-500 uppercase tracking-wide flex items-center gap-2">
+                <span class="iconify" data-icon="lucide:map-pin" data-width="14"></span>
+                Cesar Chavez
+              </a>
+            </li>
+            <li>
+              <a href="#schedule" class="text-sm font-bold text-zinc-300 hover:text-green-500 uppercase tracking-wide flex items-center gap-2">
+                <span class="iconify" data-icon="lucide:map-pin" data-width="14"></span>
+                Prairie Lane
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="border-t border-zinc-800 pt-8 mt-auto">
+          <div class="flex gap-4">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="lucide:instagram"></span>
+            </a>
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:whatsapp"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!-- Sidebar -->
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 bg-[#FAFAFA]">
+      <!-- Header -->
+      <header class="h-16 border-b border-zinc-200 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-sm z-10 sticky top-0 px-4 md:px-6">
+        <div class="flex items-center gap-4">
+          <!-- Mobile Menu Button -->
+          <button class="lg:hidden text-zinc-500" onclick="toggleMobileMenu()">
+            <span class="iconify text-2xl" data-icon="lucide:menu" data-width="1.5"></span>
+          </button>
+          <a href="index.html" class="flex items-center group">
+            <img src="/navbar-logo.gif" alt="LaPista Logo" class="h-10 w-10 object-cover group-hover:scale-110 transition-transform">
+          </a>
+          <div class="w-px h-6 bg-zinc-300 hidden lg:block transform skew-x-[-15deg]"></div>
+          <div class="flex items-center gap-2 text-zinc-400 text-sm">
+            <span class="text-zinc-900 font-bold uppercase tracking-tight">
+              GAME SCHEDULE
+            </span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <div class="hidden md:flex items-center gap-3">
+            <div class="text-right">
+              <div class="text-[10px] text-green-600 font-black uppercase tracking-widest">
+                THIS WEEK
+              </div>
+              <div id="week-range" class="text-sm font-bold text-zinc-900 uppercase font-display">
+                <!-- Dynamically set -->
+              </div>
+            </div>
+          </div>
+
+          <div class="flex -space-x-2 hidden sm:flex">
+            <div class="w-9 h-9 rounded-md border-2 border-white bg-green-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+              <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+            </div>
+            <div class="w-9 h-9 rounded-md border-2 border-white bg-green-600 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+              <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+            </div>
+            <div class="w-9 h-9 rounded-md border-2 border-white bg-green-700 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+              <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+            </div>
+            <div class="w-9 h-9 rounded-md border-2 border-white bg-zinc-900 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm">
+              +84
+            </div>
+          </div>
+
+          <button onclick="scrollToSchedule()" class="bg-zinc-900 hover:bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-md transition-all flex items-center gap-2 shadow-sm uppercase tracking-wide group">
+            <span class="iconify group-hover:text-white text-green-400" data-icon="lucide:calendar" data-width="1.5"></span>
+            <span>FIND A GAME</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Wrapper -->
+      <div class="flex-1 flex overflow-hidden relative">
+        <!-- Board View -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <!-- Toolbar -->
+
+          <!-- Kanban Board -->
+          <div id="main-scroll-container" class="flex-1 overflow-x-hidden overflow-y-auto px-4 md:px-6 pb-6 bg-[#FAFAFA]">
+            <div class="relative w-full py-24 flex flex-col items-center justify-center text-center mb-16 overflow-hidden bg-zinc-900 text-white">
+              <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-zinc-900/50"></div>
+              <div class="relative z-10 max-w-3xl px-6">
+                <span class="inline-block py-1.5 px-4 rounded-full bg-green-500/10 text-green-400 text-xs font-black uppercase tracking-widest mb-6 border border-green-500/20">
+                  Welcome to LaPista
+                </span>
+                <h1 class="text-7xl md:text-9xl font-black uppercase italic tracking-tighter mb-6 font-display leading-[0.85]">
+                  PURO
+                  <span class="text-green-500">FÚTBOL</span>
+                </h1>
+                <p class="text-xl text-zinc-400 font-medium max-w-lg mx-auto mb-10 leading-relaxed">
+                  Austin's premier pickup soccer community. No egos, just the
+                  beautiful game. Join 500+ players weekly.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button onclick="scrollToSchedule()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-black uppercase tracking-wide rounded-md transition-all shadow-lg shadow-green-900/20 transform hover:-translate-y-1">
+                    VIEW SCHEDULE
+                  </button>
+                  <a href="about-page.html" class="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wide rounded-md transition-all border border-zinc-700">
+                    HOW IT WORKS
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 md:px-6 mb-12">
+              <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-y border-zinc-200 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
+                <div class="flex items-center gap-2">
+                  <span class="iconify text-green-600" data-icon="lucide:filter" data-width="20"></span>
+                  <span class="text-sm font-black uppercase tracking-wide text-zinc-400">
+                    FILTERS:
+                  </span>
+                  <div id="filter-buttons" class="flex items-center gap-1 ml-2">
+                    <button data-region="all" class="filter-btn px-3 py-1 text-xs font-bold uppercase bg-zinc-900 text-white rounded transition-all">
+                      ALL
+                    </button>
+                    <button data-region="south" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                      SOUTH
+                    </button>
+                    <button data-region="east" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                      EAST
+                    </button>
+                    <button data-region="north" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                      NORTH
+                    </button>
+                  </div>
+                </div>
+                <div class="relative w-full md:w-auto">
+                  <span class="iconify absolute left-3 top-2.5 text-zinc-400" data-icon="lucide:search" data-width="16"></span>
+                  <input id="game-search" type="text" placeholder="FIND A GAME..." class="w-full md:w-64 bg-white border border-zinc-200 rounded-md py-2 pl-9 pr-4 text-xs font-bold uppercase focus:outline-none focus:border-green-500 transition-all">
+                </div>
+              </div>
+            </div>
+            <!-- Sprint Header -->
+            <div class="flex items-center gap-3 mb-6 group cursor-pointer border-b-2 border-zinc-200 pb-2 border-dashed max-w-7xl mx-auto px-4 md:px-0" id="schedule">
+              <span class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display italic">
+                UPCOMING GAMES
+              </span>
+              <span id="games-count" class="text-lg font-bold text-zinc-500 font-display">
+                (Loading...)
+              </span>
+              <span class="px-2 py-0.5 rounded text-xs font-black bg-green-500 text-white uppercase tracking-wider transform -skew-x-12">
+                ACTIVE
+              </span>
+            </div>
+
+            <!-- Loading State -->
+            <div id="games-loading" class="flex flex-col items-center justify-center py-16 max-w-7xl mx-auto">
+              <div class="w-12 h-12 border-4 border-zinc-200 border-t-green-500 rounded-full animate-spin mb-4"></div>
+              <p class="text-zinc-500 font-medium">Loading games...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="games-error" class="hidden flex flex-col items-center justify-center py-16 max-w-7xl mx-auto">
+              <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                <span class="iconify text-red-500 text-3xl" data-icon="lucide:alert-circle"></span>
+              </div>
+              <p class="text-zinc-700 font-bold mb-2">Failed to load games</p>
+              <button onclick="loadGames()" class="text-green-600 font-bold text-sm uppercase hover:underline">Try Again</button>
+            </div>
+
+            <!-- Dynamic Games Container -->
+            <div id="games-container" class="hidden flex flex-col md:flex-row h-auto gap-6 w-full max-w-7xl mx-auto justify-center">
+              <!-- Games will be loaded dynamically -->
+            </div>
+            <div class="py-24 border-t border-zinc-200 mt-20">
+              <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-6 font-display">
+                    ABOUT LAPISTA
+                  </h2>
+                  <p class="text-zinc-600 text-lg mb-6 leading-relaxed">
+                    We started LaPista with a simple goal: to create the best
+                    pickup soccer experience in Austin. Organized games, quality
+                    fields, and a community that respects the game.
+                  </p>
+                  <p class="text-zinc-600 text-lg mb-8 leading-relaxed">
+                    Whether you're a former pro or just getting back into it,
+                    there's a spot for you on the pitch.
+                  </p>
+                  <a href="about-page.html" class="inline-flex items-center gap-2 text-green-600 font-black uppercase tracking-wide hover:underline text-lg group">
+                    Learn More
+                    <span class="iconify group-hover:translate-x-1 transition-transform" data-icon="lucide:arrow-right"></span>
+                  </a>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="h-64 bg-gradient-to-br from-green-500 to-green-700 rounded-lg overflow-hidden relative group flex items-center justify-center">
+                    <span class="iconify text-white/30" data-icon="lucide:image" data-width="64"></span>
+                    <span class="absolute bottom-4 left-4 text-xs text-white/60 font-bold uppercase tracking-wide">Game Photo</span>
+                  </div>
+                  <div class="h-64 bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-lg overflow-hidden relative group translate-y-8 flex items-center justify-center">
+                    <span class="iconify text-white/30" data-icon="lucide:image" data-width="64"></span>
+                    <span class="absolute bottom-4 left-4 text-xs text-white/60 font-bold uppercase tracking-wide">Game Photo</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="py-24 bg-zinc-900 text-center text-white relative overflow-hidden">
+              <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+              <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-12 font-display relative z-10">
+                ON THE PITCH
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 relative z-10">
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
+                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                </div>
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
+                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                </div>
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
+                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="py-24 max-w-6xl mx-auto w-full px-6">
+              <div class="text-center mb-16">
+                <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-4 font-display">
+                  GET IN TOUCH
+                </h2>
+                <p class="text-zinc-500 text-lg">
+                  Have questions? Want to host a game?
+                </p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="https://www.instagram.com/lapista.atx" target="_blank" class="flex flex-col items-center justify-center p-10 bg-white border border-zinc-200 rounded-xl hover:border-green-500 hover:shadow-xl transition-all group">
+                  <span class="iconify text-4xl text-zinc-400 group-hover:text-green-600 mb-6 transition-colors" data-icon="lucide:instagram"></span>
+                  <span class="font-bold text-xl text-zinc-900 mb-1">
+                    @lapista.atx
+                  </span>
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                    Follow Us
+                  </span>
+                </a>
+                <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex flex-col items-center justify-center p-10 bg-white border border-zinc-200 rounded-xl hover:border-green-500 hover:shadow-xl transition-all group">
+                  <span class="iconify text-4xl text-zinc-400 group-hover:text-green-600 mb-6 transition-colors" data-icon="mdi:whatsapp"></span>
+                  <span class="font-bold text-xl text-zinc-900 mb-1">
+                    WhatsApp Group
+                  </span>
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                    Join Chat
+                  </span>
+                </a>
+                <a href="mailto:lapista.atx@gmail.com" class="flex flex-col items-center justify-center p-10 bg-white border border-zinc-200 rounded-xl hover:border-green-500 hover:shadow-xl transition-all group">
+                  <span class="iconify text-4xl text-zinc-400 group-hover:text-green-600 mb-6 transition-colors" data-icon="lucide:mail"></span>
+                  <span class="font-bold text-xl text-zinc-900 mb-1">
+                    lapista.atx@gmail.com
+                  </span>
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                    Email Us
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <footer class="bg-zinc-900 text-white pt-20 pb-10">
+              <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-zinc-800 pb-16">
+                  <div class="col-span-1">
+                    <span class="font-display font-bold text-2xl tracking-tighter text-white">
+                      LaPista
+                      <span class="text-green-500">.ATX</span>
+                    </span>
+                    <p class="text-zinc-500 text-sm mt-6 leading-relaxed">
+                      Connecting Austin's soccer community, one game at a time.
+                    </p>
+                  </div>
+                  <div class="col-span-1">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                      Explore
+                    </h4>
+                    <ul class="space-y-4 text-sm font-medium text-zinc-400">
+                      <li>
+                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                          Games
+                        </a>
+                      </li>
+                      <li>
+                        <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                          About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                          Venues
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-span-1">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                      Support
+                    </h4>
+                    <ul class="space-y-4 text-sm font-medium text-zinc-400">
+                      <li>
+                        <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                          FAQ
+                        </a>
+                      </li>
+                      <li>
+                        <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                          Contact
+                        </a>
+                      </li>
+                      <li>
+                        <a href="terms.html" class="hover:text-green-500 transition-colors">
+                          Terms
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-span-1">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                      Follow
+                    </h4>
+                    <div class="flex gap-4">
+                      <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                        <span class="iconify" data-icon="lucide:instagram"></span>
+                      </a>
+                      <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                        <span class="iconify" data-icon="mdi:whatsapp"></span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide">
+                  <div>© 2025 LaPista.ATX</div>
+                  <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+                    <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+
+        <!-- Right Sidebar (Details Panel) -->
+        <aside class="w-[400px] bg-white border-l border-zinc-200 overflow-y-auto hidden xl:flex flex-col shrink-0 z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]">
+          <!-- Header -->
+          <div class="h-14 flex items-center justify-between px-6 border-b border-zinc-100 shrink-0 bg-zinc-50">
+            <span class="text-xs font-bold text-zinc-500 uppercase tracking-wide">
+              GAME DETAILS
+            </span>
+            <button class="text-zinc-400 hover:text-red-500 transition-colors">
+              <span class="iconify text-2xl" data-icon="lucide:x-square" data-width="1.5"></span>
+            </button>
+          </div>
+
+          <div class="p-6">
+            <div class="mb-6">
+              <div class="text-4xl font-black text-zinc-900 tracking-tighter leading-none font-display uppercase italic mb-1" id="sidebar-title">
+                SUNDAY PICKUP
+              </div>
+              <div class="text-lg font-bold text-zinc-500 font-display" id="sidebar-date">
+                JANUARY 5, 2025
+              </div>
+            </div>
+
+            <!-- Properties Grid -->
+            <div class="grid grid-cols-[100px_1fr] gap-y-5 text-sm mb-8">
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                VENUE
+              </div>
+              <div class="flex items-start gap-2 text-zinc-900 font-bold leading-tight">
+                <span class="iconify text-green-600 mt-0.5 shrink-0" data-icon="lucide:map-pin" data-width="1.5"></span>
+                <span id="sidebar-venue">
+                  Loading venue...
+                </span>
+              </div>
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                TIME
+              </div>
+              <div id="sidebar-time" class="text-zinc-900 font-bold font-mono text-sm">
+                --:-- PM
+              </div>
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                PRICE
+              </div>
+              <div class="text-green-600 font-black text-sm">
+                $5.99
+                <span class="text-zinc-400 font-medium">per person</span>
+              </div>
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                SPOTS
+              </div>
+              <div class="w-full">
+                <div class="flex justify-between text-xs font-bold mb-1">
+                  <span id="sidebar-filled" class="text-zinc-900">0 FILLED</span>
+                  <span id="sidebar-total" class="text-zinc-400">24 TOTAL</span>
+                </div>
+                <div class="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
+                  <div id="sidebar-progress" class="h-full bg-green-500 w-0 transition-all duration-300"></div>
+                </div>
+              </div>
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                LEVEL
+              </div>
+              <div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 text-[10px] font-black uppercase tracking-wide">
+                  OPEN TO ALL
+                </span>
+              </div>
+              <div class="col-span-2 border-t border-dashed border-zinc-200 my-2"></div>
+              <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
+                PAYMENT
+              </div>
+              <div class="flex gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded border border-green-500 text-green-600 bg-white text-[10px] font-black uppercase tracking-wide">
+                  PAY ONLINE
+                </span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded border border-zinc-300 text-zinc-500 bg-white text-[10px] font-black uppercase tracking-wide">
+                  PAY AT GAME
+                </span>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-8 bg-zinc-50 p-4 rounded-md border border-zinc-100">
+              <h4 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 font-display">
+                WHAT TO EXPECT
+              </h4>
+              <div class="text-zinc-700 text-sm leading-relaxed space-y-2 font-medium">
+                <p>Weekly pickup game at Shady Lane.</p>
+                <ul class="list-disc list-inside text-zinc-500 pl-1 text-xs space-y-1">
+                  <li>Bring shin guards</li>
+                  <li>Arrive 10 min early</li>
+                  <li>All skill levels welcome</li>
+                  <li>Water available on site</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Quick RSVP CTA -->
+            <div class="mb-8 border-t border-dashed border-zinc-200 pt-6">
+              <div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="iconify text-green-600 text-2xl" data-icon="lucide:calendar-check" data-width="1.5"></span>
+                </div>
+                <h4 class="text-lg font-black text-zinc-900 uppercase tracking-tight font-display mb-2">
+                  Ready to Play?
+                </h4>
+                <p class="text-sm text-zinc-500 mb-4">
+                  Reserve your spot in just a few clicks. Add guests and choose your payment method.
+                </p>
+                <a id="sidebar-rsvp-btn" href="game-details.html?gameId=LP-001" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide rounded shadow-sm transition-all text-sm text-center">
+                  <span class="iconify inline-block mr-2" data-icon="lucide:ticket" data-width="1.2"></span>
+                  Book This Game
+                </a>
+                <p class="text-[10px] text-zinc-400 mt-3 font-medium">
+                  Pay online or at the game • Add up to 4 guests
+                </p>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-dashed border-zinc-200 text-center">
+              <a id="sidebar-details-link" href="game-details.html?gameId=LP-001" class="inline-flex items-center gap-1.5 text-xs font-black text-zinc-400 hover:text-green-600 uppercase tracking-widest transition-colors group">
+                View Full Details
+                <span class="iconify group-hover:translate-x-1 transition-transform" data-icon="lucide:arrow-right"></span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      function toggleMobileMenu(){const e=document.getElementById("mobile-menu-overlay"),t=document.getElementById("mobile-menu-panel");e.classList.toggle("hidden"),t.classList.toggle("-translate-x-full")}
+      
+      function scrollToSchedule() {
+        const container = document.getElementById('main-scroll-container');
+        const target = document.getElementById('schedule');
+        if (container && target) {
+          const rect = target.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          container.scrollBy({ top: rect.top - containerRect.top - 20, behavior: 'smooth' });
+        }
+      }
+    </script>
+
+    <script>
+      // Use shared configuration with fallback
+      const API_URL = (typeof LAPISTA_CONFIG !== 'undefined' && LAPISTA_CONFIG.API_URL) 
+        ? LAPISTA_CONFIG.API_URL 
+        : (window.location.hostname === 'localhost' ? 'http://localhost:3001' : '');
+
+      // Calculate and display current week range
+      function updateWeekRange() {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0 = Sunday
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const monday = new Date(now);
+        monday.setDate(now.getDate() + mondayOffset);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const startMonth = months[monday.getMonth()];
+        const endMonth = months[sunday.getMonth()];
+        
+        const rangeText = startMonth === endMonth 
+          ? `${startMonth} ${monday.getDate()} - ${sunday.getDate()}`
+          : `${startMonth} ${monday.getDate()} - ${endMonth} ${sunday.getDate()}`;
+        
+        const el = document.getElementById('week-range');
+        if (el) el.textContent = rangeText;
+      }
+      updateWeekRange();
+
+      // Format date for display
+      function formatGameDate(dateStr) {
+        const date = new Date(dateStr);
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        return days[date.getDay()];
+      }
+
+      // Create game card HTML
+      function createGameCard(game, isHot = false) {
+        const spotsText = game.spotsRemaining === 0 ? 'FULL' : `${game.spotsRemaining} SPOTS`;
+        const spotsClass = game.spotsRemaining === 0 
+          ? 'text-red-600 border-red-200 bg-red-50' 
+          : 'text-green-600 border-green-200 bg-green-50';
+        const hotBorder = isHot ? 'border-2 border-green-500 shadow-lg' : 'border border-zinc-200';
+        const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
+        
+        return `
+          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${hotBorder} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                ${game.gameId}
+              </span>
+              ${isHot 
+                ? '<span class="text-[10px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded uppercase tracking-wide">HOT 🔥</span>'
+                : `<span class="text-[10px] font-bold ${spotsClass} border px-1.5 py-0.5 rounded uppercase tracking-wide">${spotsText}</span>`
+              }
+            </div>
+            <h3 class="text-xl font-bold text-zinc-900 mb-0.5 leading-tight font-display uppercase tracking-tight">
+              ${game.title}
+            </h3>
+            <div class="text-xs text-zinc-500 font-mono mb-4 flex items-center gap-1">
+              <span class="iconify" data-icon="lucide:map-pin" data-width="1.2"></span>
+              ${venueName} • ${formatGameDate(game.date)} ${game.time}
+            </div>
+            <div class="mt-auto flex items-center justify-between pt-3 border-t border-zinc-100 w-full">
+              <span class="text-xs font-black text-green-600">$${game.price.toFixed(2)}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                View Details →
+              </span>
+            </div>
+          </a>
+        `;
+      }
+
+      // Store games data globally for sidebar updates and filtering
+      let gamesData = [];
+      let allGamesData = [];
+      let currentFilter = 'all';
+      let currentSearch = '';
+
+      // Map venues to regions
+      const venueRegions = {
+        'Shady Lane Fields': 'east',
+        'Shady Lane': 'east',
+        'Cesar Chavez Fields': 'south',
+        'Cesar Chavez': 'south',
+        'Prairie Lane Fields': 'north',
+        'Prairie Lane': 'north'
+      };
+
+      // Get region for a game
+      function getGameRegion(game) {
+        const venueName = game.venue?.name || '';
+        return venueRegions[venueName] || 'other';
+      }
+
+      // Load games from API
+      async function loadGames() {
+        const loadingEl = document.getElementById('games-loading');
+        const errorEl = document.getElementById('games-error');
+        const containerEl = document.getElementById('games-container');
+        const countEl = document.getElementById('games-count');
+
+        if (!loadingEl || !errorEl || !containerEl || !countEl) {
+          console.error('Missing DOM elements:', { loadingEl, errorEl, containerEl, countEl });
+          return;
+        }
+
+        // Show loading
+        loadingEl.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        containerEl.classList.add('hidden');
+
+        try {
+          const response = await fetch(`${API_URL}/api/games`);
+          if (!response.ok) throw new Error(`Failed to fetch games: ${response.status}`);
+          
+          const games = await response.json();
+          
+          // Hide loading, show container
+          loadingEl.classList.add('hidden');
+          containerEl.classList.remove('hidden');
+          
+          // Update count
+          countEl.textContent = `(${games.length} Games This Week)`;
+          
+          if (games.length === 0) {
+            containerEl.innerHTML = `
+              <div class="text-center py-12 w-full">
+                <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:calendar-x"></span>
+                </div>
+                <p class="text-zinc-500 font-medium">No games scheduled this week.</p>
+                <p class="text-zinc-400 text-sm mt-2">Check back soon!</p>
+              </div>
+            `;
+            return;
+          }
+
+          // Sort games by date
+          games.sort((a, b) => new Date(a.date) - new Date(b.date));
+          
+          // Split into columns based on timing
+          const now = new Date();
+          const upcoming = games.filter(g => {
+            const gameDate = new Date(g.date);
+            return gameDate > now;
+          });
+          
+          // Handle no upcoming games
+          if (upcoming.length === 0) {
+            containerEl.innerHTML = `
+              <div class="text-center py-12 w-full">
+                <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:calendar-x"></span>
+                </div>
+                <p class="text-zinc-500 font-medium">No upcoming games scheduled.</p>
+                <p class="text-zinc-400 text-sm mt-2">Check back soon for new games!</p>
+              </div>
+            `;
+            countEl.textContent = `(${games.length} Total, 0 Upcoming)`;
+            return;
+          }
+          
+          // Find the "hottest" game (most spots filled, still available)
+          const hotGame = upcoming.reduce((hot, game) => {
+            const fillRate = (game.capacity - game.spotsRemaining) / game.capacity;
+            const hotFillRate = hot ? (hot.capacity - hot.spotsRemaining) / hot.capacity : 0;
+            return fillRate > hotFillRate && game.spotsRemaining > 0 ? game : hot;
+          }, null);
+
+          // Store all upcoming games for filtering
+          allGamesData = upcoming;
+          gamesData = upcoming;
+
+          // Build HTML
+          let html = `
+            <!-- UPCOMING GAMES COLUMN -->
+            <div class="flex flex-col gap-3 w-full md:w-2/3">
+              <div class="flex items-center justify-between text-sm font-black text-zinc-400 uppercase tracking-widest mb-1 font-display">
+                <span>Upcoming</span>
+                <span class="bg-zinc-200 text-zinc-600 px-1.5 rounded text-xs">${upcoming.length}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          `;
+          
+          upcoming.forEach(game => {
+            const isHot = hotGame && game.gameId === hotGame.gameId;
+            html += createGameCard(game, isHot);
+          });
+          
+          html += `
+              </div>
+            </div>
+          `;
+
+          containerEl.innerHTML = html;
+          
+          // Initialize filter functionality
+          initializeFilters();
+          
+          // Re-attach click handlers for sidebar
+          attachCardHandlers();
+          
+          // Update sidebar with first game
+          if (upcoming.length > 0) {
+            updateSidebar(upcoming[0]);
+          }
+
+        } catch (err) {
+          console.error('Failed to load games:', err);
+          loadingEl.classList.add('hidden');
+          errorEl.classList.remove('hidden');
+          countEl.textContent = '(Error)';
+        }
+      }
+
+      // Filter and search games
+      function filterGames() {
+        let filtered = allGamesData;
+
+        // Apply region filter
+        if (currentFilter !== 'all') {
+          filtered = filtered.filter(game => getGameRegion(game) === currentFilter);
+        }
+
+        // Apply search filter
+        if (currentSearch.trim()) {
+          const search = currentSearch.toLowerCase().trim();
+          filtered = filtered.filter(game => {
+            const title = (game.title || '').toLowerCase();
+            const venue = (game.venue?.name || '').toLowerCase();
+            const dayOfWeek = (game.dayOfWeek || '').toLowerCase();
+            return title.includes(search) || venue.includes(search) || dayOfWeek.includes(search);
+          });
+        }
+
+        return filtered;
+      }
+
+      // Render filtered games
+      function renderFilteredGames() {
+        const containerEl = document.getElementById('games-container');
+        const countEl = document.getElementById('games-count');
+        
+        const filtered = filterGames();
+        gamesData = filtered;
+
+        if (filtered.length === 0) {
+          containerEl.innerHTML = `
+            <div class="text-center py-12 w-full">
+              <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:search-x"></span>
+              </div>
+              <p class="text-zinc-500 font-medium">No games match your filters.</p>
+              <p class="text-zinc-400 text-sm mt-2">Try adjusting your search or filter criteria.</p>
+            </div>
+          `;
+          countEl.textContent = `(0 of ${allGamesData.length} Games)`;
+          return;
+        }
+
+        // Find the "hottest" game
+        const hotGame = filtered.reduce((hot, game) => {
+          const fillRate = (game.capacity - game.spotsRemaining) / game.capacity;
+          const hotFillRate = hot ? (hot.capacity - hot.spotsRemaining) / hot.capacity : 0;
+          return fillRate > hotFillRate && game.spotsRemaining > 0 ? game : hot;
+        }, null);
+
+        // Build HTML
+        let html = `
+          <!-- UPCOMING GAMES COLUMN -->
+          <div class="flex flex-col gap-3 w-full md:w-2/3">
+            <div class="flex items-center justify-between text-sm font-black text-zinc-400 uppercase tracking-widest mb-1 font-display">
+              <span>Upcoming</span>
+              <span class="bg-zinc-200 text-zinc-600 px-1.5 rounded text-xs">${filtered.length}</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        `;
+        
+        filtered.forEach(game => {
+          const isHot = hotGame && game.gameId === hotGame.gameId;
+          html += createGameCard(game, isHot);
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+
+        containerEl.innerHTML = html;
+        countEl.textContent = currentFilter === 'all' && !currentSearch 
+          ? `(${filtered.length} Games This Week)` 
+          : `(${filtered.length} of ${allGamesData.length} Games)`;
+
+        // Re-attach click handlers for sidebar
+        attachCardHandlers();
+
+        // Update sidebar with first game
+        if (filtered.length > 0) {
+          updateSidebar(filtered[0]);
+        }
+      }
+
+      // Initialize filter buttons
+      function initializeFilters() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('game-search');
+
+        // Filter button click handlers
+        filterBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            // Update active state
+            filterBtns.forEach(b => {
+              b.classList.remove('bg-zinc-900', 'text-white');
+              b.classList.add('text-zinc-500', 'hover:bg-zinc-200');
+            });
+            btn.classList.remove('text-zinc-500', 'hover:bg-zinc-200');
+            btn.classList.add('bg-zinc-900', 'text-white');
+
+            // Apply filter
+            currentFilter = btn.dataset.region;
+            renderFilteredGames();
+          });
+        });
+
+        // Search input handler with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            currentSearch = e.target.value;
+            renderFilteredGames();
+          }, 300); // 300ms debounce
+        });
+
+        // Clear search on Escape
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            searchInput.value = '';
+            currentSearch = '';
+            renderFilteredGames();
+          }
+        });
+      }
+
+      // Update sidebar with game data
+      function updateSidebar(game) {
+        const sbTitle = document.getElementById('sidebar-title');
+        const sbDate = document.getElementById('sidebar-date');
+        const sbVenue = document.getElementById('sidebar-venue');
+        const sbTime = document.getElementById('sidebar-time');
+        const sbFilled = document.getElementById('sidebar-filled');
+        const sbTotal = document.getElementById('sidebar-total');
+        const sbProgress = document.getElementById('sidebar-progress');
+        const rsvpBtn = document.getElementById('sidebar-rsvp-btn');
+        const detailsLink = document.getElementById('sidebar-details-link');
+
+        if (sbTitle) sbTitle.innerText = game.title;
+        if (sbDate) {
+          const dateObj = new Date(game.date);
+          sbDate.innerText = dateObj.toLocaleDateString('en-US', { 
+            month: 'long', day: 'numeric', year: 'numeric' 
+          }).toUpperCase();
+        }
+        
+        // Update venue
+        if (sbVenue && game.venue) {
+          const addressParts = game.venue.address.split(',');
+          if (addressParts.length >= 2) {
+            sbVenue.innerHTML = `${addressParts[0]},<br>${addressParts.slice(1).join(',').trim()}`;
+          } else {
+            sbVenue.textContent = game.venue.address;
+          }
+        }
+        
+        // Update time
+        if (sbTime && game.time) {
+          sbTime.textContent = game.time;
+        }
+        
+        // Update spots
+        const filled = game.capacity - game.spotsRemaining;
+        if (sbFilled) sbFilled.innerText = `${filled} FILLED`;
+        if (sbTotal) sbTotal.innerText = `${game.capacity} TOTAL`;
+        if (sbProgress) {
+          const percentage = (filled / game.capacity) * 100;
+          sbProgress.style.width = `${percentage}%`;
+        }
+
+        // Update links
+        const gameUrl = `game-details.html?gameId=${game.gameId}`;
+        if (rsvpBtn) rsvpBtn.href = gameUrl;
+        if (detailsLink) detailsLink.href = gameUrl;
+      }
+
+      // Attach click handlers to game cards
+      function attachCardHandlers() {
+        const cards = document.querySelectorAll('.game-card');
+
+        cards.forEach(card => {
+          card.addEventListener('click', (e) => {
+            if (window.innerWidth >= 1280) {
+              e.preventDefault();
+              cards.forEach(c => c.classList.remove('ring-4', 'ring-green-500/30'));
+              card.classList.add('ring-4', 'ring-green-500/30');
+
+              // Get gameId from href and find game data
+              const href = card.getAttribute('href');
+              const gameId = new URLSearchParams(href.split('?')[1]).get('gameId');
+              const game = gamesData.find(g => g.gameId === gameId);
+              
+              if (game) {
+                updateSidebar(game);
+              }
+            }
+          });
+        });
+      }
+
+      // Load games on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        loadGames().catch(err => {
+          // Error handled in loadGames
+        });
+
+        // Fix anchor links - body has overflow:hidden, so we need to scroll the inner container
+        document.querySelectorAll('a[href="#schedule"], a[href="index.html#schedule"]').forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.getElementById('schedule');
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+              // Close mobile menu if open
+              const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+              const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+              if (mobileMenuPanel && !mobileMenuPanel.classList.contains('-translate-x-full')) {
+                toggleMobileMenu();
+              }
+            }
+          });
+        });
+      });
+    </script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered'))
+            .catch(err => console.log('SW registration failed'));
+        });
+      }
+    </script>
+  
+</body></html>
