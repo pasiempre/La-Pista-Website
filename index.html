@@ -189,8 +189,8 @@
             <div class="w-9 h-9 rounded-md border-2 border-white bg-green-700 flex items-center justify-center text-xs font-bold text-white shadow-sm">
               <span class="iconify" data-icon="lucide:user" data-width="16"></span>
             </div>
-            <div class="w-9 h-9 rounded-md border-2 border-white bg-zinc-900 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm">
-              +84
+            <div id="player-count-badge" class="w-9 h-9 rounded-md border-2 border-white bg-zinc-900 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm" title="Total players">
+              <span class="iconify animate-pulse" data-icon="lucide:loader-2" data-width="14"></span>
             </div>
           </div>
 
@@ -697,12 +697,44 @@
         'Cesar Chavez': 'south',
         'Prairie Lane Fields': 'north',
         'Prairie Lane': 'north'
-      };
+      }};
 
       // Get region for a game
       function getGameRegion(game) {
         const venueName = game.venue?.name || '';
         return venueRegions[venueName] || 'other';
+      }
+
+      // Load platform stats for user count badge
+      async function loadPlatformStats() {
+        try {
+          const response = await fetch(`${API_URL}/api/stats/platform`);
+          if (!response.ok) throw new Error('Failed to fetch stats');
+          
+          const stats = await response.json();
+          const badge = document.getElementById('player-count-badge');
+          
+          if (badge) {
+            const count = stats.totalParticipants || stats.uniquePlayers || 0;
+            // Show count or hide if 0
+            if (count > 0) {
+              badge.textContent = '+' + count;
+              badge.title = `${count} players have joined LaPista`;
+            } else {
+              // Show "NEW" if no players yet
+              badge.textContent = 'NEW';
+              badge.title = 'Be one of our first players!';
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load platform stats:', err);
+          // Fallback - hide the badge or show NEW
+          const badge = document.getElementById('player-count-badge');
+          if (badge) {
+            badge.textContent = 'NEW';
+            badge.title = 'Join our community!';
+          }
+        }
       }
 
       // Load games from API
@@ -1034,6 +1066,9 @@
         loadGames().catch(err => {
           // Error handled in loadGames
         });
+        
+        // Load platform stats for user count badge
+        loadPlatformStats();
 
         // Fix anchor links - body has overflow:hidden, so we need to scroll the inner container
         document.querySelectorAll('a[href="#schedule"], a[href="index.html#schedule"]').forEach(link => {

@@ -903,6 +903,40 @@ app.get('/api/waitlist/:gameId', async (req, res) => {
   }
 });
 
+// Get platform stats (total players who have used the platform)
+app.get('/api/stats/platform', async (req, res) => {
+  try {
+    // Count unique emails from all RSVPs (confirmed or completed)
+    const uniquePlayers = await RSVP.distinct('player.email', {
+      status: { $in: ['confirmed', 'completed'] }
+    });
+    
+    // Also count total guests
+    const rsvpsWithGuests = await RSVP.find({ 
+      status: { $in: ['confirmed', 'completed'] },
+      'guests.0': { $exists: true }
+    });
+    const totalGuests = rsvpsWithGuests.reduce((sum, r) => sum + (r.guests?.length || 0), 0);
+    
+    // Total RSVPs
+    const totalRsvps = await RSVP.countDocuments({ status: { $in: ['confirmed', 'completed'] } });
+    
+    // Total games hosted
+    const totalGames = await Game.countDocuments();
+    
+    res.json({
+      uniquePlayers: uniquePlayers.length,
+      totalGuests,
+      totalParticipants: uniquePlayers.length + totalGuests,
+      totalRsvps,
+      totalGames
+    });
+  } catch (err) {
+    console.error('Platform stats error:', err);
+    res.status(500).json({ error: 'Failed to get platform stats' });
+  }
+});
+
 // ============================================
 // GAME TEMPLATES & AUTO-GENERATION
 // ============================================

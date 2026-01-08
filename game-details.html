@@ -221,48 +221,18 @@
         </div>
       </div>
 
-      <!-- 4. What to Expect -->
+      <!-- 4. What to Expect (Dynamic per game) -->
       <div class="mb-12">
         <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
           What to Expect
         </h3>
         <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ul id="expectations-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Will be populated by JavaScript based on game data -->
+            <!-- Default expectations shown until game loads -->
             <li class="flex items-start gap-3">
               <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                Bring shin guards (recommended)
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                Arrive 10 minutes before kickoff
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                All skill levels welcome - no ego
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                Water available on site
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                Turf shoes or firm ground cleats
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-              <span class="text-sm font-medium text-zinc-700">
-                Bibs provided by host
-              </span>
+              <span class="text-sm font-medium text-zinc-700">Loading...</span>
             </li>
           </ul>
         </div>
@@ -686,6 +656,56 @@
           const embedUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
           mapIframe.src = embedUrl;
         }
+        
+        // Update "What to Expect" section based on game/venue
+        updateExpectations();
+      }
+
+      // Update "What to Expect" section dynamically
+      function updateExpectations() {
+        const expectationsList = document.getElementById('expectations-list');
+        if (!expectationsList || !gameData) return;
+        
+        // Default expectations that apply to all games
+        const defaultExpectations = [
+          'Arrive 10 minutes before kickoff',
+          'All skill levels welcome - no ego',
+          'Turf shoes or firm ground cleats',
+          'Bibs provided by host'
+        ];
+        
+        // Venue-specific expectations
+        const venueExpectations = {
+          'Shady Lane Fields': [
+            'Turf field with lights',
+            'Free parking available',
+            'Water available on site',
+            'Restrooms on site'
+          ],
+          'Prairie Lane Fields': [
+            'Grass field',
+            'Bring your own water',
+            'Street parking available',
+            'No restrooms - plan accordingly'
+          ],
+          'Cesar Chavez Fields': [
+            'Downtown location',
+            'Limited street parking',
+            'Water fountains nearby',
+            'Great city views'
+          ]
+        };
+        
+        // Use game.expectations if defined in database, otherwise use venue-specific or defaults
+        let expectations = gameData.expectations || venueExpectations[gameData.venue?.name] || defaultExpectations;
+        
+        // Build the HTML
+        expectationsList.innerHTML = expectations.map(exp => `
+          <li class="flex items-start gap-3">
+            <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+            <span class="text-sm font-medium text-zinc-700">${exp}</span>
+          </li>
+        `).join('');
       }
 
       // Update availability display
