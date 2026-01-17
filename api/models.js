@@ -106,14 +106,21 @@ const rsvpSchema = new mongoose.Schema({
   waiverAcceptedIP: {
     type: String
   },
-  status: { 
-    type: String, 
+  status: {
+    type: String,
     enum: ['confirmed', 'pending', 'cancelled', 'no-show'],
-    default: 'pending' 
+    default: 'pending'
   },
   checkedIn: {
     type: Boolean,
     default: false
+  },
+  // Cancellation tracking
+  cancelledAt: {
+    type: Date
+  },
+  refundEligible: {
+    type: Boolean
   }
 }, { timestamps: true });
 

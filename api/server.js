@@ -602,6 +602,18 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
         return res.status(400).json({ error: 'Game not found' });
       }
 
+      // 🔒 Check for duplicate RSVP to prevent webhook replay issues
+      const existingRSVP = await RSVP.findOne({
+        $or: [
+          { confirmationCode: metadata.confirmationCode },
+          { stripeSessionId: session.id }
+        ]
+      });
+      if (existingRSVP) {
+        console.log('⚠️ Duplicate webhook detected, RSVP already exists:', metadata.confirmationCode);
+        return res.json({ received: true, duplicate: true });
+      }
+
       // Create RSVP
       const rsvp = new RSVP({
         gameId: metadata.gameId,
@@ -637,9 +649,12 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       await game.save();
 
       // Send confirmation email
-      await sendConfirmationEmail(rsvp, game);
+      const emailSent = await sendConfirmationEmail(rsvp, game);
+      if (!emailSent) {
+        console.error('⚠️ Failed to send confirmation email for:', metadata.confirmationCode, 'to:', metadata.email);
+      }
 
-      console.log('✅ Payment processed:', metadata.confirmationCode);
+      console.log('✅ Payment processed:', metadata.confirmationCode, '| Email sent:', emailSent);
     } catch (err) {
       console.error('Webhook processing error:', err);
     }
@@ -776,28 +791,59 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Cannot cancel past games' });
     }
 
-    // Process Stripe refund if paid online
-    let refundId = null;
-    if (rsvp.paymentMethod === 'online' && rsvp.stripePaymentIntentId) {
-      try {
-        const refund = await stripe.refunds.create({
-          payment_intent: rsvp.stripePaymentIntentId,
-          reason: 'requested_by_customer'
-        });
-        refundId = refund.id;
-        console.log(`💰 Refund processed: ${refundId} for ${rsvp.confirmationCode}`);
-      } catch (refundErr) {
-        console.error('Stripe refund error:', refundErr);
-        // Continue with cancellation even if refund fails - manual intervention needed
-        // You may want to flag this for manual review
-      }
+    // Calculate if eligible for refund (cancelled 24+ hours before game)
+    let refundEligible = false;
+    if (game && rsvp.paymentMethod === 'online') {
+      const gameDate = new Date(game.date);
+      const now = new Date();
+      const hoursUntilGame = (gameDate - now) / (1000 * 60 * 60);
+      refundEligible = hoursUntilGame >= 24;
     }
 
-    // Update RSVP status
+    // Update RSVP status (NO automatic refund - admin will review manually)
     rsvp.status = 'cancelled';
-    rsvp.paymentStatus = rsvp.paymentMethod === 'online' ? 'refunded' : 'cancelled';
-    if (refundId) rsvp.stripeRefundId = refundId;
+    rsvp.cancelledAt = new Date();
+    rsvp.refundEligible = refundEligible;
+    // Keep paymentStatus as 'paid' until admin manually processes refund
+    if (rsvp.paymentMethod !== 'online') {
+      rsvp.paymentStatus = 'cancelled';
+    }
     await rsvp.save();
+
+    // Send admin notification for cancellation (so you can manually review refunds)
+    if (rsvp.paymentMethod === 'online' && resend) {
+      try {
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'LaPista.ATX <noreply@lapista.atx>',
+          to: 'lapista.atx@gmail.com',
+          subject: `🚨 Cancellation Request - ${rsvp.confirmationCode} ${refundEligible ? '(REFUND ELIGIBLE)' : '(No Refund)'}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+              <h1 style="color: #ef4444;">Cancellation Request</h1>
+              <p><strong>Confirmation Code:</strong> ${rsvp.confirmationCode}</p>
+              <p><strong>Player:</strong> ${rsvp.player.firstName} ${rsvp.player.lastName}</p>
+              <p><strong>Email:</strong> ${rsvp.player.email}</p>
+              <p><strong>Phone:</strong> ${rsvp.player.phone || 'N/A'}</p>
+              <p><strong>Game:</strong> ${game?.title || rsvp.gameId}</p>
+              <p><strong>Game Date:</strong> ${game?.date ? new Date(game.date).toLocaleDateString() : 'N/A'}</p>
+              <p><strong>Total Players:</strong> ${rsvp.totalPlayers}</p>
+              <p><strong>Amount Paid:</strong> $${rsvp.totalAmount?.toFixed(2)}</p>
+              <p><strong>Payment Intent:</strong> ${rsvp.stripePaymentIntentId || 'N/A'}</p>
+              <hr style="margin: 20px 0;">
+              <p style="font-size: 18px; font-weight: bold; color: ${refundEligible ? '#22c55e' : '#ef4444'};">
+                ${refundEligible ? '✅ ELIGIBLE FOR REFUND (24+ hours before game)' : '❌ NOT ELIGIBLE (Less than 24 hours before game)'}
+              </p>
+              <p style="color: #666;">
+                To process refund, go to <a href="https://dashboard.stripe.com/payments">Stripe Dashboard</a> and search for the payment intent above.
+              </p>
+            </div>
+          `
+        });
+        console.log('📧 Admin notification sent for cancellation:', rsvp.confirmationCode);
+      } catch (emailErr) {
+        console.error('Failed to send admin cancellation notification:', emailErr);
+      }
+    }
 
     // Restore spots to game (cap at capacity to avoid overcount, floor at 0)
     if (game) {
@@ -848,6 +894,12 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
 
     // Send cancellation confirmation email
     try {
+      const refundMessage = rsvp.paymentMethod === 'online'
+        ? (refundEligible
+            ? '<p>Since you cancelled more than 24 hours before the game, you are eligible for a full refund. Your refund will be processed within 5-10 business days.</p>'
+            : '<p>Since you cancelled less than 24 hours before the game, unfortunately you are not eligible for a refund per our cancellation policy.</p>')
+        : '';
+
       await resend.emails.send({
         from: process.env.EMAIL_FROM || 'LaPista.ATX <noreply@lapista.atx>',
         to: rsvp.player.email,
@@ -857,7 +909,7 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
             <h1 style="color: #18181b;">Booking Cancelled</h1>
             <p>Hi ${rsvp.player.firstName},</p>
             <p>Your booking <strong>${rsvp.confirmationCode}</strong> has been cancelled.</p>
-            ${rsvp.paymentMethod === 'online' ? '<p>Your refund will be processed within 5-10 business days.</p>' : ''}
+            ${refundMessage}
             <p>We hope to see you at a future game!</p>
             <a href="${process.env.FRONTEND_URL}" style="color: #22c55e;">View Upcoming Games</a>
           </div>
@@ -867,9 +919,10 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
       console.error('Cancellation email error:', emailErr);
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Booking cancelled successfully',
+      refundEligible: refundEligible,
       refund: rsvp.paymentMethod === 'online'
     });
   } catch (err) {
