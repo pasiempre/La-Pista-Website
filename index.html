@@ -680,7 +680,8 @@
         const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
         
         return `
-          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${hotBorder} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200">
+          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${hotBorder} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200 overflow-hidden">
+            <div class="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
             <div class="flex items-center justify-between mb-2">
               <span class="text-[10px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded uppercase tracking-wide">
                 ${game.gameId}
