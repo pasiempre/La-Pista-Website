@@ -433,16 +433,20 @@
               cancelLink.href = `cancel.html?code=${rsvp.confirmationCode}`;
             }
             
-            // Generate QR code with confirmation URL
+            // Generate QR code with confirmation URL (guard if QRCode fails to load)
             const qrCanvas = document.getElementById('qr-code');
-            const confirmationUrl = `${window.location.origin}/confirmation-page.html?code=${rsvp.confirmationCode}`;
-            QRCode.toCanvas(qrCanvas, confirmationUrl, {
-              width: 48,
-              margin: 0,
-              color: { dark: '#18181b', light: '#f4f4f5' }
-            }, function(error) {
-              if (error) console.error('QR code error:', error);
-            });
+            if (window.QRCode && qrCanvas) {
+              const confirmationUrl = `${window.location.origin}/confirmation-page.html?code=${rsvp.confirmationCode}`;
+              QRCode.toCanvas(qrCanvas, confirmationUrl, {
+                width: 48,
+                margin: 0,
+                color: { dark: '#18181b', light: '#f4f4f5' }
+              }, function(error) {
+                if (error) console.error('QR code error:', error);
+              });
+            } else {
+              console.warn('QR code library not loaded');
+            }
 
             // Setup Add to Calendar button
             const calendarBtn = document.getElementById('add-to-calendar-btn');
