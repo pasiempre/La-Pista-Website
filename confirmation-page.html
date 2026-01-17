@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="/js/config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="/js/qrcode.min.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-zinc-200">
@@ -434,15 +434,17 @@
             }
             
             // Generate QR code with confirmation URL (guard if QRCode fails to load)
-            const qrCanvas = document.getElementById('qr-code');
-            if (window.QRCode && qrCanvas) {
+            const qrContainer = document.getElementById('qr-code-container');
+            if (window.QRCode && qrContainer) {
               const confirmationUrl = `${window.location.origin}/confirmation-page.html?code=${rsvp.confirmationCode}`;
-              QRCode.toCanvas(qrCanvas, confirmationUrl, {
+              qrContainer.innerHTML = '';
+              new QRCode(qrContainer, {
+                text: confirmationUrl,
                 width: 48,
-                margin: 0,
-                color: { dark: '#18181b', light: '#f4f4f5' }
-              }, function(error) {
-                if (error) console.error('QR code error:', error);
+                height: 48,
+                colorDark: '#18181b',
+                colorLight: '#f4f4f5',
+                correctLevel: QRCode.CorrectLevel.M
               });
             } else {
               console.warn('QR code library not loaded');
