@@ -406,7 +406,7 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
     // Create RSVP
     const rsvp = new RSVP({
       gameId,
-      confirmationCode: generateConfirmationCode(),
+      confirmationCode: generateConfirmationCode().toUpperCase(),
       player: { 
         firstName: sanitize(firstName), 
         lastName: sanitize(lastName), 
@@ -501,7 +501,7 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
     }
 
     // Generate confirmation code early
-    const confirmationCode = generateConfirmationCode();
+    const confirmationCode = generateConfirmationCode().toUpperCase();
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -579,7 +579,7 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       // Create RSVP
       const rsvp = new RSVP({
         gameId: metadata.gameId,
-        confirmationCode: metadata.confirmationCode,
+        confirmationCode: metadata.confirmationCode?.toUpperCase(),
         player: {
           firstName: metadata.firstName,
           lastName: metadata.lastName,
