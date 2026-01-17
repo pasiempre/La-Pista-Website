@@ -415,15 +415,16 @@
                           Pay Now
                         </div>
                       </label>
-                      <label class="cursor-pointer" onclick="document.getElementById('payCash').checked = true; updatePaymentUI('cash');">
-                        <input type="radio" name="payment" id="payCash" value="cash" class="peer sr-only">
-                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300">
-                          Pay at Game
+                      <label class="cursor-pointer" onclick="document.getElementById('payCashApp').checked = true; updatePaymentUI('cashapp');">
+                        <input type="radio" name="payment" id="payCashApp" value="cashapp" class="peer sr-only">
+                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300 flex items-center justify-center gap-1">
+                          <span class="iconify" data-icon="simple-icons:cashapp" data-width="14"></span>
+                          CashApp
                         </div>
                       </label>
                     </div>
-                    <p id="cash-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
-                      💵 Bring exact cash (<span class="cash-total">$5.99</span>) to the game. Your spot is reserved.
+                    <p id="cashapp-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
+                      <span class="font-bold">⚠️ Payment Required:</span> You must pay <span class="cashapp-total font-bold">$5.99</span> via CashApp to <span class="font-bold">$LaPistaATX</span> before the game. No payment = no play.
                     </p>
                   </div>
 
@@ -920,22 +921,22 @@
       
       function updatePaymentUI(method) {
         const btn = document.getElementById('rsvp-submit-btn');
-        const cashHelper = document.getElementById('cash-helper');
-        const cashTotal = document.querySelector('.cash-total');
-        
-        if (method === 'cash') {
-          btn.textContent = 'Reserve Spot';
-          if (cashHelper) {
-            cashHelper.classList.remove('hidden');
-            // Update the cash total display
-            if (cashTotal) {
+        const cashAppHelper = document.getElementById('cashapp-helper');
+        const cashAppTotal = document.querySelector('.cashapp-total');
+
+        if (method === 'cashapp') {
+          btn.textContent = 'Reserve Spot & Pay via CashApp';
+          if (cashAppHelper) {
+            cashAppHelper.classList.remove('hidden');
+            // Update the CashApp total display
+            if (cashAppTotal) {
               const total = PRICE_PER_PERSON * (1 + guests.length);
-              cashTotal.textContent = '$' + total.toFixed(2);
+              cashAppTotal.textContent = '$' + total.toFixed(2);
             }
           }
         } else {
           btn.textContent = 'Pay Now & Confirm';
-          if (cashHelper) cashHelper.classList.add('hidden');
+          if (cashAppHelper) cashAppHelper.classList.add('hidden');
         }
       }
 
@@ -982,23 +983,23 @@
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
         
         try {
-          if (paymentMethod === 'cash') {
-            // Pay at game - direct RSVP
+          if (paymentMethod === 'cashapp') {
+            // CashApp payment - reserve spot immediately
             const response = await fetch(`${API_URL}/api/rsvp`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(formData)
+              body: JSON.stringify({ ...formData, paymentMethod: 'cashapp' })
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
               throw new Error(data.error || 'Failed to create RSVP');
             }
-            
+
             // Redirect to confirmation page
             window.location.href = `confirmation-page.html?code=${data.confirmationCode}`;
-            
+
           } else {
             // Pay online - Stripe checkout
             const response = await fetch(`${API_URL}/api/checkout`, {
@@ -1006,13 +1007,13 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(formData)
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
               throw new Error(data.error || 'Failed to create checkout');
             }
-            
+
             // Redirect to Stripe
             window.location.href = data.url;
           }
@@ -1021,7 +1022,7 @@
           errorDiv.textContent = err.message || 'Something went wrong. Please try again.';
           errorDiv.classList.remove('hidden');
           btn.disabled = false;
-          btn.textContent = paymentMethod === 'cash' ? 'Reserve Spot' : 'Pay Now & Confirm';
+          btn.textContent = paymentMethod === 'cashapp' ? 'Reserve Spot & Pay via CashApp' : 'Pay Now & Confirm';
         }
       });
       

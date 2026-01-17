@@ -187,46 +187,46 @@
             </a>
           </div>
 
-          <!-- Pay at Game Section (Only shows for cash payments) -->
-          <div id="pay-at-game-section" class="hidden mb-8">
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+          <!-- CashApp Payment Section (Only shows for CashApp payments) -->
+          <div id="cashapp-payment-section" class="hidden mb-8">
+            <div class="bg-red-50 border-2 border-red-300 rounded-lg p-6">
               <div class="flex items-center gap-2 mb-4">
-                <span class="iconify text-amber-600" data-icon="lucide:wallet" data-width="1.5"></span>
-                <h3 class="text-sm font-black text-amber-800 uppercase tracking-wide font-display">
-                  Payment Due at Game
+                <span class="iconify text-red-600 text-xl" data-icon="lucide:alert-triangle" data-width="1.5"></span>
+                <h3 class="text-sm font-black text-red-800 uppercase tracking-wide font-display">
+                  Payment Required Before Game
                 </h3>
               </div>
-              <p class="text-sm text-amber-700 font-medium mb-4">
-                Bring <span id="pay-at-game-amount" class="font-bold">$5.99</span> cash to the game, or pay in advance below.
+              <p class="text-sm text-red-700 font-medium mb-2">
+                You selected CashApp payment. <span class="font-bold">You must pay <span id="cashapp-amount">$5.99</span> via CashApp before arriving</span>, or you will not be allowed to play.
               </p>
-              
-              <div class="border-t border-amber-200 pt-4 mt-4">
-                <p class="text-xs font-bold text-amber-600 uppercase tracking-wide mb-4 text-center">
-                  — Or Pay in Advance —
-                </p>
-                
+              <p class="text-xs text-red-600 font-medium mb-4">
+                Your spot is reserved but not confirmed until payment is received.
+              </p>
+
+              <div class="border-t border-red-200 pt-4 mt-4">
                 <!-- CashApp QR -->
-                <div class="bg-white rounded-lg p-4 border border-amber-200 mb-4">
+                <div class="bg-white rounded-lg p-4 border border-red-200 mb-4">
                   <div class="flex flex-col items-center">
-                    <div class="w-32 h-32 bg-zinc-100 border-2 border-dashed border-zinc-300 rounded-lg flex items-center justify-center mb-3">
+                    <div id="cashapp-qr-container" class="w-32 h-32 bg-zinc-100 border-2 border-dashed border-zinc-300 rounded-lg flex items-center justify-center mb-3">
                       <div class="text-center">
-                        <span class="iconify text-4xl text-zinc-400" data-icon="lucide:qr-code"></span>
-                        <p class="text-[10px] text-zinc-400 font-medium mt-1">QR Placeholder</p>
+                        <span class="iconify text-4xl text-zinc-400" data-icon="simple-icons:cashapp"></span>
+                        <p class="text-[10px] text-zinc-400 font-medium mt-1">QR Coming Soon</p>
                       </div>
                     </div>
-                    <p class="text-sm font-bold text-zinc-900 mb-1">Scan to Pay via Cash App</p>
-                    <p class="text-xs text-zinc-500 font-medium">$LaPistaATX</p>
+                    <p class="text-sm font-bold text-zinc-900 mb-1">Pay via CashApp</p>
+                    <p class="text-lg font-black text-green-600">$LaPistaATX</p>
+                    <p class="text-xs text-zinc-500 font-medium mt-2">
+                      Include your confirmation code in the note: <span id="cashapp-note-code" class="font-bold text-zinc-900">---</span>
+                    </p>
                   </div>
                 </div>
-                
-                <!-- Pay Online Instead Button -->
-                <a id="pay-online-btn" href="#" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white text-center font-bold text-sm uppercase tracking-wide rounded transition-all">
-                  <span class="iconify inline-block mr-2" data-icon="lucide:credit-card" data-width="1.2"></span>
-                  Pay Online Instead
-                </a>
-                <p class="text-[10px] text-center text-amber-600 font-medium mt-2">
-                  Secure payment via Stripe
-                </p>
+
+                <div class="bg-amber-50 border border-amber-200 rounded p-3 text-center">
+                  <p class="text-xs font-bold text-amber-700">
+                    <span class="iconify inline-block mr-1" data-icon="lucide:clock" data-width="14"></span>
+                    Pay at least 1 hour before game time
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -400,24 +400,22 @@
               }
             }
             
-            // Payment status and pay-at-game section
+            // Payment status and CashApp section
             const statusEl = document.getElementById('conf-payment-status');
-            const payAtGameSection = document.getElementById('pay-at-game-section');
-            
+            const cashAppSection = document.getElementById('cashapp-payment-section');
+
             if (rsvp.paymentMethod === 'online' && rsvp.paymentStatus === 'paid') {
               statusEl.textContent = 'Paid via Card';
               statusEl.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
-            } else if (rsvp.paymentMethod === 'cash') {
-              statusEl.textContent = 'Pay at Game';
+            } else if (rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash') {
+              statusEl.textContent = 'Pay via CashApp';
               statusEl.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');
-              statusEl.classList.add('bg-amber-50', 'text-amber-700', 'border-amber-200');
-              
-              // Show pay-at-game section
-              payAtGameSection.classList.remove('hidden');
-              document.getElementById('pay-at-game-amount').textContent = '$' + rsvp.totalAmount.toFixed(2);
-              
-              // Set up pay online button to redirect to game details
-              document.getElementById('pay-online-btn').href = `game-details.html?gameId=${game.gameId}&upgrade=${rsvp.confirmationCode}`;
+              statusEl.classList.add('bg-red-50', 'text-red-700', 'border-red-200');
+
+              // Show CashApp payment section
+              cashAppSection.classList.remove('hidden');
+              document.getElementById('cashapp-amount').textContent = '$' + rsvp.totalAmount.toFixed(2);
+              document.getElementById('cashapp-note-code').textContent = rsvp.confirmationCode;
             } else {
               statusEl.textContent = rsvp.paymentStatus;
             }

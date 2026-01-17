@@ -213,7 +213,7 @@ async function sendConfirmationEmail(rsvp, game) {
                   </div>
                   <div class="detail-row">
                     <span class="detail-label">💰 Total</span>
-                    <span class="detail-value">$${rsvp.totalAmount.toFixed(2)} ${rsvp.paymentMethod === 'cash' ? '(Pay at game)' : '(Paid)'}</span>
+                    <span class="detail-value">$${rsvp.totalAmount.toFixed(2)} ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? '(Pay via CashApp)' : '(Paid)'}</span>
                   </div>
                 </div>
               </div>
@@ -223,6 +223,21 @@ async function sendConfirmationEmail(rsvp, game) {
                 <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" class="btn" style="background: #25D366;">💬 Join WhatsApp</a>
               </div>
               
+              ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? `
+              <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <strong style="color: #b91c1c;">⚠️ PAYMENT REQUIRED:</strong>
+                <p style="margin: 10px 0 0; color: #991b1b;">
+                  You must pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$LaPistaATX</strong> before the game.
+                </p>
+                <p style="margin: 5px 0 0; color: #991b1b; font-size: 12px;">
+                  Include your confirmation code <strong>${rsvp.confirmationCode}</strong> in the note.
+                </p>
+                <p style="margin: 10px 0 0; color: #b91c1c; font-size: 13px; font-weight: bold;">
+                  No payment = No play. Pay at least 1 hour before game time.
+                </p>
+              </div>
+              ` : ''}
+
               <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
                 <strong>📝 Remember:</strong>
                 <ul style="margin: 10px 0 0; padding-left: 20px; color: #92400e;">
@@ -354,10 +369,10 @@ app.get('/api/games/:gameId/rsvps', async (req, res) => {
   }
 });
 
-// Create RSVP (Pay at Game)
+// Create RSVP (CashApp payment)
 app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
   try {
-    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted } = req.body;
+    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted, paymentMethod } = req.body;
 
     // Validate required fields
     if (!gameId || !firstName || !lastName || !email || !phone || !waiverAccepted) {
@@ -407,11 +422,11 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
     const rsvp = new RSVP({
       gameId,
       confirmationCode: generateConfirmationCode().toUpperCase(),
-      player: { 
-        firstName: sanitize(firstName), 
-        lastName: sanitize(lastName), 
-        email: sanitizedEmail, 
-        phone: sanitize(phone) 
+      player: {
+        firstName: sanitize(firstName),
+        lastName: sanitize(lastName),
+        email: sanitizedEmail,
+        phone: sanitize(phone)
       },
       // 🔒 Sanitize guest names to prevent stored XSS
       guests: (guests || []).map(g => ({
@@ -420,7 +435,7 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
       })),
       totalPlayers,
       totalAmount: totalPlayers * game.price,
-      paymentMethod: 'cash',
+      paymentMethod: paymentMethod === 'cashapp' ? 'cashapp' : 'cashapp', // Default to CashApp
       paymentStatus: 'pending',
       waiverAccepted,
       // 🔒 Legal: capture waiver acceptance metadata
