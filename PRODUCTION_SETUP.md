@@ -50,7 +50,7 @@ RESEND_API_KEY=re_xxxx
 # Application
 PORT=3001
 NODE_ENV=production
-FRONTEND_URL=https://lapista.atx
+FRONTEND_URL=https://lapista-atx.com
 ```
 
 ---
@@ -70,7 +70,7 @@ Both the Website and App use `js/shared-constants.js` for unified configuration:
 ### API Endpoints
 The `LAPISTA.api.getBaseUrl()` function automatically detects the environment:
 - **Development**: `http://localhost:3001`
-- **Production**: `https://api.lapista.atx`
+- **Production**: `https://api.lapista-atx.com`
 
 To update the production URL, edit `js/shared-constants.js`:
 ```javascript
@@ -78,7 +78,7 @@ getBaseUrl: function() {
     if (window.location.hostname === 'localhost') {
         return 'http://localhost:3001';
     }
-    return 'https://api.lapista.atx'; // ← Update this
+    return 'https://api.lapista-atx.com'; // ← Update this
 }
 ```
 
@@ -188,7 +188,7 @@ Create a product in Stripe Dashboard:
 ### 2. Webhook Configuration
 
 Add webhook endpoint in Stripe Dashboard:
-- **URL**: `https://api.lapista.atx/api/webhook`
+- **URL**: `https://api.lapista-atx.com/api/webhook`
 - **Events**: 
   - `checkout.session.completed`
   - `payment_intent.succeeded`

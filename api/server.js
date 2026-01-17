@@ -105,7 +105,7 @@ const optionalAuth = (req, res, next) => {
 // Middleware
 // 🔒 CORS: Restrict to frontend domain in production, allow all in development
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL, 'https://lapista-atx-jd756.ondigitalocean.app'].filter(Boolean)
+  ? [process.env.FRONTEND_URL, 'https://lapista-atx.com'].filter(Boolean)
   : true;
 
 app.use(cors({
