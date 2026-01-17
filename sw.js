@@ -7,11 +7,13 @@ const STATIC_ASSETS = [
   '/faq-page.html',
   '/contact-page.html',
   '/game-details.html',
+  '/confirmation-page.html',
+  '/cancel.html',
   '/terms.html',
+  '/waiver.html',
   '/css/styles.css',
   '/js/config.js',
-  '/LaPista Logo 1.png',
-  '/navbar-logo.gif'
+  '/LaPista Logo 1.png'
 ];
 
 // Install event - cache static assets

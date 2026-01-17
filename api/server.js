@@ -103,8 +103,13 @@ const optionalAuth = (req, res, next) => {
 };
 
 // Middleware
+// 🔒 CORS: Restrict to frontend domain in production, allow all in development
+const corsOrigin = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL, 'https://lapista-atx-jd756.ondigitalocean.app'].filter(Boolean)
+  : true;
+
 app.use(cors({
-  origin: true, // Allow all origins in development
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -619,14 +624,24 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 // Get RSVP by confirmation code
 app.get('/api/rsvp/:code', async (req, res) => {
   try {
-    // 🔒 Case-insensitive lookup (codes contain mixed case)
-    const rsvp = await RSVP.findOne({ 
-      confirmationCode: { $regex: new RegExp(`^${req.params.code}$`, 'i') }
-    });
+    // 🔒 Sanitize and normalize confirmation code (prevent ReDoS)
+    const code = req.params.code?.toString().trim().toUpperCase();
+    if (!code || code.length > 20) {
+      return res.status(400).json({ error: 'Invalid confirmation code' });
+    }
+
+    // Try exact match first (codes are stored uppercase with LP- prefix)
+    let rsvp = await RSVP.findOne({ confirmationCode: code });
+
+    // Fallback: try with LP- prefix if not provided
+    if (!rsvp && !code.startsWith('LP-')) {
+      rsvp = await RSVP.findOne({ confirmationCode: `LP-${code}` });
+    }
+
     if (!rsvp) {
       return res.status(404).json({ error: 'RSVP not found' });
     }
-    
+
     const game = await Game.findOne({ gameId: rsvp.gameId });
     res.json({ rsvp, game });
   } catch (err) {
@@ -693,15 +708,24 @@ app.post('/api/contact', apiLimiter, async (req, res) => {
 app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({ error: 'Email is required to confirm cancellation' });
     }
 
-    // Find RSVP (case-insensitive)
-    const rsvp = await RSVP.findOne({ 
-      confirmationCode: { $regex: new RegExp(`^${req.params.code}$`, 'i') }
-    });
+    // 🔒 Sanitize and normalize confirmation code (prevent ReDoS)
+    const code = req.params.code?.toString().trim().toUpperCase();
+    if (!code || code.length > 20) {
+      return res.status(400).json({ error: 'Invalid confirmation code' });
+    }
+
+    // Find RSVP by exact match
+    let rsvp = await RSVP.findOne({ confirmationCode: code });
+
+    // Fallback: try with LP- prefix if not provided
+    if (!rsvp && !code.startsWith('LP-')) {
+      rsvp = await RSVP.findOne({ confirmationCode: `LP-${code}` });
+    }
     
     if (!rsvp) {
       return res.status(404).json({ error: 'RSVP not found' });
