@@ -374,8 +374,8 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
   try {
     const { gameId, firstName, lastName, email, phone, guests, waiverAccepted, paymentMethod } = req.body;
 
-    // Validate required fields
-    if (!gameId || !firstName || !lastName || !email || !phone || !waiverAccepted) {
+    // Validate required fields (phone is optional)
+    if (!gameId || !firstName || !lastName || !email || !waiverAccepted) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -472,8 +472,8 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
   try {
     const { gameId, firstName, lastName, email, phone, guests, waiverAccepted } = req.body;
 
-    // Validate
-    if (!gameId || !firstName || !lastName || !email || !phone || !waiverAccepted) {
+    // Validate (phone is optional)
+    if (!gameId || !firstName || !lastName || !email || !waiverAccepted) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 

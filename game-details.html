@@ -354,9 +354,9 @@
                 </div>
                 <div class="space-y-1">
                   <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
-                    Phone Number
+                    Phone Number <span class="text-zinc-400 font-normal">(optional)</span>
                   </label>
-                  <input type="tel" id="phone" name="phone" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="(512) 555-0123" required="">
+                  <input type="tel" id="phone" name="phone" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="(512) 555-0123">
                 </div>
               </div>
 
@@ -955,13 +955,15 @@
           return;
         }
 
-        // 📱 Validate phone number (US format)
+        // 📱 Validate phone number (US format) - only if provided
         const phoneValue = document.getElementById('phone').value.trim();
-        const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-        if (!phoneRegex.test(phoneValue.replace(/\s/g, ''))) {
-          errorDiv.textContent = 'Please enter a valid phone number.';
-          errorDiv.classList.remove('hidden');
-          return;
+        if (phoneValue) {
+          const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+          if (!phoneRegex.test(phoneValue.replace(/\s/g, ''))) {
+            errorDiv.textContent = 'Please enter a valid phone number.';
+            errorDiv.classList.remove('hidden');
+            return;
+          }
         }
         
         // Disable button and show loading
