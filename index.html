@@ -666,8 +666,10 @@
       // Format date for display
       function formatGameDate(dateStr) {
         const date = new Date(dateStr);
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        return days[date.getDay()];
+        return date.toLocaleDateString('en-US', {
+          timeZone: 'America/Chicago',
+          weekday: 'short'
+        });
       }
 
       // Create game card HTML
@@ -1027,8 +1029,11 @@
         if (sbTitle) sbTitle.innerText = game.title;
         if (sbDate) {
           const dateObj = new Date(game.date);
-          sbDate.innerText = dateObj.toLocaleDateString('en-US', { 
-            month: 'long', day: 'numeric', year: 'numeric' 
+          sbDate.innerText = dateObj.toLocaleDateString('en-US', {
+            timeZone: 'America/Chicago',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
           }).toUpperCase();
         }
         

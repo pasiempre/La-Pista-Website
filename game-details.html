@@ -580,8 +580,11 @@
           // Update date display
           const dateDiv = document.querySelector('.text-xl.font-bold.text-zinc-900.font-display');
           if (dateDiv && gameData.date) {
-            dateDiv.textContent = new Date(gameData.date).toLocaleDateString('en-US', { 
-              month: 'long', day: 'numeric', year: 'numeric' 
+            dateDiv.textContent = new Date(gameData.date).toLocaleDateString('en-US', {
+              timeZone: 'America/Chicago',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric'
             });
           }
           
