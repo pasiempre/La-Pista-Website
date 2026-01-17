@@ -20,7 +20,22 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // FRONTEND_URL is required for Stripe redirect URLs
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://lapista-atx.com';
+// Remove ALL whitespace (spaces, tabs, newlines) from the URL
+let FRONTEND_URL = (process.env.FRONTEND_URL || 'https://lapista-atx.com').replace(/\s+/g, '');
+
+// Ensure URL has protocol
+if (FRONTEND_URL && !FRONTEND_URL.startsWith('http://') && !FRONTEND_URL.startsWith('https://')) {
+  FRONTEND_URL = 'https://' + FRONTEND_URL;
+  console.warn('⚠️  FRONTEND_URL was missing protocol, added https://');
+}
+
+// Remove trailing slash if present
+if (FRONTEND_URL.endsWith('/')) {
+  FRONTEND_URL = FRONTEND_URL.slice(0, -1);
+}
+
+console.log('📍 FRONTEND_URL configured as:', JSON.stringify(FRONTEND_URL));
+console.log('📍 Raw env value was:', JSON.stringify(process.env.FRONTEND_URL));
 if (!process.env.FRONTEND_URL) {
   console.warn('⚠️  FRONTEND_URL not set - using default: https://lapista-atx.com');
 }
@@ -524,6 +539,11 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
     // Generate confirmation code early
     const confirmationCode = generateConfirmationCode().toUpperCase();
 
+    // Debug: Log the URLs being sent to Stripe
+    const successUrl = `${FRONTEND_URL}/confirmation-page.html?code=${confirmationCode}`;
+    const cancelUrl = `${FRONTEND_URL}/game-details.html?gameId=${gameId}&cancelled=true`;
+    console.log('🔗 Stripe URLs:', { FRONTEND_URL, successUrl, cancelUrl });
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -536,8 +556,8 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
         quantity: totalPlayers,
       }],
       mode: 'payment',
-      success_url: `${FRONTEND_URL}/confirmation-page.html?code=${confirmationCode}`,
-      cancel_url: `${FRONTEND_URL}/game-details.html?gameId=${gameId}&cancelled=true`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       customer_email: email,
       metadata: {
         gameId,
