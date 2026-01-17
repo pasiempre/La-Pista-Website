@@ -13,7 +13,10 @@ const STATIC_ASSETS = [
   '/waiver.html',
   '/css/styles.css',
   '/js/config.js',
-  '/LaPista Logo 1.png'
+  '/LaPista Logo 1.png',
+  '/Game photo 1.png',
+  '/Game photo 2.png'
+  // Videos not cached (too large for service worker cache)
 ];
 
 // Install event - cache static assets

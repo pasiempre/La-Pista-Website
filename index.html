@@ -316,13 +316,11 @@
                   </a>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                  <div class="h-64 bg-gradient-to-br from-green-500 to-green-700 rounded-lg overflow-hidden relative group flex items-center justify-center">
-                    <span class="iconify text-white/30" data-icon="lucide:image" data-width="64"></span>
-                    <span class="absolute bottom-4 left-4 text-xs text-white/60 font-bold uppercase tracking-wide">Game Photo</span>
+                  <div class="h-64 bg-zinc-900 rounded-lg overflow-hidden relative group">
+                    <img src="/Game photo 1.png" alt="LaPista pickup soccer game" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                   </div>
-                  <div class="h-64 bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-lg overflow-hidden relative group translate-y-8 flex items-center justify-center">
-                    <span class="iconify text-white/30" data-icon="lucide:image" data-width="64"></span>
-                    <span class="absolute bottom-4 left-4 text-xs text-white/60 font-bold uppercase tracking-wide">Game Photo</span>
+                  <div class="h-64 bg-zinc-900 rounded-lg overflow-hidden relative group translate-y-8">
+                    <img src="/Game photo 2.png" alt="LaPista soccer community" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                   </div>
                 </div>
               </div>
@@ -334,16 +332,42 @@
                 ON THE PITCH
               </h2>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 relative z-10">
-                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
-                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 overflow-hidden group cursor-pointer hover:border-green-500 transition-colors relative">
+                  <video class="w-full h-full object-cover" poster="/Game photo 1.png" playsinline muted loop onclick="this.paused ? this.play() : this.pause()">
+                    <source src="/La Pista Highlights.mp4" type="video/mp4">
+                  </video>
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none video-overlay">
+                    <span class="iconify text-5xl text-white/80 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                  </div>
                 </div>
-                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
-                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 overflow-hidden group cursor-pointer hover:border-green-500 transition-colors relative">
+                  <video class="w-full h-full object-cover" poster="/Game photo 2.png" playsinline muted loop onclick="this.paused ? this.play() : this.pause()">
+                    <source src="/North Austin 4v4 Futbol Video.mp4" type="video/mp4">
+                  </video>
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none video-overlay">
+                    <span class="iconify text-5xl text-white/80 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                  </div>
                 </div>
-                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 flex items-center justify-center group cursor-pointer hover:border-green-500 transition-colors">
-                  <span class="iconify text-5xl text-zinc-600 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                <div class="aspect-[9/16] bg-zinc-800 rounded-xl border border-zinc-700 overflow-hidden group cursor-pointer hover:border-green-500 transition-colors relative">
+                  <video class="w-full h-full object-cover" poster="/Game photo 1.png" playsinline muted loop onclick="this.paused ? this.play() : this.pause()">
+                    <source src="/NORTH%20AUSTIN%20%F0%9F%93%8DLa%20Pista%F0%9F%92%9A%E2%9A%BD%EF%B8%8F%20and%20%40fletchasoccerchamps%20%F0%9F%92%AB%20will%20be%20hosting%204v4%20games%20every%20thursday.mp4" type="video/mp4">
+                  </video>
+                  <div class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none video-overlay">
+                    <span class="iconify text-5xl text-white/80 group-hover:text-green-500 transition-colors" data-icon="lucide:play-circle"></span>
+                  </div>
                 </div>
               </div>
+              <script>
+                // Hide play overlay when video plays
+                document.querySelectorAll('video').forEach(video => {
+                  video.addEventListener('play', () => {
+                    video.parentElement.querySelector('.video-overlay').style.opacity = '0';
+                  });
+                  video.addEventListener('pause', () => {
+                    video.parentElement.querySelector('.video-overlay').style.opacity = '1';
+                  });
+                });
+              </script>
             </div>
 
             <div class="py-24 max-w-6xl mx-auto w-full px-6">
