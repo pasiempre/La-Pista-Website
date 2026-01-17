@@ -62,7 +62,7 @@ const LAPISTA = {
       displayName: 'LaPista WhatsApp Group',
     },
     email: 'lapista.atx@gmail.com',
-    cashApp: '$LaPistaATX',
+    cashApp: '$bhrizzo',
   },
 
   // ============================================

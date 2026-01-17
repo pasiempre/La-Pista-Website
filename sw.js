@@ -1,5 +1,5 @@
-// LaPista Service Worker v1.0
-const CACHE_NAME = 'lapista-v1';
+// LaPista Service Worker v2.0
+const CACHE_NAME = 'lapista-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
   '/css/styles.css',
   '/js/config.js',
   '/js/qrcode.min.js',
+  '/lapista%20cashapp%20qr.jpg',
   '/LaPista Logo 1.png',
   '/Game photo 1.png',
   '/Game photo 2.png',

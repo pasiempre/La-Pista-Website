@@ -424,7 +424,7 @@
                       </label>
                     </div>
                     <p id="cashapp-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
-                      <span class="font-bold">⚠️ Payment Required:</span> You must pay <span class="cashapp-total font-bold">$5.99</span> via CashApp to <span class="font-bold">$LaPistaATX</span> before the game. No payment = no play.
+                      <span class="font-bold">⚠️ Payment Required:</span> You must pay <span class="cashapp-total font-bold">$5.99</span> via CashApp to <span class="font-bold">$bhrizzo</span> before the game. No payment = no play.
                     </p>
                   </div>
 
@@ -715,23 +715,26 @@
       // Update availability display
       function updateAvailabilityDisplay() {
         if (!gameData) return;
-        
-        const filled = gameData.capacity - gameData.spotsRemaining;
-        
+
+        // Ensure spotsRemaining is bounded between 0 and capacity
+        const capacity = gameData.capacity || 24;
+        const spotsRemaining = Math.max(0, Math.min(gameData.spotsRemaining, capacity));
+        const filled = Math.max(0, capacity - spotsRemaining);
+
         // Update filled text
         const filledText = document.getElementById('filled-text');
-        if (filledText) filledText.textContent = `${filled} of ${gameData.capacity} FILLED`;
-        
+        if (filledText) filledText.textContent = `${filled} of ${capacity} FILLED`;
+
         // Update progress bar
         const progressBar = document.getElementById('progress-bar');
         if (progressBar) {
-          const percentage = (filled / gameData.capacity) * 100;
+          const percentage = Math.max(0, Math.min(100, (filled / capacity) * 100));
           progressBar.style.width = `${percentage}%`;
         }
-        
+
         // Update remaining text
         const remainingText = document.getElementById('spots-remaining');
-        if (remainingText) remainingText.textContent = `${gameData.spotsRemaining} spots remaining`;
+        if (remainingText) remainingText.textContent = `${spotsRemaining} spots remaining`;
       }
 
       // Add a guest row

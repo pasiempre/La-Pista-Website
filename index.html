@@ -674,9 +674,12 @@
 
       // Create game card HTML
       function createGameCard(game, isHot = false) {
-        const spotsText = game.spotsRemaining === 0 ? 'FULL' : `${game.spotsRemaining} SPOTS`;
-        const spotsClass = game.spotsRemaining === 0 
-          ? 'text-red-600 border-red-200 bg-red-50' 
+        // Ensure spotsRemaining is bounded between 0 and capacity
+        const capacity = game.capacity || 24;
+        const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
+        const spotsText = spotsRemaining === 0 ? 'FULL' : `${spotsRemaining} SPOTS`;
+        const spotsClass = spotsRemaining === 0
+          ? 'text-red-600 border-red-200 bg-red-50'
           : 'text-green-600 border-green-200 bg-green-50';
         const hotBorder = isHot ? 'border-2 border-green-500 shadow-lg' : 'border border-zinc-200';
         const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
@@ -834,9 +837,13 @@
           
           // Find the "hottest" game (most spots filled, still available)
           const hotGame = upcoming.reduce((hot, game) => {
-            const fillRate = (game.capacity - game.spotsRemaining) / game.capacity;
-            const hotFillRate = hot ? (hot.capacity - hot.spotsRemaining) / hot.capacity : 0;
-            return fillRate > hotFillRate && game.spotsRemaining > 0 ? game : hot;
+            const capacity = game.capacity || 24;
+            const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
+            const fillRate = (capacity - spotsRemaining) / capacity;
+            const hotCapacity = hot ? (hot.capacity || 24) : 24;
+            const hotSpotsRemaining = hot ? Math.max(0, Math.min(hot.spotsRemaining, hotCapacity)) : 0;
+            const hotFillRate = hot ? (hotCapacity - hotSpotsRemaining) / hotCapacity : 0;
+            return fillRate > hotFillRate && spotsRemaining > 0 ? game : hot;
           }, null);
 
           // Store all upcoming games for filtering
@@ -932,9 +939,13 @@
 
         // Find the "hottest" game
         const hotGame = filtered.reduce((hot, game) => {
-          const fillRate = (game.capacity - game.spotsRemaining) / game.capacity;
-          const hotFillRate = hot ? (hot.capacity - hot.spotsRemaining) / hot.capacity : 0;
-          return fillRate > hotFillRate && game.spotsRemaining > 0 ? game : hot;
+          const capacity = game.capacity || 24;
+          const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
+          const fillRate = (capacity - spotsRemaining) / capacity;
+          const hotCapacity = hot ? (hot.capacity || 24) : 24;
+          const hotSpotsRemaining = hot ? Math.max(0, Math.min(hot.spotsRemaining, hotCapacity)) : 0;
+          const hotFillRate = hot ? (hotCapacity - hotSpotsRemaining) / hotCapacity : 0;
+          return fillRate > hotFillRate && spotsRemaining > 0 ? game : hot;
         }, null);
 
         // Build HTML
@@ -1052,12 +1063,14 @@
           sbTime.textContent = game.time;
         }
         
-        // Update spots
-        const filled = game.capacity - game.spotsRemaining;
+        // Update spots (with safeguards to prevent negative values)
+        const capacity = game.capacity || 24;
+        const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
+        const filled = Math.max(0, capacity - spotsRemaining);
         if (sbFilled) sbFilled.innerText = `${filled} FILLED`;
-        if (sbTotal) sbTotal.innerText = `${game.capacity} TOTAL`;
+        if (sbTotal) sbTotal.innerText = `${capacity} TOTAL`;
         if (sbProgress) {
-          const percentage = (filled / game.capacity) * 100;
+          const percentage = Math.max(0, Math.min(100, (filled / capacity) * 100));
           sbProgress.style.width = `${percentage}%`;
         }
 

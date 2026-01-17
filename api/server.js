@@ -227,7 +227,7 @@ async function sendConfirmationEmail(rsvp, game) {
               <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
                 <strong style="color: #b91c1c;">⚠️ PAYMENT REQUIRED:</strong>
                 <p style="margin: 10px 0 0; color: #991b1b;">
-                  You must pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$LaPistaATX</strong> before the game.
+                  You must pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$bhrizzo</strong> before the game.
                 </p>
                 <p style="margin: 5px 0 0; color: #991b1b; font-size: 12px;">
                   Include your confirmation code <strong>${rsvp.confirmationCode}</strong> in the note.
@@ -446,8 +446,8 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
 
     await rsvp.save();
 
-    // Update game spots
-    game.spotsRemaining -= totalPlayers;
+    // Update game spots (with safeguard to prevent negative values)
+    game.spotsRemaining = Math.max(0, game.spotsRemaining - totalPlayers);
     if (game.spotsRemaining <= 0) {
       game.status = 'full';
     }
@@ -552,13 +552,24 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
       }
     });
 
-    res.json({ 
+    res.json({
       sessionId: session.id,
-      url: session.url 
+      url: session.url
     });
   } catch (err) {
     console.error('Checkout error:', err);
-    res.status(500).json({ error: 'Failed to create checkout session' });
+    // Provide more helpful error messages for common Stripe issues
+    let errorMessage = 'Failed to create checkout session';
+    if (err.type === 'StripeInvalidRequestError') {
+      if (err.message.includes('product')) {
+        errorMessage = 'Payment configuration error. Please contact support.';
+        console.error('STRIPE_PRODUCT_ID may be invalid or mismatched with API key mode (live/test)');
+      } else if (err.message.includes('api_key')) {
+        errorMessage = 'Payment service temporarily unavailable.';
+        console.error('STRIPE_SECRET_KEY may be invalid');
+      }
+    }
+    res.status(500).json({ error: errorMessage, details: process.env.NODE_ENV === 'development' ? err.message : undefined });
   }
 });
 
@@ -617,8 +628,9 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 
       await rsvp.save();
 
-      // Update game spots
-      game.spotsRemaining -= parseInt(metadata.totalPlayers);
+      // Update game spots (with safeguard to prevent negative values)
+      const playersToDeduct = parseInt(metadata.totalPlayers);
+      game.spotsRemaining = Math.max(0, game.spotsRemaining - playersToDeduct);
       if (game.spotsRemaining <= 0) {
         game.status = 'full';
       }
@@ -787,11 +799,11 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
     if (refundId) rsvp.stripeRefundId = refundId;
     await rsvp.save();
 
-    // Restore spots to game (cap at capacity to avoid overcount)
+    // Restore spots to game (cap at capacity to avoid overcount, floor at 0)
     if (game) {
       const restoredSpots = game.spotsRemaining + rsvp.totalPlayers;
-      const capacity = Number.isFinite(game.capacity) ? game.capacity : restoredSpots;
-      game.spotsRemaining = Math.min(restoredSpots, capacity);
+      const capacity = Number.isFinite(game.capacity) ? game.capacity : 24; // Default to 24 if capacity undefined
+      game.spotsRemaining = Math.max(0, Math.min(restoredSpots, capacity));
       if (game.status === 'full' && game.spotsRemaining > 0) {
         game.status = 'open';
       }
