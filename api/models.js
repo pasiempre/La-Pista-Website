@@ -286,12 +286,13 @@ const Notification = mongoose.model('Notification', notificationSchema);
 // USER SCHEMA (for authentication & profiles)
 // ============================================
 const userSchema = new mongoose.Schema({
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
+    index: true  // Explicit index (removing separate schema.index call below)
   },
   passwordHash: { 
     type: String,
@@ -369,8 +370,7 @@ const userSchema = new mongoose.Schema({
   lastLoginAt: Date
 }, { timestamps: true });
 
-// Index for fast email lookups
-userSchema.index({ email: 1 });
+// Note: email index defined in schema field with index: true
 
 const User = mongoose.model('User', userSchema);
 

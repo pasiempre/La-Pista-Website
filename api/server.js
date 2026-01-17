@@ -19,6 +19,12 @@ app.set('trust proxy', 1);
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// FRONTEND_URL is required for Stripe redirect URLs
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://lapista-atx.com';
+if (!process.env.FRONTEND_URL) {
+  console.warn('⚠️  FRONTEND_URL not set - using default: https://lapista-atx.com');
+}
+
 if (!stripe) console.warn('⚠️  Stripe not configured - payments disabled');
 if (!resend) console.warn('⚠️  Resend not configured - emails disabled');
 
@@ -105,7 +111,7 @@ const optionalAuth = (req, res, next) => {
 // Middleware
 // 🔒 CORS: Restrict to frontend domain in production, allow all in development
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL, 'https://lapista-atx.com'].filter(Boolean)
+  ? [FRONTEND_URL, 'https://lapista-atx.com'].filter(Boolean)
   : true;
 
 app.use(cors({
@@ -250,7 +256,7 @@ async function sendConfirmationEmail(rsvp, game) {
               
               <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e4e4e7;">
                 <p style="color: #71717a; font-size: 12px; margin-bottom: 10px;">Need to cancel?</p>
-                <a href="${process.env.FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" 
+                <a href="${FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" 
                    style="color: #ef4444; font-size: 12px; text-decoration: underline;">Cancel Booking</a>
               </div>
             </div>
@@ -530,8 +536,8 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
         quantity: totalPlayers,
       }],
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/confirmation-page.html?code=${confirmationCode}`,
-      cancel_url: `${process.env.FRONTEND_URL}/game-details.html?gameId=${gameId}&cancelled=true`,
+      success_url: `${FRONTEND_URL}/confirmation-page.html?code=${confirmationCode}`,
+      cancel_url: `${FRONTEND_URL}/game-details.html?gameId=${gameId}&cancelled=true`,
       customer_email: email,
       metadata: {
         gameId,
@@ -875,7 +881,7 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
                 <p><strong>Date:</strong> ${game.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                 <p><strong>Time:</strong> ${game.time}</p>
                 <p><strong>Venue:</strong> ${game.venue.name}</p>
-                <a href="${process.env.FRONTEND_URL}/game-details.html?gameId=${game.gameId}" 
+                <a href="${FRONTEND_URL}/game-details.html?gameId=${game.gameId}" 
                    style="display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0;">
                   RSVP Now
                 </a>
@@ -911,7 +917,7 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
             <p>Your booking <strong>${rsvp.confirmationCode}</strong> has been cancelled.</p>
             ${refundMessage}
             <p>We hope to see you at a future game!</p>
-            <a href="${process.env.FRONTEND_URL}" style="color: #22c55e;">View Upcoming Games</a>
+            <a href="${FRONTEND_URL}" style="color: #22c55e;">View Upcoming Games</a>
           </div>
         `
       });
