@@ -18,7 +18,10 @@ const gameSchema = new mongoose.Schema({
   },
   dayOfWeek: { 
     type: String, 
-    enum: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    enum: [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+      'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    ],
     required: true 
   },
   time: { 
@@ -173,7 +176,10 @@ const gameTemplateSchema = new mongoose.Schema({
   },
   dayOfWeek: { 
     type: String, 
-    enum: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    enum: [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+      'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+    ],
     required: true 
   },
   time: { 
