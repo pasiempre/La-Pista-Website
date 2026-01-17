@@ -787,10 +787,12 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
     if (refundId) rsvp.stripeRefundId = refundId;
     await rsvp.save();
 
-    // Restore spots to game
+    // Restore spots to game (cap at capacity to avoid overcount)
     if (game) {
-      game.spotsRemaining += rsvp.totalPlayers;
-      if (game.status === 'full') {
+      const restoredSpots = game.spotsRemaining + rsvp.totalPlayers;
+      const capacity = Number.isFinite(game.capacity) ? game.capacity : restoredSpots;
+      game.spotsRemaining = Math.min(restoredSpots, capacity);
+      if (game.status === 'full' && game.spotsRemaining > 0) {
         game.status = 'open';
       }
       await game.save();
