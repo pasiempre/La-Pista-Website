@@ -148,7 +148,7 @@ const LAPISTA = {
   rules: {
     whatToBring: [
       'Turf shoes or cleats (no metal studs)',
-      'Shin guards (recommended)',
+      'Bring a white and dark shirt',
       'Water bottle',
       'White and dark shirt (for teams)',
     ],

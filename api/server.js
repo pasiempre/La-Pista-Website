@@ -173,6 +173,38 @@ function generateConfirmationCode() {
 
 async function sendConfirmationEmail(rsvp, game) {
   try {
+    // Build guest list HTML
+    let guestListHtml = '';
+    if (rsvp.totalPlayers > 1) {
+      guestListHtml = `
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e4e4e7;">
+          <div style="font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Players</div>
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px;">1</span>
+            <span style="font-size: 13px; color: #18181b;">${rsvp.player.firstName} ${rsvp.player.lastName}</span>
+            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">(You)</span>
+          </div>
+          ${(rsvp.guests || []).map((guest, i) => `
+          <div style="display: flex; align-items: center; margin-bottom: 8px;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: #f4f4f5; color: #71717a; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px;">${i + 2}</span>
+            <span style="font-size: 13px; color: #18181b;">${guest.firstName} ${guest.lastName}</span>
+            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">(Guest)</span>
+          </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    const paymentStatus = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
+      ? 'PAY VIA CASHAPP'
+      : 'PAID VIA CARD';
+    const paymentStatusColor = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
+      ? '#dc2626'
+      : '#16a34a';
+    const paymentStatusBg = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
+      ? '#fef2f2'
+      : '#f0fdf4';
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'LaPista.ATX <noreply@lapista.atx>',
       to: rsvp.player.email,
@@ -181,103 +213,123 @@ async function sendConfirmationEmail(rsvp, game) {
         <!DOCTYPE html>
         <html>
         <head>
-          <style>
-            body { font-family: 'Segoe UI', sans-serif; background: #f4f4f5; margin: 0; padding: 20px; }
-            .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; }
-            .header { background: #18181b; color: white; padding: 30px; text-align: center; }
-            .header h1 { margin: 0; font-size: 28px; font-weight: 800; text-transform: uppercase; }
-            .header .green { color: #22c55e; }
-            .content { padding: 30px; }
-            .ticket { background: #f4f4f5; border: 2px dashed #d4d4d8; border-radius: 8px; padding: 20px; margin: 20px 0; }
-            .ticket-header { font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-            .ticket-value { font-size: 18px; font-weight: 700; color: #18181b; }
-            .confirmation-code { font-size: 32px; font-weight: 800; color: #22c55e; letter-spacing: 2px; text-align: center; margin: 20px 0; }
-            .details { margin: 20px 0; }
-            .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e4e4e7; }
-            .detail-label { color: #71717a; font-size: 14px; }
-            .detail-value { font-weight: 600; color: #18181b; }
-            .footer { background: #18181b; color: #71717a; padding: 20px; text-align: center; font-size: 12px; }
-            .btn { display: inline-block; background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; text-transform: uppercase; margin: 10px 5px; }
-          </style>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>LaPista<span class="green">.ATX</span></h1>
-              <p style="margin: 10px 0 0; opacity: 0.8;">RSVP Confirmation</p>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; margin: 0; padding: 20px;">
+          <div style="max-width: 500px; margin: 0 auto;">
+
+            <!-- Header -->
+            <div style="text-align: center; padding: 30px 20px;">
+              <div style="width: 70px; height: 70px; border-radius: 50%; background: #dcfce7; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 32px;">✓</span>
+              </div>
+              <h1 style="margin: 0; font-size: 36px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1px;">
+                YOU'RE <span style="color: #16a34a;">IN!</span>
+              </h1>
+              <p style="margin: 8px 0 0; color: #71717a; font-size: 16px;">Your spot is confirmed.</p>
             </div>
-            <div class="content">
-              <p>Hey ${rsvp.player.firstName}! 👋</p>
-              <p>You're confirmed for <strong>${game.title}</strong>. See you on the pitch!</p>
-              
-              <div class="confirmation-code">${rsvp.confirmationCode}</div>
-              
-              <div class="ticket">
-                <div class="ticket-header">Game Details</div>
-                <div class="ticket-value">${game.title}</div>
-                <div style="margin-top: 15px;">
-                  <div class="detail-row">
-                    <span class="detail-label">📅 Date</span>
-                    <span class="detail-value">${game.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">⏰ Time</span>
-                    <span class="detail-value">${game.time}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">📍 Venue</span>
-                    <span class="detail-value">${game.venue.name}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">👥 Players</span>
-                    <span class="detail-value">${rsvp.totalPlayers}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">💰 Total</span>
-                    <span class="detail-value">$${rsvp.totalAmount.toFixed(2)} ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? '(Pay via CashApp)' : '(Paid)'}</span>
-                  </div>
+
+            <!-- Ticket Card -->
+            <div style="background: white; border: 1px solid #e4e4e7; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <!-- Decorative Top -->
+              <div style="height: 6px; background: #18181b;"></div>
+              <div style="height: 3px; background: #22c55e;"></div>
+
+              <div style="padding: 24px;">
+                <!-- Booking Ref -->
+                <div style="margin-bottom: 20px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Booking Ref</div>
+                  <div style="font-size: 20px; font-weight: 700; font-family: monospace; color: #18181b; letter-spacing: 1px;">#${rsvp.confirmationCode}</div>
+                </div>
+
+                <!-- Game Title -->
+                <h2 style="margin: 0 0 4px; font-size: 28px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1px; color: #18181b;">
+                  ${game.title}
+                </h2>
+                <div style="display: inline-flex; align-items: center; margin-bottom: 20px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 8px;"></span>
+                  <span style="font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">Confirmed</span>
+                </div>
+
+                <!-- Details -->
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${game.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                  <div style="font-size: 12px; color: #71717a; text-transform: uppercase;">${game.time}</div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${game.venue.name}</div>
+                  <div style="font-size: 12px; color: #71717a;">${game.venue.address}</div>
+                </div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${rsvp.totalPlayers} ${rsvp.totalPlayers === 1 ? 'Person' : 'People'}</div>
+                  <div style="font-size: 12px; color: #71717a;">Reserved by ${rsvp.player.firstName} ${rsvp.player.lastName}</div>
+                </div>
+
+                ${guestListHtml}
+              </div>
+
+              <!-- Perforated Line -->
+              <div style="border-top: 2px dashed #e4e4e7; margin: 0 24px;"></div>
+
+              <!-- Total & Status -->
+              <div style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total</div>
+                  <div style="font-size: 20px; font-weight: 700; color: #18181b;">$${rsvp.totalAmount.toFixed(2)}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Status</div>
+                  <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; background: ${paymentStatusBg}; color: ${paymentStatusColor}; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid ${paymentStatusColor}20;">
+                    ${paymentStatus}
+                  </span>
                 </div>
               </div>
-              
-              <div style="text-align: center;">
-                <a href="${game.venue.mapsUrl}" class="btn">📍 Get Directions</a>
-                <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" class="btn" style="background: #25D366;">💬 Join WhatsApp</a>
-              </div>
-              
-              ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? `
-              <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                <strong style="color: #b91c1c;">⚠️ PAYMENT REQUIRED:</strong>
-                <p style="margin: 10px 0 0; color: #991b1b;">
-                  You must pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$bhrizzo</strong> before the game.
-                </p>
-                <p style="margin: 5px 0 0; color: #991b1b; font-size: 12px;">
-                  Include your confirmation code <strong>${rsvp.confirmationCode}</strong> in the note.
-                </p>
-                <p style="margin: 10px 0 0; color: #b91c1c; font-size: 13px; font-weight: bold;">
-                  No payment = No play. Pay at least 1 hour before game time.
-                </p>
-              </div>
-              ` : ''}
-
-              <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                <strong>📝 Remember:</strong>
-                <ul style="margin: 10px 0 0; padding-left: 20px; color: #92400e;">
-                  <li>Bring shin guards</li>
-                  <li>Arrive 10 minutes early</li>
-                  <li>Turf shoes or cleats (no metal studs)</li>
-                  <li>Bring water</li>
-                </ul>
-              </div>
-              
-              <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e4e4e7;">
-                <p style="color: #71717a; font-size: 12px; margin-bottom: 10px;">Need to cancel?</p>
-                <a href="${FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" 
-                   style="color: #ef4444; font-size: 12px; text-decoration: underline;">Cancel Booking</a>
-              </div>
             </div>
-            <div class="footer">
-              <p>© 2025 LaPista.ATX • Austin's Pickup Soccer Community</p>
-              <p>Questions? Reply to this email or DM us on <a href="https://instagram.com/lapista.atx" style="color: #22c55e;">Instagram</a></p>
+
+            <!-- CashApp Warning -->
+            ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? `
+            <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; margin-top: 20px;">
+              <div style="font-size: 14px; font-weight: 700; color: #991b1b; margin-bottom: 10px;">⚠️ PAYMENT REQUIRED</div>
+              <p style="margin: 0 0 10px; color: #991b1b; font-size: 14px;">
+                Pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$bhrizzo</strong> before the game.
+              </p>
+              <p style="margin: 0 0 10px; color: #7f1d1d; font-size: 12px;">
+                Include your code <strong>${rsvp.confirmationCode}</strong> in the note.
+              </p>
+              <p style="margin: 0; color: #991b1b; font-size: 13px; font-weight: 700;">
+                No payment = No play. Pay at least 1 hour before game time.
+              </p>
+            </div>
+            ` : ''}
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin-top: 20px;">
+              <a href="${game.venue.mapsUrl}" style="display: inline-block; background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">📍 Get Directions</a>
+              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" style="display: inline-block; background: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">💬 WhatsApp</a>
+            </div>
+
+            <!-- Remember Section -->
+            <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 16px; margin-top: 20px;">
+              <div style="font-size: 13px; font-weight: 700; color: #854d0e; margin-bottom: 8px;">📝 Remember</div>
+              <ul style="margin: 0; padding-left: 20px; color: #a16207; font-size: 13px; line-height: 1.6;">
+                <li>Arrive 10 minutes early</li>
+                <li>Turf shoes or cleats (no metal studs)</li>
+                <li>Bring a white and dark shirt</li>
+                <li>Bring water</li>
+              </ul>
+            </div>
+
+            <!-- Cancel Link -->
+            <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px dashed #e4e4e7;">
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0 0 8px;">Need to cancel?</p>
+              <a href="${FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" style="color: #ef4444; font-size: 12px;">Cancel Booking</a>
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align: center; margin-top: 30px; padding: 20px; color: #a1a1aa; font-size: 11px;">
+              <p style="margin: 0 0 5px;">© 2026 LaPista.ATX • Austin's Pickup Soccer Community</p>
+              <p style="margin: 0;">Questions? DM us on <a href="https://instagram.com/lapista.atx" style="color: #16a34a;">Instagram</a></p>
             </div>
           </div>
         </body>
