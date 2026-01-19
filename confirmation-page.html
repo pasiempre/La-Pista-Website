@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="/css/styles.css">
 <script src="/js/config.js"></script>
 <script src="/js/qrcode.min.js"></script>
+<script src="/js/translations.js"></script>
+<script src="/js/i18n.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-zinc-200">
@@ -21,16 +23,16 @@
             <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
           </a>
           <div class="hidden md:flex items-center gap-6">
-            <a href="index.html#schedule" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+            <a href="index.html#schedule" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors" data-i18n="nav.games">
               Games
             </a>
-            <a href="about-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+            <a href="about-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors" data-i18n="nav.about">
               About
             </a>
-            <a href="faq-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+            <a href="faq-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors" data-i18n="nav.faq">
               FAQ
             </a>
-            <a href="contact-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors">
+            <a href="contact-page.html" class="text-sm font-semibold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide transition-colors" data-i18n="nav.contact">
               Contact
             </a>
           </div>
@@ -38,8 +40,11 @@
         <div class="flex items-center gap-4">
           <a href="index.html" class="hidden md:flex items-center gap-2 text-xs font-bold uppercase text-zinc-900 hover:text-green-600 transition-colors">
             <span class="iconify" data-icon="lucide:arrow-left" data-width="16"></span>
-            Back to Schedule
+            <span data-i18n="nav.backToSchedule">Back to Schedule</span>
           </a>
+          <button data-lang-toggle class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors px-2 py-1 border border-zinc-200 rounded">
+            ES
+          </button>
           <button class="md:hidden text-zinc-900">
             <span class="iconify text-2xl" data-icon="lucide:menu"></span>
           </button>
@@ -62,11 +67,10 @@
               <span class="iconify text-5xl" data-icon="lucide:check" data-width="2"></span>
               <div class="absolute inset-0 border-4 border-green-400 rounded-full animate-ping opacity-75"></div>
             </div>
-            <h1 class="text-5xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
-              YOU'RE
-              <span class="text-green-600">IN!</span>
+            <h1 class="text-5xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2" data-i18n="confirmation.youreIn">
+              YOU'RE IN!
             </h1>
-            <p class="text-zinc-500 text-lg font-medium">
+            <p class="text-zinc-500 text-lg font-medium" data-i18n="confirmation.spotConfirmed">
               Your spot is confirmed.
             </p>
           </div>
@@ -80,7 +84,7 @@
             <div class="p-8 pb-0">
               <div class="flex justify-between items-start mb-6">
                 <div>
-                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1" data-i18n="confirmation.bookingRef">
                     Booking Ref
                   </div>
                   <div id="conf-code" class="text-2xl font-mono font-bold text-zinc-900 tracking-wider">
@@ -98,7 +102,7 @@
 
               <div class="flex items-center gap-2 text-green-600 font-bold text-sm uppercase tracking-wide mb-6">
                 <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Confirmed
+                <span data-i18n="confirmation.confirmed">Confirmed</span>
               </div>
 
               <div class="space-y-4">
@@ -151,13 +155,13 @@
             <div class="px-8 pb-8 pt-0">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1" data-i18n="confirmation.total">
                     Total
                   </div>
                   <div id="conf-total" class="text-xl font-bold text-zinc-900">$--</div>
                 </div>
                 <div class="text-right">
-                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                  <div class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1" data-i18n="confirmation.status">
                     Status
                   </div>
                   <div id="conf-payment-status" class="inline-flex items-center px-2 py-1 rounded bg-green-50 text-green-700 border border-green-200 text-[10px] font-black uppercase tracking-wide">
@@ -172,17 +176,17 @@
           <div class="grid grid-cols-2 gap-3 mb-4">
             <button id="add-to-calendar-btn" class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-md font-bold text-sm uppercase tracking-wide transition-all shadow-md shadow-green-900/10">
               <span class="iconify" data-icon="lucide:calendar-plus" data-width="1.5"></span>
-              Add to Calendar
+              <span data-i18n="confirmation.addToCalendar">Add to Calendar</span>
             </button>
             <button id="share-btn" class="flex items-center justify-center gap-2 bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 py-3 px-4 rounded-md font-bold text-sm uppercase tracking-wide transition-all">
               <span class="iconify" data-icon="lucide:share-2" data-width="1.5"></span>
-              Share Game
+              <span data-i18n="confirmation.shareGame">Share Game</span>
             </button>
           </div>
 
           <div class="text-center mb-10">
             <a href="game-details.html" class="text-xs font-bold text-zinc-500 hover:text-zinc-900 uppercase tracking-wide inline-flex items-center gap-1 group">
-              View Game Details
+              <span data-i18n="confirmation.viewGameDetails">View Game Details</span>
               <span class="iconify group-hover:translate-x-0.5 transition-transform" data-icon="lucide:arrow-right" data-width="1.2"></span>
             </a>
           </div>
@@ -192,7 +196,7 @@
             <div class="bg-red-50 border-2 border-red-300 rounded-lg p-6">
               <div class="flex items-center gap-2 mb-4">
                 <span class="iconify text-red-600 text-xl" data-icon="lucide:alert-triangle" data-width="1.5"></span>
-                <h3 class="text-sm font-black text-red-800 uppercase tracking-wide font-display">
+                <h3 class="text-sm font-black text-red-800 uppercase tracking-wide font-display" data-i18n="confirmation.paymentRequired">
                   Payment Required Before Game
                 </h3>
               </div>
@@ -232,31 +236,31 @@
           <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6 mb-8">
             <h3 class="text-xs font-black text-zinc-900 uppercase tracking-widest mb-4 font-display flex items-center gap-2">
               <span class="iconify text-green-600" data-icon="lucide:info" data-width="1.5"></span>
-              Important Info
+              <span data-i18n="confirmation.importantInfo">Important Info</span>
             </h3>
             <ul class="space-y-3">
               <li class="flex items-start gap-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 mt-1.5"></span>
-                <span class="text-sm text-zinc-600 font-medium">
+                <span class="text-sm text-zinc-600 font-medium" data-i18n="confirmation.bringTurf">
                   Bring turf shoes or cleats (no metal studs).
                 </span>
               </li>
               <li class="flex items-start gap-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 mt-1.5"></span>
-                <span class="text-sm text-zinc-600 font-medium">
+                <span class="text-sm text-zinc-600 font-medium" data-i18n="confirmation.bringShirts">
                   Bring a white and a dark shirt just in case.
                 </span>
               </li>
               <li class="pt-2">
                 <a id="conf-maps-link" href="#" target="_blank" class="flex items-center gap-2 text-xs font-bold text-green-600 uppercase hover:underline">
                   <span class="iconify" data-icon="lucide:map" data-width="1.2"></span>
-                  Open Location in Maps
+                  <span data-i18n="confirmation.openInMaps">Open Location in Maps</span>
                 </a>
               </li>
               <li>
                 <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex items-center gap-2 text-xs font-bold text-green-600 uppercase hover:underline">
                   <span class="iconify" data-icon="mdi:whatsapp" data-width="1.2"></span>
-                  Join Game WhatsApp Group
+                  <span data-i18n="confirmation.joinWhatsApp">Join Game WhatsApp Group</span>
                 </a>
               </li>
             </ul>
@@ -265,23 +269,23 @@
           <!-- Email Note -->
           <div class="text-center mb-8 px-4">
             <p class="text-sm text-zinc-500 font-medium mb-1">
-              A confirmation email has been sent to
+              <span data-i18n="confirmation.emailSent">A confirmation email has been sent to</span>
               <span id="conf-email" class="text-zinc-900 font-bold">your email</span>
             </p>
-            <p class="text-xs text-zinc-400">
+            <p class="text-xs text-zinc-400" data-i18n="confirmation.checkSpam">
               Check your spam folder if you don't see it.
             </p>
           </div>
 
           <!-- Cancellation -->
           <div class="border-t border-dashed border-zinc-200 pt-6 text-center">
-            <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">
+            <p class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2" data-i18n="confirmation.needToCancel">
               Need to cancel?
             </p>
-            <a id="cancel-booking-link" href="#" class="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide border-b border-red-200 pb-0.5 hover:border-red-500 transition-all">
+            <a id="cancel-booking-link" href="#" class="text-xs font-bold text-red-500 hover:text-red-600 uppercase tracking-wide border-b border-red-200 pb-0.5 hover:border-red-500 transition-all" data-i18n="confirmation.cancelBooking">
               Cancel Booking
             </a>
-            <p class="text-[10px] text-zinc-400 mt-3 font-medium">
+            <p class="text-[10px] text-zinc-400 mt-3 font-medium" data-i18n="confirmation.refundEligible">
               Paid bookings are eligible for a full refund.
             </p>
           </div>
@@ -296,6 +300,9 @@
             <a href="mailto:lapista.atx@gmail.com" class="text-zinc-300 hover:text-zinc-500 transition-colors">
               <span class="iconify" data-icon="lucide:mail" data-width="18"></span>
             </a>
+            <button data-lang-toggle class="text-zinc-300 hover:text-zinc-500 transition-colors text-xs font-bold uppercase">
+              ES
+            </button>
           </div>
           <div class="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
             © <span data-year>2025</span> LaPista.ATX

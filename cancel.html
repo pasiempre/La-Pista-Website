@@ -11,6 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="/js/config.js"></script>
+<script src="/js/translations.js"></script>
+<script src="/js/i18n.js"></script>
 </head>
 <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
   <!-- Nav -->
@@ -19,6 +21,9 @@
       <a href="index.html" class="flex items-center group">
         <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
       </a>
+      <button data-lang-toggle class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors px-2 py-1 border border-zinc-200 rounded">
+        ES
+      </button>
     </div>
   </nav>
 
@@ -26,7 +31,7 @@
     <!-- Loading State -->
     <div id="loading-state" class="text-center py-16">
       <div class="w-12 h-12 border-4 border-zinc-200 border-t-green-500 rounded-full animate-spin mx-auto mb-4"></div>
-      <p class="text-zinc-500 font-medium">Loading booking details...</p>
+      <p class="text-zinc-500 font-medium" data-i18n="cancel.loading">Loading booking details...</p>
     </div>
 
     <!-- Error State -->
@@ -34,11 +39,11 @@
       <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
         <span class="iconify text-red-500 text-4xl" data-icon="lucide:alert-circle"></span>
       </div>
-      <h1 class="text-2xl font-bold text-zinc-900 mb-2">Booking Not Found</h1>
-      <p id="error-message" class="text-zinc-500 mb-6">We couldn't find this booking.</p>
+      <h1 class="text-2xl font-bold text-zinc-900 mb-2" data-i18n="cancel.notFound">Booking Not Found</h1>
+      <p id="error-message" class="text-zinc-500 mb-6" data-i18n="cancel.notFoundDesc">We couldn't find a booking with that confirmation code.</p>
       <a href="index.html" class="inline-flex items-center gap-2 text-green-600 font-bold hover:underline">
         <span class="iconify" data-icon="lucide:arrow-left"></span>
-        Back to Home
+        <span data-i18n="cancel.backToHome">Back to Home</span>
       </a>
     </div>
 
@@ -48,10 +53,10 @@
         <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <span class="iconify text-amber-500 text-3xl" data-icon="lucide:alert-triangle"></span>
         </div>
-        <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
+        <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2" data-i18n="cancel.title">
           Cancel Booking
         </h1>
-        <p class="text-zinc-500">Are you sure you want to cancel?</p>
+        <p class="text-zinc-500" data-i18n="cancel.confirmCancel">Enter the email address used for this booking to confirm cancellation.</p>
       </div>
 
       <!-- Booking Details -->
@@ -94,8 +99,8 @@
       <!-- Email Verification -->
       <form id="cancel-form" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">
-            Confirm Your Email
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2" data-i18n="cancel.emailLabel">
+            Email Address
           </label>
           <input type="email" id="confirm-email" required 
                  class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none"
@@ -104,12 +109,12 @@
         
         <div id="form-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
 
-        <button type="submit" id="cancel-btn" 
-                class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-sm rounded transition-all">
-          Cancel My Booking
+        <button type="submit" id="cancel-btn"
+                class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-widest text-sm rounded transition-all" data-i18n="cancel.cancelButton">
+          Cancel This Booking
         </button>
-        
-        <a href="index.html" class="block text-center text-sm font-bold text-zinc-500 hover:text-zinc-700 uppercase tracking-wide">
+
+        <a href="index.html" class="block text-center text-sm font-bold text-zinc-500 hover:text-zinc-700 uppercase tracking-wide" data-i18n="cancel.keepBooking">
           Keep My Booking
         </a>
       </form>
@@ -120,12 +125,12 @@
       <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
         <span class="iconify text-green-600 text-4xl" data-icon="lucide:check"></span>
       </div>
-      <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2">
-        Cancelled
+      <h1 class="text-3xl font-black uppercase tracking-tighter italic font-display text-zinc-900 mb-2" data-i18n="cancel.success">
+        Booking Cancelled
       </h1>
-      <p class="text-zinc-500 mb-2">Your booking has been cancelled.</p>
-      <p id="refund-message" class="text-sm text-green-600 font-medium mb-8 hidden">
-        Your refund will be processed within 5-10 business days.
+      <p class="text-zinc-500 mb-2" data-i18n="cancel.successDesc">Your booking has been cancelled successfully.</p>
+      <p id="refund-message" class="text-sm text-green-600 font-medium mb-8 hidden" data-i18n="cancel.refundMessage">
+        If you paid online, your refund will be processed within 5-10 business days.
       </p>
       <a href="index.html" class="inline-flex items-center gap-2 bg-zinc-900 hover:bg-green-600 text-white py-3 px-6 rounded-md font-bold text-sm uppercase tracking-wide transition-all">
         <span class="iconify" data-icon="lucide:calendar"></span>

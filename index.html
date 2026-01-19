@@ -20,6 +20,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="/js/config.js"></script>
+<script src="/js/translations.js"></script>
+<script src="/js/i18n.js"></script>
 
 <!-- Google Analytics - Uncomment and add your GA4 ID when ready -->
 <!-- 
@@ -95,21 +97,21 @@
       </div>
       <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
         <nav class="flex flex-col gap-4">
-          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+          <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors" data-i18n="nav.games">
             Games
           </a>
-          <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+          <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors" data-i18n="nav.about">
             About
           </a>
-          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+          <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors" data-i18n="nav.faq">
             FAQ
           </a>
-          <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">
+          <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors" data-i18n="nav.contact">
             Contact
           </a>
         </nav>
         <div>
-          <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">
+          <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4" data-i18n="footer.venues">
             Venues
           </div>
           <ul class="flex flex-col gap-3">
@@ -159,13 +161,7 @@
           <a href="index.html" class="flex items-center group">
             <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
           </a>
-          <div class="w-px h-6 bg-zinc-300 hidden lg:block transform skew-x-[-15deg]"></div>
-          <div class="flex items-center gap-2 text-zinc-400 text-sm">
-            <span class="text-zinc-900 font-bold uppercase tracking-tight">
-              GAME SCHEDULE
-            </span>
           </div>
-        </div>
 
         <div class="flex items-center gap-6">
           <div class="hidden md:flex items-center gap-3">
@@ -196,7 +192,12 @@
 
           <button onclick="scrollToSchedule()" class="bg-zinc-900 hover:bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-md transition-all flex items-center gap-2 shadow-sm uppercase tracking-wide group">
             <span class="iconify group-hover:text-white text-green-400" data-icon="lucide:calendar" data-width="1.5"></span>
-            <span>FIND A GAME</span>
+            <span data-i18n="hero.cta">FIND A GAME</span>
+          </button>
+
+          <!-- Language Toggle -->
+          <button data-lang-toggle class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center text-xs font-bold text-zinc-700 transition-all" aria-label="Toggle language">
+            ES
           </button>
         </div>
       </header>
@@ -213,22 +214,21 @@
               <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
               <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-zinc-900/50"></div>
               <div class="relative z-10 max-w-3xl px-6">
-                <span class="inline-block py-1.5 px-4 rounded-full bg-green-500/10 text-green-400 text-xs font-black uppercase tracking-widest mb-6 border border-green-500/20">
-                  Welcome to LaPista
+                <span class="inline-block py-1.5 px-4 rounded-full bg-green-500/10 text-green-400 text-xs font-black uppercase tracking-widest mb-6 border border-green-500/20" data-i18n="hero.tagline">
+                  AUSTIN'S PICKUP SOCCER
                 </span>
                 <h1 class="text-7xl md:text-9xl font-black uppercase italic tracking-tighter mb-6 font-display leading-[0.85]">
                   PURO
                   <span class="text-green-500">FÚTBOL</span>
                 </h1>
-                <p class="text-xl text-zinc-400 font-medium max-w-lg mx-auto mb-10 leading-relaxed">
-                  Austin's premier pickup soccer community. No egos, just the
-                  beautiful game. Join 500+ players weekly.
+                <p class="text-xl text-zinc-400 font-medium max-w-lg mx-auto mb-10 leading-relaxed" data-i18n="hero.description">
+                  Join weekly pickup games at quality fields across Austin. All skill levels welcome. $5.99 per game.
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <button onclick="scrollToSchedule()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-black uppercase tracking-wide rounded-md transition-all shadow-lg shadow-green-900/20 transform hover:-translate-y-1">
+                  <button onclick="scrollToSchedule()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-black uppercase tracking-wide rounded-md transition-all shadow-lg shadow-green-900/20 transform hover:-translate-y-1" data-i18n="hero.cta">
                     VIEW SCHEDULE
                   </button>
-                  <a href="about-page.html" class="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wide rounded-md transition-all border border-zinc-700">
+                  <a href="about-page.html" class="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wide rounded-md transition-all border border-zinc-700" data-i18n="hero.learnMore">
                     HOW IT WORKS
                   </a>
                 </div>
@@ -239,33 +239,33 @@
               <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-y border-zinc-200 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
                 <div class="flex items-center gap-2">
                   <span class="iconify text-green-600" data-icon="lucide:filter" data-width="20"></span>
-                  <span class="text-sm font-black uppercase tracking-wide text-zinc-400">
+                  <span class="text-sm font-black uppercase tracking-wide text-zinc-400" data-i18n="filter.label">
                     FILTERS:
                   </span>
                   <div id="filter-buttons" class="flex items-center gap-1 ml-2">
-                    <button data-region="all" class="filter-btn px-3 py-1 text-xs font-bold uppercase bg-zinc-900 text-white rounded transition-all">
+                    <button data-region="all" class="filter-btn px-3 py-1 text-xs font-bold uppercase bg-zinc-900 text-white rounded transition-all" data-i18n="filter.all">
                       ALL
                     </button>
-                    <button data-region="south" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                    <button data-region="south" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all" data-i18n="filter.south">
                       SOUTH
                     </button>
-                    <button data-region="east" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                    <button data-region="east" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all" data-i18n="filter.east">
                       EAST
                     </button>
-                    <button data-region="north" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all">
+                    <button data-region="north" class="filter-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-zinc-200 rounded transition-all" data-i18n="filter.north">
                       NORTH
                     </button>
                   </div>
                 </div>
                 <div class="relative w-full md:w-auto">
                   <span class="iconify absolute left-3 top-2.5 text-zinc-400" data-icon="lucide:search" data-width="16"></span>
-                  <input id="game-search" type="text" placeholder="FIND A GAME..." class="w-full md:w-64 bg-white border border-zinc-200 rounded-md py-2 pl-9 pr-4 text-xs font-bold uppercase focus:outline-none focus:border-green-500 transition-all">
+                  <input id="game-search" type="text" data-i18n-placeholder="filter.search" placeholder="FIND A GAME..." class="w-full md:w-64 bg-white border border-zinc-200 rounded-md py-2 pl-9 pr-4 text-xs font-bold uppercase focus:outline-none focus:border-green-500 transition-all">
                 </div>
               </div>
             </div>
             <!-- Sprint Header -->
             <div class="flex items-center gap-3 mb-6 group cursor-pointer border-b-2 border-zinc-200 pb-2 border-dashed max-w-7xl mx-auto px-4 md:px-0" id="schedule">
-              <span class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display italic">
+              <span class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display italic" data-i18n="game.upcoming">
                 UPCOMING GAMES
               </span>
               <span id="games-count" class="text-lg font-bold text-zinc-500 font-display">
@@ -279,7 +279,7 @@
             <!-- Loading State -->
             <div id="games-loading" class="flex flex-col items-center justify-center py-16 max-w-7xl mx-auto">
               <div class="w-12 h-12 border-4 border-zinc-200 border-t-green-500 rounded-full animate-spin mb-4"></div>
-              <p class="text-zinc-500 font-medium">Loading games...</p>
+              <p class="text-zinc-500 font-medium" data-i18n="misc.loading">Loading games...</p>
             </div>
 
             <!-- Error State -->
@@ -298,20 +298,20 @@
             <div class="py-24 border-t border-zinc-200 mt-20">
               <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div>
-                  <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-6 font-display">
+                  <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-6 font-display" data-i18n="home.aboutTitle">
                     ABOUT LAPISTA
                   </h2>
-                  <p class="text-zinc-600 text-lg mb-6 leading-relaxed">
+                  <p class="text-zinc-600 text-lg mb-6 leading-relaxed" data-i18n="home.aboutPara1">
                     We started LaPista with a simple goal: to create the best
                     pickup soccer experience in Austin. Organized games, quality
                     fields, and a community that respects the game.
                   </p>
-                  <p class="text-zinc-600 text-lg mb-8 leading-relaxed">
+                  <p class="text-zinc-600 text-lg mb-8 leading-relaxed" data-i18n="home.aboutPara2">
                     Whether you're a former pro or just getting back into it,
                     there's a spot for you on the pitch.
                   </p>
                   <a href="about-page.html" class="inline-flex items-center gap-2 text-green-600 font-black uppercase tracking-wide hover:underline text-lg group">
-                    Learn More
+                    <span data-i18n="home.learnMore">Learn More</span>
                     <span class="iconify group-hover:translate-x-1 transition-transform" data-icon="lucide:arrow-right"></span>
                   </a>
                 </div>
@@ -328,7 +328,7 @@
 
             <div class="py-24 bg-zinc-900 text-center text-white relative overflow-hidden">
               <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-              <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-12 font-display relative z-10">
+              <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-12 font-display relative z-10" data-i18n="home.onThePitch">
                 ON THE PITCH
               </h2>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 relative z-10">
@@ -372,11 +372,11 @@
 
             <div class="py-24 max-w-6xl mx-auto w-full px-6">
               <div class="text-center mb-16">
-                <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-4 font-display">
+                <h2 class="text-5xl font-black uppercase tracking-tighter italic mb-4 font-display" data-i18n="contact.title">
                   GET IN TOUCH
                 </h2>
-                <p class="text-zinc-500 text-lg">
-                  Have questions? Want to host a game?
+                <p class="text-zinc-500 text-lg" data-i18n="contact.subtitle">
+                  Have a question? We'd love to hear from you.
                 </p>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -385,16 +385,16 @@
                   <span class="font-bold text-xl text-zinc-900 mb-1">
                     @lapista.atx
                   </span>
-                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider" data-i18n="contact.followUs">
                     Follow Us
                   </span>
                 </a>
                 <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex flex-col items-center justify-center p-10 bg-white border border-zinc-200 rounded-xl hover:border-green-500 hover:shadow-xl transition-all group">
                   <span class="iconify text-4xl text-zinc-400 group-hover:text-green-600 mb-6 transition-colors" data-icon="mdi:whatsapp"></span>
-                  <span class="font-bold text-xl text-zinc-900 mb-1">
+                  <span class="font-bold text-xl text-zinc-900 mb-1" data-i18n="contact.whatsappGroup">
                     WhatsApp Group
                   </span>
-                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider" data-i18n="contact.joinChat">
                     Join Chat
                   </span>
                 </a>
@@ -403,7 +403,7 @@
                   <span class="font-bold text-xl text-zinc-900 mb-1">
                     lapista.atx@gmail.com
                   </span>
-                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider">
+                  <span class="text-xs text-zinc-400 font-bold uppercase tracking-wider" data-i18n="contact.emailUs">
                     Email Us
                   </span>
                 </a>
@@ -418,59 +418,59 @@
                       LaPista
                       <span class="text-green-500">.ATX</span>
                     </span>
-                    <p class="text-zinc-500 text-sm mt-6 leading-relaxed">
+                    <p class="text-zinc-500 text-sm mt-6 leading-relaxed" data-i18n="footer.tagline">
                       Connecting Austin's soccer community, one game at a time.
                     </p>
                   </div>
                   <div class="col-span-1">
-                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6" data-i18n="footer.explore">
                       Explore
                     </h4>
                     <ul class="space-y-4 text-sm font-medium text-zinc-400">
                       <li>
-                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors" data-i18n="nav.games">
                           Games
                         </a>
                       </li>
                       <li>
-                        <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                        <a href="about-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.about">
                           About
                         </a>
                       </li>
                       <li>
-                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                        <a href="index.html#schedule" class="hover:text-green-500 transition-colors" data-i18n="footer.venues">
                           Venues
                         </a>
                       </li>
                     </ul>
                   </div>
                   <div class="col-span-1">
-                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6" data-i18n="footer.support">
                       Support
                     </h4>
                     <ul class="space-y-4 text-sm font-medium text-zinc-400">
                       <li>
-                        <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                        <a href="faq-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.faq">
                           FAQ
                         </a>
                       </li>
                       <li>
-                        <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                        <a href="contact-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.contact">
                           Contact
                         </a>
                       </li>
                       <li>
-                        <a href="terms.html" class="hover:text-green-500 transition-colors">
+                        <a href="terms.html" class="hover:text-green-500 transition-colors" data-i18n="footer.terms">
                           Terms
                         </a>
                       </li>
                     </ul>
                   </div>
                   <div class="col-span-1">
-                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6">
+                    <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6" data-i18n="footer.follow">
                       Follow
                     </h4>
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 mb-6">
                       <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                         <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
                       </a>
@@ -478,12 +478,19 @@
                         <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
                       </a>
                     </div>
+                    <!-- Language Toggle in Footer -->
+                    <div class="flex items-center gap-2">
+                      <span class="iconify text-zinc-500" data-icon="lucide:globe" data-width="16"></span>
+                      <button data-lang-toggle class="text-sm font-bold text-zinc-400 hover:text-green-500 transition-colors">
+                        ES
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide">
-                  <div>© <span data-year>2025</span> LaPista.ATX</div>
+                  <div>© <span data-year>2026</span> LaPista.ATX</div>
                   <div class="flex gap-6 mt-4 md:mt-0">
-                    <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+                    <a href="terms.html" class="hover:text-zinc-400" data-i18n="footer.privacy">Privacy Policy</a>
                     <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
                   </div>
                 </div>
@@ -803,8 +810,8 @@
                 <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:calendar-x"></span>
                 </div>
-                <p class="text-zinc-500 font-medium">No games scheduled this week.</p>
-                <p class="text-zinc-400 text-sm mt-2">Check back soon!</p>
+                <p class="text-zinc-500 font-medium">${typeof I18N !== 'undefined' ? I18N.t('game.noGames', 'No upcoming games scheduled.') : 'No upcoming games scheduled.'}</p>
+                <p class="text-zinc-400 text-sm mt-2">${typeof I18N !== 'undefined' ? I18N.t('game.checkBack', 'Check back soon for new games!') : 'Check back soon for new games!'}</p>
               </div>
             `;
             return;
@@ -827,8 +834,8 @@
                 <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:calendar-x"></span>
                 </div>
-                <p class="text-zinc-500 font-medium">No upcoming games scheduled.</p>
-                <p class="text-zinc-400 text-sm mt-2">Check back soon for new games!</p>
+                <p class="text-zinc-500 font-medium">${typeof I18N !== 'undefined' ? I18N.t('game.noGames', 'No upcoming games scheduled.') : 'No upcoming games scheduled.'}</p>
+                <p class="text-zinc-400 text-sm mt-2">${typeof I18N !== 'undefined' ? I18N.t('game.checkBack', 'Check back soon for new games!') : 'Check back soon for new games!'}</p>
               </div>
             `;
             countEl.textContent = `(${games.length} Total, 0 Upcoming)`;
@@ -929,8 +936,8 @@
               <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="iconify text-zinc-400 text-3xl" data-icon="lucide:search-x"></span>
               </div>
-              <p class="text-zinc-500 font-medium">No games match your filters.</p>
-              <p class="text-zinc-400 text-sm mt-2">Try adjusting your search or filter criteria.</p>
+              <p class="text-zinc-500 font-medium">${typeof I18N !== 'undefined' ? I18N.t('filter.noResults', 'No games match your filters.') : 'No games match your filters.'}</p>
+              <p class="text-zinc-400 text-sm mt-2">${typeof I18N !== 'undefined' ? I18N.t('filter.tryAdjusting', 'Try adjusting your search or filter criteria.') : 'Try adjusting your search or filter criteria.'}</p>
             </div>
           `;
           countEl.textContent = `(0 of ${allGamesData.length} Games)`;

@@ -16,6 +16,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="/js/config.js"></script>
+<script src="/js/translations.js"></script>
+<script src="/js/i18n.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
     <!-- Mobile Menu Overlay -->
@@ -62,19 +64,23 @@
 
       <div class="flex items-center gap-4">
         <nav class="hidden md:flex items-center gap-6 mr-4">
-          <a href="index.html#schedule" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+          <a href="index.html#schedule" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors" data-i18n="nav.games">
             Games
           </a>
-          <a href="about-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+          <a href="about-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors" data-i18n="nav.about">
             About
           </a>
-          <a href="faq-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+          <a href="faq-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors" data-i18n="nav.faq">
             FAQ
           </a>
-          <a href="contact-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors">
+          <a href="contact-page.html" class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors" data-i18n="nav.contact">
             Contact
           </a>
         </nav>
+        <!-- Language Toggle -->
+        <button data-lang-toggle class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center text-xs font-bold text-zinc-700 transition-all" aria-label="Toggle language">
+          ES
+        </button>
       </div>
     </header>
 
@@ -116,12 +122,12 @@
               <span class="px-2 py-0.5 rounded text-[10px] font-black bg-green-50 text-green-600 border border-green-200 uppercase tracking-wider">
                 Open for RSVP
               </span>
-              <span class="text-xs font-bold text-zinc-400 font-display">
-                GAME ID: LP-2025-001
+              <span id="game-id-badge" class="text-xs font-bold text-zinc-400 font-display">
+                GAME ID: Loading...
               </span>
             </div>
-            <h1 class="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter italic font-display leading-[0.9]">
-              Sunday Pickup
+            <h1 id="game-title" class="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter italic font-display leading-[0.9]">
+              Loading...
             </h1>
           </div>
           <div class="text-left md:text-right">
@@ -209,10 +215,10 @@
                 <span class="iconify text-xl text-zinc-400" data-icon="lucide:users" data-width="1.2em"></span>
               </div>
               <div>
-                <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide" data-i18n="gameDetails.skillLevel">
                   Skill Level
                 </div>
-                <div class="text-sm font-bold text-zinc-900 uppercase">
+                <div class="text-sm font-bold text-zinc-900 uppercase" data-i18n="gameDetails.allLevels">
                   Open to all skill levels
                 </div>
               </div>
@@ -223,7 +229,7 @@
 
       <!-- 4. What to Expect (Dynamic per game) -->
       <div class="mb-12">
-        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4" data-i18n="gameDetails.whatToExpect">
           What to Expect
         </h3>
         <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
@@ -246,18 +252,17 @@
           </div>
 
           <div class="relative z-10">
-            <h3 class="text-xl font-bold text-green-800 uppercase font-display mb-2">
+            <h3 class="text-xl font-bold text-green-800 uppercase font-display mb-2" data-i18n="gameDetails.gameChat">
               Game Chat
             </h3>
-            <p class="text-sm font-medium text-green-700 max-w-md">
-              Join the game chat for live updates, carpooling, and to connect
-              with other players before the match.
+            <p class="text-sm font-medium text-green-700 max-w-md" data-i18n="gameDetails.gameChatDesc">
+              Join the game chat for live updates, carpooling, and to connect with other players before the match.
             </p>
           </div>
 
           <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="relative z-10 shrink-0 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide px-6 py-3 rounded-md shadow-sm transition-all flex items-center gap-2 group">
             <span class="iconify text-xl" data-icon="mdi:whatsapp"></span>
-            Join WhatsApp Group
+            <span data-i18n="gameDetails.joinWhatsApp">Join WhatsApp Group</span>
           </a>
         </div>
       </div>
@@ -266,7 +271,7 @@
       <div class="mb-16">
         <div class="flex items-center gap-3 mb-6">
           <div class="h-px flex-1 bg-zinc-200"></div>
-          <h2 id="form-section-title" class="text-2xl font-black text-zinc-900 uppercase tracking-tighter italic font-display">
+          <h2 id="form-section-title" class="text-2xl font-black text-zinc-900 uppercase tracking-tighter italic font-display" data-i18n="form.reserveSpot">
             Reserve Your Spot
           </h2>
           <div class="h-px flex-1 bg-zinc-200"></div>
@@ -278,8 +283,8 @@
             <div class="flex items-center gap-3">
               <span class="iconify text-amber-600 text-2xl" data-icon="lucide:clock"></span>
               <div>
-                <h3 class="text-lg font-black text-amber-800 uppercase tracking-tight font-display">Game Full</h3>
-                <p class="text-sm text-amber-700 font-medium">Join the waitlist to get notified if a spot opens up.</p>
+                <h3 class="text-lg font-black text-amber-800 uppercase tracking-tight font-display" data-i18n="waitlist.title">Game Full</h3>
+                <p class="text-sm text-amber-700 font-medium" data-i18n="waitlist.description">Join the waitlist to get notified if a spot opens up.</p>
               </div>
             </div>
           </div>
@@ -332,13 +337,13 @@
               <!-- Personal Info -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-1">
-                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.firstName">
                     First Name
                   </label>
                   <input type="text" id="firstName" name="firstName" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="Lionel" required="">
                 </div>
                 <div class="space-y-1">
-                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.lastName">
                     Last Name
                   </label>
                   <input type="text" id="lastName" name="lastName" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="Messi" required="">
@@ -347,14 +352,14 @@
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-1">
-                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                  <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.email">
                     Email Address
                   </label>
                   <input type="email" id="email" name="email" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="leo@example.com" required="">
                 </div>
                 <div class="space-y-1">
                   <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
-                    Phone Number <span class="text-zinc-400 font-normal">(optional)</span>
+                    <span data-i18n="form.phone">Phone Number</span> <span class="text-zinc-400 font-normal" data-i18n="form.phoneOptional">(optional)</span>
                   </label>
                   <input type="tel" id="phone" name="phone" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:bg-white focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none transition-all placeholder-zinc-400" placeholder="(512) 555-0123">
                 </div>
@@ -382,7 +387,7 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Order Summary -->
                 <div class="bg-zinc-50 rounded-lg p-4 border border-zinc-100">
-                  <h4 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 font-display">
+                  <h4 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-3 font-display" data-i18n="form.orderSummary">
                     Order Summary
                   </h4>
                   <div class="flex justify-between items-center text-sm font-medium text-zinc-600 mb-2">
@@ -395,7 +400,7 @@
                   </div>
                   <div class="border-t border-zinc-200 my-2"></div>
                   <div class="flex justify-between items-center">
-                    <span class="text-sm font-bold text-zinc-900 uppercase">
+                    <span class="text-sm font-bold text-zinc-900 uppercase" data-i18n="form.totalDue">
                       Total Due
                     </span>
                     <span class="text-lg font-black text-green-600">$<span id="totalAmount">5.99</span></span>
@@ -405,13 +410,13 @@
                 <!-- Payment & Waiver -->
                 <div class="space-y-4">
                   <div class="space-y-2">
-                    <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide">
+                    <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.paymentMethod">
                       Payment Method
                     </label>
                     <div class="grid grid-cols-2 gap-3">
                       <label class="cursor-pointer" onclick="document.getElementById('payOnline').checked = true; updatePaymentUI('online');">
                         <input type="radio" name="payment" id="payOnline" value="online" class="peer sr-only" checked="">
-                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300">
+                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300" data-i18n="form.payNow">
                           Pay Now
                         </div>
                       </label>
@@ -431,8 +436,8 @@
                   <div class="flex items-start gap-3 pt-2">
                     <input type="checkbox" id="waiver" name="waiver" class="mt-1 rounded border-zinc-300 text-green-600 focus:ring-green-500" required="">
                     <label for="waiver" class="text-xs text-zinc-500 font-medium leading-relaxed">
-                      I have read and agree to the
-                      <a href="waiver.html" target="_blank" class="text-green-600 underline hover:text-green-700 font-bold">
+                      <span data-i18n="form.waiver">I have read and agree to the</span>
+                      <a href="waiver.html" target="_blank" class="text-green-600 underline hover:text-green-700 font-bold" data-i18n="form.liabilityWaiver">
                         Liability Waiver
                       </a>
                     </label>
@@ -443,10 +448,10 @@
               <!-- Error Message -->
               <div id="form-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
 
-              <button type="submit" id="rsvp-submit-btn" class="w-full py-4 bg-zinc-900 hover:bg-green-600 text-white font-black uppercase tracking-widest text-sm rounded shadow-lg shadow-zinc-900/10 transition-all transform hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed">
-                Pay Now &amp; Confirm
+              <button type="submit" id="rsvp-submit-btn" class="w-full py-4 bg-zinc-900 hover:bg-green-600 text-white font-black uppercase tracking-widest text-sm rounded shadow-lg shadow-zinc-900/10 transition-all transform hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed" data-i18n="form.payAndConfirm">
+                Pay Now & Confirm
               </button>
-              <p class="text-[10px] text-center text-zinc-400 font-medium">
+              <p class="text-[10px] text-center text-zinc-400 font-medium" data-i18n="form.confirmationEmail">
                 You'll receive a confirmation email shortly.
               </p>
             </form>
@@ -470,51 +475,51 @@
             </p>
           </div>
           <div class="col-span-1">
-            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4" data-i18n="footer.explore">
               Explore
             </h4>
             <ul class="space-y-3 text-sm font-medium text-zinc-400">
               <li>
-                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors" data-i18n="nav.games">
                   Games
                 </a>
               </li>
               <li>
-                <a href="about-page.html" class="hover:text-green-500 transition-colors">
+                <a href="about-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.about">
                   About
                 </a>
               </li>
               <li>
-                <a href="index.html#schedule" class="hover:text-green-500 transition-colors">
+                <a href="index.html#schedule" class="hover:text-green-500 transition-colors" data-i18n="footer.venues">
                   Venues
                 </a>
               </li>
             </ul>
           </div>
           <div class="col-span-1">
-            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4" data-i18n="footer.support">
               Support
             </h4>
             <ul class="space-y-3 text-sm font-medium text-zinc-400">
               <li>
-                <a href="faq-page.html" class="hover:text-green-500 transition-colors">
+                <a href="faq-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.faq">
                   FAQ
                 </a>
               </li>
               <li>
-                <a href="contact-page.html" class="hover:text-green-500 transition-colors">
+                <a href="contact-page.html" class="hover:text-green-500 transition-colors" data-i18n="nav.contact">
                   Contact
                 </a>
               </li>
               <li>
-                <a href="terms.html" class="hover:text-green-500 transition-colors">
+                <a href="terms.html" class="hover:text-green-500 transition-colors" data-i18n="footer.terms">
                   Terms
                 </a>
               </li>
             </ul>
           </div>
           <div class="col-span-1">
-            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
+            <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4" data-i18n="footer.follow">
               Follow
             </h4>
             <div class="flex gap-4">
@@ -573,10 +578,14 @@
           
           // Update page title
           document.title = `${gameData.title} - LaPista.ATX`;
-          
-          // Update game header (find elements by context since no IDs)
-          const h1 = document.querySelector('main h1');
-          if (h1) h1.textContent = gameData.title;
+
+          // Update game header
+          const titleEl = document.getElementById('game-title');
+          if (titleEl) titleEl.textContent = gameData.title;
+
+          // Update game ID badge
+          const gameIdBadge = document.getElementById('game-id-badge');
+          if (gameIdBadge) gameIdBadge.textContent = `GAME ID: ${gameData.gameId}`;
           
           // Update date display
           const dateDiv = document.querySelector('.text-xl.font-bold.text-zinc-900.font-display');
@@ -974,7 +983,7 @@
         btn.textContent = 'Processing...';
         errorDiv.classList.add('hidden');
         
-        // Get form data
+        // Get form data (include language preference for email)
         const formData = {
           gameId: document.getElementById('gameId').value,
           firstName: document.getElementById('firstName').value,
@@ -982,7 +991,8 @@
           email: document.getElementById('email').value,
           phone: document.getElementById('phone').value,
           waiverAccepted: document.getElementById('waiver').checked,
-          guests: guestData
+          guests: guestData,
+          lang: typeof I18N !== 'undefined' ? I18N.getLanguage() : 'en'
         };
         
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;

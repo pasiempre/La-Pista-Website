@@ -1,5 +1,5 @@
-// LaPista Service Worker v2.0
-const CACHE_NAME = 'lapista-v2';
+// LaPista Service Worker v4.0 - Full i18n translations
+const CACHE_NAME = 'lapista-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -14,6 +14,8 @@ const STATIC_ASSETS = [
   '/css/styles.css',
   '/js/config.js',
   '/js/qrcode.min.js',
+  '/js/translations.js',
+  '/js/i18n.js',
   '/lapista%20cashapp%20qr.jpg',
   '/LaPista Logo 1.png',
   '/Game photo 1.png',

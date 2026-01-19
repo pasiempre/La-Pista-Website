@@ -171,24 +171,98 @@ function generateConfirmationCode() {
   return code;
 }
 
-async function sendConfirmationEmail(rsvp, game) {
+async function sendConfirmationEmail(rsvp, game, lang = 'en') {
   try {
+    // Email translations
+    const t = {
+      en: {
+        subject: `🎉 You're In! ${game.title} - ${game.date.toLocaleDateString('en-US')}`,
+        youreIn: "YOU'RE",
+        in: "IN!",
+        spotConfirmed: "Your spot is confirmed.",
+        players: "Players",
+        you: "(You)",
+        guest: "(Guest)",
+        bookingRef: "Booking Ref",
+        confirmed: "Confirmed",
+        person: "Person",
+        people: "People",
+        reservedBy: "Reserved by",
+        total: "Total",
+        status: "Status",
+        payViaCashApp: "PAY VIA CASHAPP",
+        paidViaCard: "PAID VIA CARD",
+        paymentRequired: "⚠️ PAYMENT REQUIRED",
+        payAmount: (amount) => `Pay <strong>$${amount}</strong> via CashApp to <strong>$bhrizzo</strong> before the game.`,
+        includeCode: (code) => `Include your code <strong>${code}</strong> in the note.`,
+        noPayment: "No payment = No play. Pay at least 1 hour before game time.",
+        getDirections: "📍 Get Directions",
+        whatsApp: "💬 WhatsApp",
+        remember: "📝 Remember",
+        arriveEarly: "Arrive 10 minutes early",
+        turfShoes: "Turf shoes or cleats (no metal studs)",
+        bringShirts: "Bring a white and dark shirt",
+        bringWater: "Bring water",
+        needToCancel: "Need to cancel?",
+        cancelBooking: "Cancel Booking",
+        copyright: "© 2026 LaPista.ATX • Austin's Pickup Soccer Community",
+        questions: 'Questions? DM us on',
+        dateLocale: 'en-US'
+      },
+      es: {
+        subject: `🎉 ¡Estás Dentro! ${game.title} - ${game.date.toLocaleDateString('es-ES')}`,
+        youreIn: "¡ESTÁS",
+        in: "DENTRO!",
+        spotConfirmed: "Tu lugar está confirmado.",
+        players: "Jugadores",
+        you: "(Tú)",
+        guest: "(Invitado)",
+        bookingRef: "Ref. de Reserva",
+        confirmed: "Confirmado",
+        person: "Persona",
+        people: "Personas",
+        reservedBy: "Reservado por",
+        total: "Total",
+        status: "Estado",
+        payViaCashApp: "PAGAR VIA CASHAPP",
+        paidViaCard: "PAGADO CON TARJETA",
+        paymentRequired: "⚠️ PAGO REQUERIDO",
+        payAmount: (amount) => `Paga <strong>$${amount}</strong> via CashApp a <strong>$bhrizzo</strong> antes del partido.`,
+        includeCode: (code) => `Incluye tu código <strong>${code}</strong> en la nota.`,
+        noPayment: "Sin pago = Sin jugar. Paga al menos 1 hora antes del partido.",
+        getDirections: "📍 Cómo Llegar",
+        whatsApp: "💬 WhatsApp",
+        remember: "📝 Recuerda",
+        arriveEarly: "Llega 10 minutos antes",
+        turfShoes: "Zapatos de césped o tacos (sin tacos de metal)",
+        bringShirts: "Trae una camiseta blanca y una oscura",
+        bringWater: "Trae agua",
+        needToCancel: "¿Necesitas cancelar?",
+        cancelBooking: "Cancelar Reserva",
+        copyright: "© 2026 LaPista.ATX • Comunidad de Fútbol de Austin",
+        questions: 'Preguntas? Envíanos un DM en',
+        dateLocale: 'es-ES'
+      }
+    };
+
+    const txt = t[lang] || t.en;
+
     // Build guest list HTML
     let guestListHtml = '';
     if (rsvp.totalPlayers > 1) {
       guestListHtml = `
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e4e4e7;">
-          <div style="font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Players</div>
+          <div style="font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">${txt.players}</div>
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <span style="width: 20px; height: 20px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px;">1</span>
             <span style="font-size: 13px; color: #18181b;">${rsvp.player.firstName} ${rsvp.player.lastName}</span>
-            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">(You)</span>
+            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">${txt.you}</span>
           </div>
           ${(rsvp.guests || []).map((guest, i) => `
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <span style="width: 20px; height: 20px; border-radius: 50%; background: #f4f4f5; color: #71717a; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px;">${i + 2}</span>
             <span style="font-size: 13px; color: #18181b;">${guest.firstName} ${guest.lastName}</span>
-            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">(Guest)</span>
+            <span style="font-size: 11px; color: #a1a1aa; margin-left: 6px;">${txt.guest}</span>
           </div>
           `).join('')}
         </div>
@@ -196,8 +270,8 @@ async function sendConfirmationEmail(rsvp, game) {
     }
 
     const paymentStatus = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
-      ? 'PAY VIA CASHAPP'
-      : 'PAID VIA CARD';
+      ? txt.payViaCashApp
+      : txt.paidViaCard;
     const paymentStatusColor = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
       ? '#dc2626'
       : '#16a34a';
@@ -208,10 +282,10 @@ async function sendConfirmationEmail(rsvp, game) {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'LaPista.ATX <noreply@lapista.atx>',
       to: rsvp.player.email,
-      subject: `🎉 You're In! ${game.title} - ${game.date.toLocaleDateString()}`,
+      subject: txt.subject,
       html: `
         <!DOCTYPE html>
-        <html>
+        <html lang="${lang}">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -225,9 +299,9 @@ async function sendConfirmationEmail(rsvp, game) {
                 <span style="font-size: 32px;">✓</span>
               </div>
               <h1 style="margin: 0; font-size: 36px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -1px;">
-                YOU'RE <span style="color: #16a34a;">IN!</span>
+                ${txt.youreIn} <span style="color: #16a34a;">${txt.in}</span>
               </h1>
-              <p style="margin: 8px 0 0; color: #71717a; font-size: 16px;">Your spot is confirmed.</p>
+              <p style="margin: 8px 0 0; color: #71717a; font-size: 16px;">${txt.spotConfirmed}</p>
             </div>
 
             <!-- Ticket Card -->
@@ -239,7 +313,7 @@ async function sendConfirmationEmail(rsvp, game) {
               <div style="padding: 24px;">
                 <!-- Booking Ref -->
                 <div style="margin-bottom: 20px;">
-                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Booking Ref</div>
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">${txt.bookingRef}</div>
                   <div style="font-size: 20px; font-weight: 700; font-family: monospace; color: #18181b; letter-spacing: 1px;">#${rsvp.confirmationCode}</div>
                 </div>
 
@@ -249,12 +323,12 @@ async function sendConfirmationEmail(rsvp, game) {
                 </h2>
                 <div style="display: inline-flex; align-items: center; margin-bottom: 20px;">
                   <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 8px;"></span>
-                  <span style="font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">Confirmed</span>
+                  <span style="font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px;">${txt.confirmed}</span>
                 </div>
 
                 <!-- Details -->
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${game.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${game.date.toLocaleDateString(txt.dateLocale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</div>
                   <div style="font-size: 12px; color: #71717a; text-transform: uppercase;">${game.time}</div>
                 </div>
                 <div style="margin-bottom: 10px;">
@@ -262,8 +336,8 @@ async function sendConfirmationEmail(rsvp, game) {
                   <div style="font-size: 12px; color: #71717a;">${game.venue.address}</div>
                 </div>
                 <div>
-                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${rsvp.totalPlayers} ${rsvp.totalPlayers === 1 ? 'Person' : 'People'}</div>
-                  <div style="font-size: 12px; color: #71717a;">Reserved by ${rsvp.player.firstName} ${rsvp.player.lastName}</div>
+                  <div style="font-size: 14px; font-weight: 600; color: #18181b;">${rsvp.totalPlayers} ${rsvp.totalPlayers === 1 ? txt.person : txt.people}</div>
+                  <div style="font-size: 12px; color: #71717a;">${txt.reservedBy} ${rsvp.player.firstName} ${rsvp.player.lastName}</div>
                 </div>
 
                 ${guestListHtml}
@@ -275,11 +349,11 @@ async function sendConfirmationEmail(rsvp, game) {
               <!-- Total & Status -->
               <div style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Total</div>
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">${txt.total}</div>
                   <div style="font-size: 20px; font-weight: 700; color: #18181b;">$${rsvp.totalAmount.toFixed(2)}</div>
                 </div>
                 <div style="text-align: right;">
-                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Status</div>
+                  <div style="font-size: 10px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">${txt.status}</div>
                   <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; background: ${paymentStatusBg}; color: ${paymentStatusColor}; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid ${paymentStatusColor}20;">
                     ${paymentStatus}
                   </span>
@@ -290,46 +364,46 @@ async function sendConfirmationEmail(rsvp, game) {
             <!-- CashApp Warning -->
             ${rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash' ? `
             <div style="background: #fef2f2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; margin-top: 20px;">
-              <div style="font-size: 14px; font-weight: 700; color: #991b1b; margin-bottom: 10px;">⚠️ PAYMENT REQUIRED</div>
+              <div style="font-size: 14px; font-weight: 700; color: #991b1b; margin-bottom: 10px;">${txt.paymentRequired}</div>
               <p style="margin: 0 0 10px; color: #991b1b; font-size: 14px;">
-                Pay <strong>$${rsvp.totalAmount.toFixed(2)}</strong> via CashApp to <strong>$bhrizzo</strong> before the game.
+                ${txt.payAmount(rsvp.totalAmount.toFixed(2))}
               </p>
               <p style="margin: 0 0 10px; color: #7f1d1d; font-size: 12px;">
-                Include your code <strong>${rsvp.confirmationCode}</strong> in the note.
+                ${txt.includeCode(rsvp.confirmationCode)}
               </p>
               <p style="margin: 0; color: #991b1b; font-size: 13px; font-weight: 700;">
-                No payment = No play. Pay at least 1 hour before game time.
+                ${txt.noPayment}
               </p>
             </div>
             ` : ''}
 
             <!-- Action Buttons -->
             <div style="text-align: center; margin-top: 20px;">
-              <a href="${game.venue.mapsUrl}" style="display: inline-block; background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">📍 Get Directions</a>
-              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" style="display: inline-block; background: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">💬 WhatsApp</a>
+              <a href="${game.venue.mapsUrl}" style="display: inline-block; background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">${txt.getDirections}</a>
+              <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" style="display: inline-block; background: #25D366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; text-transform: uppercase; margin: 5px;">${txt.whatsApp}</a>
             </div>
 
             <!-- Remember Section -->
             <div style="background: #fefce8; border: 1px solid #fef08a; border-radius: 8px; padding: 16px; margin-top: 20px;">
-              <div style="font-size: 13px; font-weight: 700; color: #854d0e; margin-bottom: 8px;">📝 Remember</div>
+              <div style="font-size: 13px; font-weight: 700; color: #854d0e; margin-bottom: 8px;">${txt.remember}</div>
               <ul style="margin: 0; padding-left: 20px; color: #a16207; font-size: 13px; line-height: 1.6;">
-                <li>Arrive 10 minutes early</li>
-                <li>Turf shoes or cleats (no metal studs)</li>
-                <li>Bring a white and dark shirt</li>
-                <li>Bring water</li>
+                <li>${txt.arriveEarly}</li>
+                <li>${txt.turfShoes}</li>
+                <li>${txt.bringShirts}</li>
+                <li>${txt.bringWater}</li>
               </ul>
             </div>
 
             <!-- Cancel Link -->
             <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px dashed #e4e4e7;">
-              <p style="color: #a1a1aa; font-size: 12px; margin: 0 0 8px;">Need to cancel?</p>
-              <a href="${FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" style="color: #ef4444; font-size: 12px;">Cancel Booking</a>
+              <p style="color: #a1a1aa; font-size: 12px; margin: 0 0 8px;">${txt.needToCancel}</p>
+              <a href="${FRONTEND_URL}/cancel.html?code=${rsvp.confirmationCode}" style="color: #ef4444; font-size: 12px;">${txt.cancelBooking}</a>
             </div>
 
             <!-- Footer -->
             <div style="text-align: center; margin-top: 30px; padding: 20px; color: #a1a1aa; font-size: 11px;">
-              <p style="margin: 0 0 5px;">© 2026 LaPista.ATX • Austin's Pickup Soccer Community</p>
-              <p style="margin: 0;">Questions? DM us on <a href="https://instagram.com/lapista.atx" style="color: #16a34a;">Instagram</a></p>
+              <p style="margin: 0 0 5px;">${txt.copyright}</p>
+              <p style="margin: 0;">${txt.questions} <a href="https://instagram.com/lapista.atx" style="color: #16a34a;">Instagram</a></p>
             </div>
           </div>
         </body>
@@ -445,7 +519,9 @@ app.get('/api/games/:gameId/rsvps', async (req, res) => {
 // Create RSVP (CashApp payment)
 app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
   try {
-    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted, paymentMethod } = req.body;
+    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted, paymentMethod, lang } = req.body;
+    // Language preference: 'en' or 'es', default to 'en'
+    const userLang = (lang === 'es') ? 'es' : 'en';
 
     // Validate required fields (phone is optional)
     if (!gameId || !firstName || !lastName || !email || !waiverAccepted) {
@@ -526,13 +602,13 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
     }
     await game.save();
 
-    // Send confirmation email
-    await sendConfirmationEmail(rsvp, game);
+    // Send confirmation email (with language preference)
+    await sendConfirmationEmail(rsvp, game, userLang);
 
     res.json({
       success: true,
       confirmationCode: rsvp.confirmationCode,
-      message: 'RSVP confirmed! Check your email.'
+      message: userLang === 'es' ? '¡RSVP confirmado! Revisa tu email.' : 'RSVP confirmed! Check your email.'
     });
   } catch (err) {
     console.error('RSVP error:', err);
@@ -543,7 +619,9 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
 // Create Stripe Checkout Session (Pay Online)
 app.post('/api/checkout', rsvpLimiter, async (req, res) => {
   try {
-    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted } = req.body;
+    const { gameId, firstName, lastName, email, phone, guests, waiverAccepted, lang } = req.body;
+    // Language preference: 'en' or 'es', default to 'en'
+    const userLang = (lang === 'es') ? 'es' : 'en';
 
     // Validate (phone is optional)
     if (!gameId || !firstName || !lastName || !email || !waiverAccepted) {
@@ -626,7 +704,9 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
         totalPlayers: totalPlayers.toString(),
         waiverAccepted: waiverAccepted.toString(),
         // 🔒 Capture IP for waiver legal compliance
-        waiverAcceptedIP: req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress
+        waiverAcceptedIP: req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress,
+        // Language preference for email
+        lang: userLang
       }
     });
 
@@ -726,13 +806,14 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       }
       await game.save();
 
-      // Send confirmation email
-      const emailSent = await sendConfirmationEmail(rsvp, game);
+      // Send confirmation email (with language preference from metadata)
+      const userLang = metadata.lang === 'es' ? 'es' : 'en';
+      const emailSent = await sendConfirmationEmail(rsvp, game, userLang);
       if (!emailSent) {
         console.error('⚠️ Failed to send confirmation email for:', metadata.confirmationCode, 'to:', metadata.email);
       }
 
-      console.log('✅ Payment processed:', metadata.confirmationCode, '| Email sent:', emailSent);
+      console.log('✅ Payment processed:', metadata.confirmationCode, '| Email sent:', emailSent, '| Lang:', userLang);
     } catch (err) {
       console.error('Webhook processing error:', err);
     }
