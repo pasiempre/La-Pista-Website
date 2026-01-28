@@ -33,50 +33,68 @@ async function main() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    // 1. Cancel/Remove Sunday Jan 25th game (LP-2027)
-    console.log('\n--- Cancelling Sunday Jan 25th game (LP-2027) ---');
-    const cancelResult = await Game.findOneAndUpdate(
-      { gameId: 'LP-2027' },
-      { status: 'cancelled' },
-      { new: true }
-    );
+    // ============================================
+    // ADD THIS WEEK'S GAMES (Jan 29 & Feb 1, 2026)
+    // ============================================
 
-    if (cancelResult) {
-      console.log(`✅ Cancelled game: ${cancelResult.gameId} - ${cancelResult.title} on ${cancelResult.date}`);
+    // 1. Create Thursday Jan 29th game at Prairie Lane
+    console.log('\n--- Creating Thursday Jan 29th game at Prairie Lane ---');
+    const thursdayExists = await Game.findOne({ gameId: 'LP-2030' });
+    if (thursdayExists) {
+      console.log(`⚠️ Game LP-2030 already exists`);
     } else {
-      console.log('❌ Game LP-2027 not found');
-    }
-
-    // 2. Create Tuesday Jan 27th game
-    console.log('\n--- Creating Tuesday Jan 27th game ---');
-
-    // Check if it already exists
-    const existing = await Game.findOne({ gameId: 'LP-2029' });
-    if (existing) {
-      console.log(`⚠️ Game LP-2029 already exists`);
-    } else {
-      const newGame = new Game({
-        gameId: 'LP-2029',
-        title: 'Tuesday Night',
+      const thursdayGame = new Game({
+        gameId: 'LP-2030',
+        title: 'Thursday Night',
         venue: {
-          name: 'Shady Lane Fields',
-          address: '757 Shady Ln, Austin, TX 78702',
-          mapsUrl: 'https://maps.google.com/?q=757+Shady+Ln+Austin+TX+78702'
+          name: 'Prairie Lane Fields',
+          address: '4005 Prairie Ln, Austin, TX 78728',
+          mapsUrl: 'https://maps.google.com/?q=4005+Prairie+Ln+Austin+TX+78728'
         },
-        dayOfWeek: 'Tuesday',
-        time: '8:00 PM',
-        date: new Date('2026-01-28T02:00:00.000Z'), // Jan 27th 8PM CST = Jan 28 02:00 UTC
+        dayOfWeek: 'Thursday',
+        time: '8:30 PM',
+        date: new Date('2026-01-30T02:30:00.000Z'), // Jan 29th 8:30PM CST = Jan 30 02:30 UTC
         price: 5.99,
         capacity: 24,
         spotsRemaining: 24,
         status: 'open',
         format: '7v7',
         skillLevel: 'all',
-        description: 'Tuesday night pickup game at Shady Lane. All skill levels welcome.'
+        description: 'Thursday night pickup game at Prairie Lane. All skill levels welcome.'
       });
 
-      await newGame.save();
-      console.log(`✅ Created game: ${newGame.gameId} - ${newGame.title} on ${newGame.date}`);
+      await thursdayGame.save();
+      console.log(`✅ Created game: ${thursdayGame.gameId} - ${thursdayGame.title} on ${thursdayGame.date}`);
+    }
+
+    // 2. Create Sunday Feb 1st game at Shady Lane
+    console.log('\n--- Creating Sunday Feb 1st game at Shady Lane ---');
+    const sundayExists = await Game.findOne({ gameId: 'LP-2031' });
+    if (sundayExists) {
+      console.log(`⚠️ Game LP-2031 already exists`);
+    } else {
+      const sundayGame = new Game({
+        gameId: 'LP-2031',
+        title: 'Sunday Pickup',
+        venue: {
+          name: 'Shady Lane Fields',
+          address: '757 Shady Ln, Austin, TX 78702',
+          mapsUrl: 'https://maps.google.com/?q=757+Shady+Ln+Austin+TX+78702'
+        },
+        dayOfWeek: 'Sunday',
+        time: '8:00 PM',
+        date: new Date('2026-02-02T02:00:00.000Z'), // Feb 1st 8:00PM CST = Feb 2 02:00 UTC
+        price: 5.99,
+        capacity: 24,
+        spotsRemaining: 24,
+        status: 'open',
+        format: '7v7',
+        skillLevel: 'all',
+        description: 'Sunday pickup game at Shady Lane. All skill levels welcome.'
+      });
+
+      await sundayGame.save();
+      console.log(`✅ Created game: ${sundayGame.gameId} - ${sundayGame.title} on ${sundayGame.date}`);
     }
 
     // 3. Show current active games
@@ -87,7 +105,7 @@ async function main() {
     }).sort({ date: 1 });
 
     activeGames.forEach(g => {
-      console.log(`${g.gameId.padEnd(15)} ${g.dayOfWeek.padEnd(10)} ${g.date.toISOString().slice(0,10)} ${g.title}`);
+      console.log(`${g.gameId.padEnd(15)} ${g.dayOfWeek.padEnd(10)} ${g.date.toISOString().slice(0,10)} ${g.time.padEnd(10)} ${g.title}`);
     });
 
     console.log('\n✅ Done!');

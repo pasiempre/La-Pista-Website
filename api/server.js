@@ -82,9 +82,28 @@ const authLimiter = rateLimit({
   message: { error: 'Too many login attempts, please try again later.' }
 });
 
+// 🔒 SECURITY: Rate limiter for confirmation code lookups (prevents brute-force)
+const codeLookupLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // Max 10 lookups per minute per IP
+  message: { error: 'Too many attempts, please try again later.' }
+});
+
+// 🔒 SECURITY: Rate limiter for admin endpoints (prevents abuse)
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 admin requests per 15 min per IP
+  message: { error: 'Too many admin requests, please try again later.' }
+});
+
 // ============================================
 // JWT CONFIG
 // ============================================
+// 🔒 SECURITY: Fail fast if JWT_SECRET is missing in production
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.error('❌ FATAL: JWT_SECRET environment variable is required in production');
+  process.exit(1);
+}
 const JWT_SECRET = process.env.JWT_SECRET || 'lapista-dev-secret-change-in-production';
 const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days
 
@@ -146,8 +165,94 @@ app.use((req, res, next) => {
   }
 });
 
+// 🔒 SECURITY: Allowlist approach for static files
+// Only serve files with explicitly allowed extensions from allowed directories
+app.use((req, res, next) => {
+  // Handle API routes - must match exactly '/api' or start with '/api/'
+  // This prevents paths like '/apiary' or '/api-docs' from bypassing the allowlist
+  if (req.path === '/api' || req.path.startsWith('/api/')) {
+    // Block ALL file access in /api directory (source code protection)
+    // API routes don't have extensions (e.g., /api/games, /api/rsvp)
+    // Files have extensions (e.g., /api/server.js, /api/config.yml)
+    const hasExtension = /\.[a-zA-Z0-9]+$/.test(req.path);
+    if (hasExtension) {
+      return res.status(404).send('Not found');
+    }
+    // Let API route handlers process the request
+    return next();
+  }
+
+  // Allowed static file extensions (whitelist approach)
+  const allowedExtensions = [
+    '.html', '.css', '.js',           // Web files
+    '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico',  // Images
+    '.mp4', '.webm', '.mov',          // Videos
+    '.woff', '.woff2', '.ttf', '.eot', // Fonts
+    '.pdf',                            // Documents
+    '.json',                           // Config (manifest.json for PWA)
+  ];
+
+  // Allowed directories (for paths without extensions)
+  const allowedPaths = [
+    '/',              // Root index
+    '/js/',           // JavaScript
+    '/css/',          // Stylesheets
+    '/images/',       // Images
+    '/fonts/',        // Fonts
+  ];
+
+  // Block dotfiles and hidden directories
+  if (req.path.includes('/.') || req.path.startsWith('.')) {
+    return res.status(404).send('Not found');
+  }
+
+  // Block known sensitive files explicitly
+  const blockedFiles = [
+    '/package.json', '/package-lock.json',
+    '/SECURITY_ASSESSMENT.md', '/TODO.md', '/README.md',
+    '/PRODUCTION_SETUP.md', '/TESTING.md',
+    '/server.js', '/models.js',
+  ];
+  if (blockedFiles.some(f => req.path.toLowerCase() === f.toLowerCase())) {
+    return res.status(404).send('Not found');
+  }
+
+  // Block directories that shouldn't be browsed
+  const blockedDirs = ['/node_modules', '/api', '/scripts', '/.git', '/.claude'];
+  if (blockedDirs.some(d => req.path.toLowerCase().startsWith(d.toLowerCase()))) {
+    return res.status(404).send('Not found');
+  }
+
+  // Allow root path and HTML files
+  if (req.path === '/' || req.path.endsWith('.html')) {
+    return next();
+  }
+
+  // Allow files with permitted extensions
+  const ext = req.path.substring(req.path.lastIndexOf('.')).toLowerCase();
+  if (allowedExtensions.includes(ext)) {
+    // Special case: block .json except manifest.json
+    if (ext === '.json' && !req.path.endsWith('manifest.json')) {
+      return res.status(404).send('Not found');
+    }
+    return next();
+  }
+
+  // Allow paths in allowed directories (for directory index)
+  if (allowedPaths.some(p => req.path.startsWith(p))) {
+    return next();
+  }
+
+  // Block everything else
+  return res.status(404).send('Not found');
+});
+
 // Serve static files (HTML, CSS, images)
-app.use(express.static('.'));
+// 🔒 SECURITY: dotfiles set to 'deny' as additional protection
+app.use(express.static('.', {
+  dotfiles: 'deny',
+  index: ['index.html']
+}));
 
 // ============================================
 // DATABASE CONNECTION
@@ -456,17 +561,15 @@ app.get('/api/games/:gameId', async (req, res) => {
   }
 });
 
-// Get RSVPs for a user by email (for My Games page)
-app.get('/api/user/rsvps', async (req, res) => {
+// Get RSVPs for a user (for My Games page)
+// 🔒 SECURITY: Requires authentication - users can only see their own RSVPs
+app.get('/api/user/rsvps', authenticateToken, async (req, res) => {
   try {
-    const email = req.query.email?.toLowerCase().trim();
-    
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
-    }
-    
+    // Use authenticated user's email, not query param (prevents accessing others' RSVPs)
+    const email = req.user.email.toLowerCase();
+
     // Find all RSVPs for this email
-    const rsvps = await RSVP.find({ 
+    const rsvps = await RSVP.find({
       'player.email': email,
       status: { $in: ['confirmed', 'pending'] }
     }).sort({ createdAt: -1 });
@@ -549,15 +652,15 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
     }
 
     // 🔒 Check for duplicate RSVP (same email + same game)
-    const existingRSVP = await RSVP.findOne({ 
-      gameId: sanitize(gameId), 
+    const existingRSVP = await RSVP.findOne({
+      gameId: sanitize(gameId),
       'player.email': sanitizedEmail,
       status: { $ne: 'cancelled' }
     });
     if (existingRSVP) {
-      return res.status(400).json({ 
-        error: 'You have already RSVP\'d for this game',
-        confirmationCode: existingRSVP.confirmationCode
+      // 🔒 SECURITY: Don't leak confirmation code - user should check their email
+      return res.status(400).json({
+        error: 'An RSVP already exists for this email. Check your email for the confirmation code.'
       });
     }
 
@@ -649,15 +752,15 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
     }
 
     // 🔒 Check for duplicate RSVP (same email + same game)
-    const existingRSVP = await RSVP.findOne({ 
-      gameId: sanitize(gameId), 
+    const existingRSVP = await RSVP.findOne({
+      gameId: sanitize(gameId),
       'player.email': sanitizedEmail,
       status: { $ne: 'cancelled' }
     });
     if (existingRSVP) {
-      return res.status(400).json({ 
-        error: 'You have already RSVP\'d for this game',
-        confirmationCode: existingRSVP.confirmationCode
+      // 🔒 SECURITY: Don't leak confirmation code - user should check their email
+      return res.status(400).json({
+        error: 'An RSVP already exists for this email. Check your email for the confirmation code.'
       });
     }
 
@@ -810,7 +913,8 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       const userLang = metadata.lang === 'es' ? 'es' : 'en';
       const emailSent = await sendConfirmationEmail(rsvp, game, userLang);
       if (!emailSent) {
-        console.error('⚠️ Failed to send confirmation email for:', metadata.confirmationCode, 'to:', metadata.email);
+        // 🔒 SECURITY: Don't log email (PII) - use confirmation code as identifier
+        console.error('⚠️ Failed to send confirmation email for:', metadata.confirmationCode);
       }
 
       console.log('✅ Payment processed:', metadata.confirmationCode, '| Email sent:', emailSent, '| Lang:', userLang);
@@ -823,7 +927,8 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 });
 
 // Get RSVP by confirmation code
-app.get('/api/rsvp/:code', async (req, res) => {
+// 🔒 SECURITY: Rate limited to prevent brute-force code guessing
+app.get('/api/rsvp/:code', codeLookupLimiter, async (req, res) => {
   try {
     // 🔒 Sanitize and normalize confirmation code (prevent ReDoS)
     const code = req.params.code?.toString().trim().toUpperCase();
@@ -906,7 +1011,8 @@ app.post('/api/contact', apiLimiter, async (req, res) => {
 // ============================================
 // CANCELLATION API
 // ============================================
-app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
+// 🔒 SECURITY: Rate limited to prevent brute-force attacks
+app.post('/api/rsvp/:code/cancel', codeLookupLimiter, async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -927,14 +1033,11 @@ app.post('/api/rsvp/:code/cancel', apiLimiter, async (req, res) => {
     if (!rsvp && !code.startsWith('LP-')) {
       rsvp = await RSVP.findOne({ confirmationCode: `LP-${code}` });
     }
-    
-    if (!rsvp) {
-      return res.status(404).json({ error: 'RSVP not found' });
-    }
 
-    // Verify email matches
-    if (rsvp.player.email.toLowerCase() !== email.toLowerCase()) {
-      return res.status(403).json({ error: 'Email does not match booking' });
+    // 🔒 SECURITY: Uniform error response prevents enumeration
+    // Don't reveal whether code exists vs email mismatch
+    if (!rsvp || rsvp.player.email.toLowerCase() !== email.toLowerCase()) {
+      return res.status(404).json({ error: 'Booking not found or email does not match' });
     }
 
     // Check if already cancelled
@@ -1217,7 +1320,8 @@ app.get('/api/templates', async (req, res) => {
 });
 
 // Create a template
-app.post('/api/templates', async (req, res) => {
+// 🔒 SECURITY: Rate limited to prevent abuse
+app.post('/api/templates', adminLimiter, async (req, res) => {
   const authKey = req.headers['x-admin-key'];
   if (authKey !== process.env.ADMIN_SECRET_KEY) {
     return res.status(403).json({ error: 'Unauthorized' });
@@ -1234,7 +1338,8 @@ app.post('/api/templates', async (req, res) => {
 });
 
 // Generate games for next week from templates
-app.post('/api/games/generate-week', async (req, res) => {
+// 🔒 SECURITY: Rate limited to prevent abuse
+app.post('/api/games/generate-week', adminLimiter, async (req, res) => {
   const authKey = req.headers['x-admin-key'];
   if (authKey !== process.env.ADMIN_SECRET_KEY) {
     return res.status(403).json({ error: 'Unauthorized' });
@@ -1315,7 +1420,13 @@ app.post('/api/games/generate-week', async (req, res) => {
 // SEED DATA (Protected - requires secret key)
 // ============================================
 app.post('/api/seed', async (req, res) => {
-  // 🔒 SECURITY: Require secret key to run seed
+  // 🔒 SECURITY: Seed endpoint is DISABLED in production
+  // This prevents accidental or malicious data deletion
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  // 🔒 SECURITY: Require secret key to run seed (even in non-production)
   const seedKey = req.headers['x-seed-key'] || req.query.key;
   if (seedKey !== process.env.SEED_SECRET_KEY) {
     return res.status(403).json({ error: 'Unauthorized. Seed key required.' });
@@ -1512,23 +1623,21 @@ app.delete('/api/comments/:commentId', async (req, res) => {
 
 // ============================================
 // NOTIFICATIONS API
+// 🔒 SECURITY: All endpoints require authentication
 // ============================================
 
-// Get notifications for a user
-app.get('/api/notifications', async (req, res) => {
+// Get notifications for authenticated user
+app.get('/api/notifications', authenticateToken, async (req, res) => {
   try {
-    const email = req.query.email?.toLowerCase().trim();
-    
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
-    }
-    
-    const notifications = await Notification.find({ 
-      userEmail: email 
+    // Use authenticated user's email (prevents accessing others' notifications)
+    const email = req.user.email.toLowerCase();
+
+    const notifications = await Notification.find({
+      userEmail: email
     })
     .sort({ createdAt: -1 })
     .limit(50);
-    
+
     res.json(notifications);
   } catch (err) {
     console.error('Error fetching notifications:', err);
@@ -1536,15 +1645,21 @@ app.get('/api/notifications', async (req, res) => {
   }
 });
 
-// Create a notification (internal use - called by other parts of the system)
-app.post('/api/notifications', async (req, res) => {
+// Create a notification (internal/admin use only)
+// 🔒 SECURITY: Requires admin key to prevent spam-creation
+app.post('/api/notifications', adminLimiter, async (req, res) => {
+  const authKey = req.headers['x-admin-key'];
+  if (authKey !== process.env.ADMIN_SECRET_KEY) {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+
   try {
     const { userEmail, type, title, message, gameId, confirmationCode, promoCode, gameStartTime } = req.body;
-    
+
     if (!userEmail || !type || !title || !message) {
       return res.status(400).json({ error: 'userEmail, type, title, and message are required' });
     }
-    
+
     const notification = await Notification.create({
       userEmail: userEmail.toLowerCase().trim(),
       type,
@@ -1555,7 +1670,7 @@ app.post('/api/notifications', async (req, res) => {
       promoCode,
       gameStartTime: gameStartTime ? new Date(gameStartTime) : undefined
     });
-    
+
     res.status(201).json(notification);
   } catch (err) {
     console.error('Error creating notification:', err);
@@ -1564,18 +1679,25 @@ app.post('/api/notifications', async (req, res) => {
 });
 
 // Mark notification as read
-app.patch('/api/notifications/:notificationId/read', async (req, res) => {
+// 🔒 SECURITY: Requires auth and verifies ownership
+app.patch('/api/notifications/:notificationId/read', authenticateToken, async (req, res) => {
   try {
-    const notification = await Notification.findByIdAndUpdate(
-      req.params.notificationId,
-      { isRead: true, readAt: new Date() },
-      { new: true }
-    );
-    
+    // First find the notification to verify ownership
+    const notification = await Notification.findById(req.params.notificationId);
+
     if (!notification) {
       return res.status(404).json({ error: 'Notification not found' });
     }
-    
+
+    // Verify the notification belongs to the authenticated user
+    if (notification.userEmail.toLowerCase() !== req.user.email.toLowerCase()) {
+      return res.status(403).json({ error: 'Not authorized to modify this notification' });
+    }
+
+    notification.isRead = true;
+    notification.readAt = new Date();
+    await notification.save();
+
     res.json(notification);
   } catch (err) {
     console.error('Error marking notification read:', err);
@@ -1583,20 +1705,17 @@ app.patch('/api/notifications/:notificationId/read', async (req, res) => {
   }
 });
 
-// Clear all notifications for a user
-app.delete('/api/notifications/clear', async (req, res) => {
+// Clear all notifications for authenticated user
+app.delete('/api/notifications/clear', authenticateToken, async (req, res) => {
   try {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
-    }
-    
+    // Use authenticated user's email (prevents clearing others' notifications)
+    const email = req.user.email.toLowerCase();
+
     await Notification.updateMany(
-      { userEmail: email.toLowerCase().trim() },
+      { userEmail: email },
       { isRead: true, readAt: new Date() }
     );
-    
+
     res.json({ success: true, message: 'All notifications marked as read' });
   } catch (err) {
     console.error('Error clearing notifications:', err);
@@ -1604,20 +1723,17 @@ app.delete('/api/notifications/clear', async (req, res) => {
   }
 });
 
-// Get unread notification count
-app.get('/api/notifications/count', async (req, res) => {
+// Get unread notification count for authenticated user
+app.get('/api/notifications/count', authenticateToken, async (req, res) => {
   try {
-    const email = req.query.email?.toLowerCase().trim();
-    
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
-    }
-    
-    const count = await Notification.countDocuments({ 
+    // Use authenticated user's email
+    const email = req.user.email.toLowerCase();
+
+    const count = await Notification.countDocuments({
       userEmail: email,
-      isRead: false 
+      isRead: false
     });
-    
+
     res.json({ count });
   } catch (err) {
     console.error('Error counting notifications:', err);
@@ -1699,7 +1815,8 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
       createdAt: user.createdAt
     };
     
-    console.log(`✅ New user registered: ${user.email}`);
+    // 🔒 SECURITY: Log user ID instead of email (PII)
+    console.log(`✅ New user registered: ${user._id}`);
     res.status(201).json({ user: userData, token });
     
   } catch (err) {
@@ -1769,7 +1886,8 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
       createdAt: user.createdAt
     };
     
-    console.log(`✅ User logged in: ${user.email}`);
+    // 🔒 SECURITY: Log user ID instead of email (PII)
+    console.log(`✅ User logged in: ${user._id}`);
     res.json({ user: userData, token });
     
   } catch (err) {
@@ -1835,7 +1953,8 @@ app.put('/api/auth/me', authenticateToken, async (req, res) => {
     
     await user.save();
     
-    console.log(`✅ Profile updated: ${user.email}`);
+    // 🔒 SECURITY: Log user ID instead of email (PII)
+    console.log(`✅ Profile updated: ${user._id}`);
     res.json({
       id: user._id,
       email: user.email,
@@ -1888,7 +2007,8 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
     user.passwordHash = await bcrypt.hash(newPassword, salt);
     await user.save();
     
-    console.log(`✅ Password changed: ${user.email}`);
+    // 🔒 SECURITY: Log user ID instead of email (PII)
+    console.log(`✅ Password changed: ${user._id}`);
     res.json({ message: 'Password updated successfully' });
     
   } catch (err) {
@@ -1943,7 +2063,8 @@ app.post('/api/ratings', authenticateToken, async (req, res) => {
       existingRating.comment = comment?.trim() || null;
       await existingRating.save();
       
-      console.log(`✅ Rating updated: ${req.user.email} rated game ${gameId} = ${rating}`);
+      // 🔒 SECURITY: Log user ID instead of email (PII)
+      console.log(`✅ Rating updated: user ${req.user.userId} rated game ${gameId} = ${rating}`);
       return res.json({ message: 'Rating updated', rating: existingRating });
     }
     
@@ -1957,7 +2078,8 @@ app.post('/api/ratings', authenticateToken, async (req, res) => {
     
     await newRating.save();
     
-    console.log(`✅ New rating: ${req.user.email} rated game ${gameId} = ${rating}`);
+    // 🔒 SECURITY: Log user ID instead of email (PII)
+    console.log(`✅ New rating: user ${req.user.userId} rated game ${gameId} = ${rating}`);
     res.status(201).json({ message: 'Rating submitted', rating: newRating });
     
   } catch (err) {
