@@ -800,8 +800,7 @@
           loadingEl.classList.add('hidden');
           containerEl.classList.remove('hidden');
           
-          // Update count
-          countEl.textContent = `(${games.length} Games This Week)`;
+          // Note: Count will be updated after filtering to upcoming games only
           
           if (games.length === 0) {
             containerEl.innerHTML = `
@@ -855,6 +854,9 @@
           // Store all upcoming games for filtering
           allGamesData = upcoming;
           gamesData = upcoming;
+
+          // Update count with actual upcoming games
+          countEl.textContent = `(${upcoming.length} Games This Week)`;
 
           // Build HTML
           let html = `
