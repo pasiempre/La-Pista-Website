@@ -304,7 +304,7 @@
             </button>
             
             <!-- Add Guests Button (prominent) -->
-            <button type="button" onclick="showFullForm()" 
+            <button type="button" onclick="openGuestsModal()" 
                     class="w-full mt-3 py-3 bg-white hover:bg-zinc-50 text-zinc-700 font-bold uppercase tracking-wide text-sm rounded-lg border-2 border-zinc-300 hover:border-green-400 transition-all flex items-center justify-center gap-2">
               <span class="iconify" data-icon="lucide:users" data-width="18"></span>
               <span>Bring Friends (+1 to 4 guests)</span>
@@ -540,56 +540,84 @@
         </div>
       </div>
 
-      <!-- 7. Game Discussion -->
-      <div class="mb-12">
-        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
-          Discussion <span id="comments-count" class="text-zinc-300">(0)</span>
-        </h3>
-
-        <!-- Comment Form -->
-        <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-4 mb-4">
-          <form id="comment-form" class="space-y-3">
-            <!-- Honeypot field for bot prevention -->
-            <input type="text" name="website" id="comment-honeypot" class="hidden" tabindex="-1" autocomplete="off">
-
-            <div class="flex flex-col sm:flex-row gap-3">
-              <input type="text" id="comment-name" required maxlength="50"
-                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
-                     placeholder="Your name">
-              <input type="email" id="comment-email" required maxlength="100"
-                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
-                     placeholder="Your email (not shown)">
-            </div>
-            <div class="flex gap-3">
-              <input type="text" id="comment-text" required maxlength="500"
-                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
-                     placeholder="Ask a question or share something...">
-              <button type="submit" id="comment-submit-btn"
-                      class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-md transition-colors">
-                Post
-              </button>
-            </div>
-            <p class="text-[10px] text-zinc-400">Your email is used for verification only and won't be displayed.</p>
-          </form>
-        </div>
-
-        <!-- Comments List -->
-        <div id="comments-section" class="space-y-3">
-          <div id="comments-loading" class="flex items-center justify-center py-6">
-            <span class="iconify animate-spin text-zinc-400 text-xl mr-2" data-icon="lucide:loader-2"></span>
-            <span class="text-sm text-zinc-500">Loading comments...</span>
-          </div>
-          <div id="comments-list">
-            <!-- Populated by JavaScript -->
-          </div>
-          <div id="comments-empty" class="hidden text-center py-6">
-            <span class="iconify text-zinc-300 text-3xl mb-2" data-icon="lucide:message-circle"></span>
-            <p class="text-sm text-zinc-500">No comments yet. Be the first to start the discussion!</p>
-          </div>
-        </div>
-      </div>
       </div><!-- Close game-content -->
     </main>
+
+    <!-- Add Guests Modal (for logged-in users) -->
+    <div id="add-guests-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-auto">
+        <div class="p-6 border-b border-zinc-200">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-black text-zinc-900 uppercase font-display">Bring Friends</h3>
+            <button type="button" onclick="closeGuestsModal()" class="text-zinc-400 hover:text-zinc-600">
+              <span class="iconify text-2xl" data-icon="lucide:x"></span>
+            </button>
+          </div>
+          <p class="text-sm text-zinc-500 mt-1">Add up to 4 guests to your booking</p>
+        </div>
+        
+        <div class="p-6">
+          <!-- Your Info (read-only) -->
+          <div class="bg-green-50 rounded-lg p-4 mb-6 border border-green-200">
+            <div class="flex items-center gap-3">
+              <div id="modal-user-avatar" class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
+                HC
+              </div>
+              <div>
+                <div class="font-bold text-green-800" id="modal-user-name">Your Name</div>
+                <div class="text-xs text-green-600">You (booking holder)</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Guests Form -->
+          <div id="modal-guests-container" class="space-y-4 mb-6">
+            <!-- Guest inputs added dynamically -->
+          </div>
+          
+          <button type="button" id="modal-add-guest-btn" onclick="addModalGuest()" 
+                  class="w-full py-2 border-2 border-dashed border-zinc-300 hover:border-green-400 rounded-lg text-sm font-bold text-zinc-500 hover:text-green-600 transition-all flex items-center justify-center gap-2">
+            <span class="iconify" data-icon="lucide:plus"></span>
+            <span>Add Guest (<span id="modal-guests-remaining">4</span> remaining)</span>
+          </button>
+          
+          <!-- Order Summary -->
+          <div class="mt-6 pt-6 border-t border-zinc-200">
+            <div class="flex justify-between text-sm text-zinc-600 mb-2">
+              <span>Your spot</span>
+              <span>$<span id="modal-price-self">5.99</span></span>
+            </div>
+            <div id="modal-guests-summary" class="space-y-2 mb-2">
+              <!-- Guest line items added dynamically -->
+            </div>
+            <div class="flex justify-between font-bold text-lg text-zinc-900 pt-2 border-t border-zinc-200">
+              <span>Total</span>
+              <span class="text-green-600">$<span id="modal-total">5.99</span></span>
+            </div>
+          </div>
+          
+          <!-- Payment Card -->
+          <div class="mt-4 bg-zinc-50 rounded-lg p-3 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="iconify text-lg text-zinc-400" data-icon="lucide:credit-card"></span>
+              <span id="modal-card-brand" class="font-bold">VISA</span>
+              <span class="text-zinc-500">•••• <span id="modal-card-last4">4242</span></span>
+            </div>
+            <a href="payment-methods.html" class="text-xs font-bold text-green-600 hover:text-green-700">Change</a>
+          </div>
+          
+          <!-- Error Message -->
+          <div id="modal-error" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
+          
+          <!-- Submit Button -->
+          <button type="button" id="modal-book-btn" onclick="handleGuestsBooking()"
+                  class="w-full mt-6 py-4 bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-sm rounded-lg transition-all flex items-center justify-center gap-2">
+            <span class="iconify" data-icon="lucide:check"></span>
+            <span id="modal-book-btn-text">Confirm Booking</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer (Standard) -->
     <footer class="bg-zinc-900 text-white pt-16 pb-8 border-t border-zinc-800 mt-auto">
@@ -757,9 +785,6 @@
 
           // Load who's playing list
           loadPlayers();
-
-          // Load comments
-          loadComments();
 
           // Update totals
           updateTotals();
@@ -1157,6 +1182,7 @@
         const brandEl = document.getElementById('quick-card-brand');
         const last4El = document.getElementById('quick-card-last4');
         const totalEl = document.getElementById('quick-book-total');
+        const formContainer = document.getElementById('rsvp-form-container');
         
         // Update card display
         brandEl.textContent = card.brand.toUpperCase();
@@ -1166,14 +1192,12 @@
         const price = gameData ? gameData.price : PRICE_PER_PERSON;
         totalEl.textContent = `$${price.toFixed(2)}`;
         
-        // Show section
+        // Show Quick Book section
         section.classList.remove('hidden');
-      }
-      
-      // Show full form (hide quick book)
-      function showFullForm() {
-        document.getElementById('quick-book-section').classList.add('hidden');
-        document.getElementById('rsvp-form-container').scrollIntoView({ behavior: 'smooth' });
+        
+        // Hide the full form for logged-in users with Quick Book
+        // They can use Quick Book (solo) or the Guests modal (with friends)
+        formContainer.classList.add('hidden');
       }
       
       // Handle Quick Book
@@ -1218,9 +1242,196 @@
           errorEl.classList.remove('hidden');
           
           btn.disabled = false;
-          btnText.textContent = 'Book Now';
+          btnText.textContent = 'Book Now — Just Me';
         }
       }
+      
+      // ============================================
+      // GUESTS MODAL (for logged-in users)
+      // ============================================
+      let modalGuests = [];
+      const MAX_GUESTS = 4;
+      
+      function openGuestsModal() {
+        if (!quickBookCard || !gameData) return;
+        
+        const user = AuthService.getUser();
+        if (!user) return;
+        
+        // Set up user info
+        const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+        document.getElementById('modal-user-avatar').textContent = initials;
+        document.getElementById('modal-user-name').textContent = `${user.firstName} ${user.lastName}`;
+        
+        // Set up card info
+        document.getElementById('modal-card-brand').textContent = quickBookCard.brand.toUpperCase();
+        document.getElementById('modal-card-last4').textContent = quickBookCard.last4;
+        
+        // Set price
+        const price = gameData.price || PRICE_PER_PERSON;
+        document.getElementById('modal-price-self').textContent = price.toFixed(2);
+        
+        // Reset guests
+        modalGuests = [];
+        renderModalGuests();
+        updateModalTotal();
+        
+        // Check available spots
+        updateGuestsRemaining();
+        
+        // Show modal
+        document.getElementById('add-guests-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeGuestsModal() {
+        document.getElementById('add-guests-modal').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      
+      function addModalGuest() {
+        const spotsAvailable = (gameData?.spotsRemaining || 1) - 1; // -1 for the user
+        if (modalGuests.length >= MAX_GUESTS || modalGuests.length >= spotsAvailable) return;
+        
+        modalGuests.push({ name: '' });
+        renderModalGuests();
+        updateModalTotal();
+        updateGuestsRemaining();
+      }
+      
+      function removeModalGuest(index) {
+        modalGuests.splice(index, 1);
+        renderModalGuests();
+        updateModalTotal();
+        updateGuestsRemaining();
+      }
+      
+      function updateModalGuestName(index, name) {
+        modalGuests[index].name = name;
+      }
+      
+      function renderModalGuests() {
+        const container = document.getElementById('modal-guests-container');
+        
+        if (modalGuests.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-4 text-zinc-400 text-sm">
+              Click "Add Guest" below to bring friends
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = modalGuests.map((guest, i) => `
+          <div class="flex items-center gap-3 bg-zinc-50 rounded-lg p-3">
+            <div class="w-8 h-8 rounded-full bg-zinc-300 flex items-center justify-center text-white text-xs font-bold">
+              ${i + 1}
+            </div>
+            <input type="text" 
+                   placeholder="Guest name" 
+                   value="${guest.name || ''}"
+                   onchange="updateModalGuestName(${i}, this.value)"
+                   class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none">
+            <button type="button" onclick="removeModalGuest(${i})" class="text-zinc-400 hover:text-red-500 transition-colors">
+              <span class="iconify text-lg" data-icon="lucide:x"></span>
+            </button>
+          </div>
+        `).join('');
+        
+        // Update summary
+        const summaryContainer = document.getElementById('modal-guests-summary');
+        const price = gameData?.price || PRICE_PER_PERSON;
+        summaryContainer.innerHTML = modalGuests.map((guest, i) => `
+          <div class="flex justify-between text-sm text-zinc-600">
+            <span>Guest ${i + 1}${guest.name ? ` (${guest.name})` : ''}</span>
+            <span>$${price.toFixed(2)}</span>
+          </div>
+        `).join('');
+      }
+      
+      function updateModalTotal() {
+        const price = gameData?.price || PRICE_PER_PERSON;
+        const total = price * (1 + modalGuests.length);
+        document.getElementById('modal-total').textContent = total.toFixed(2);
+      }
+      
+      function updateGuestsRemaining() {
+        const spotsAvailable = (gameData?.spotsRemaining || 1) - 1;
+        const remaining = Math.min(MAX_GUESTS, spotsAvailable) - modalGuests.length;
+        document.getElementById('modal-guests-remaining').textContent = remaining;
+        
+        const addBtn = document.getElementById('modal-add-guest-btn');
+        if (remaining <= 0) {
+          addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          addBtn.disabled = true;
+        } else {
+          addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          addBtn.disabled = false;
+        }
+      }
+      
+      async function handleGuestsBooking() {
+        if (!quickBookCard || !gameData) return;
+        
+        // Validate all guests have names
+        const emptyGuests = modalGuests.filter(g => !g.name.trim());
+        if (emptyGuests.length > 0) {
+          document.getElementById('modal-error').textContent = 'Please enter names for all guests';
+          document.getElementById('modal-error').classList.remove('hidden');
+          return;
+        }
+        
+        const btn = document.getElementById('modal-book-btn');
+        const btnText = document.getElementById('modal-book-btn-text');
+        const errorEl = document.getElementById('modal-error');
+        
+        btn.disabled = true;
+        btnText.textContent = 'Booking...';
+        errorEl.classList.add('hidden');
+        
+        try {
+          const token = AuthService.getToken();
+          const response = await fetch(`${API_URL}/api/payment-methods/charge`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              paymentMethodId: quickBookCard.id,
+              gameId: gameId,
+              guests: modalGuests.map(g => ({ name: g.name.trim() }))
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Booking failed');
+          }
+          
+          // Success! Redirect to confirmation
+          window.location.href = `confirmation-page.html?code=${data.confirmationCode}`;
+          
+        } catch (err) {
+          console.error('Guests booking error:', err);
+          errorEl.textContent = err.message || 'Failed to book. Please try again.';
+          errorEl.classList.remove('hidden');
+          
+          btn.disabled = false;
+          btnText.textContent = 'Confirm Booking';
+        }
+      }
+      
+      // Close modal on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeGuestsModal();
+      });
+      
+      // Close modal on backdrop click
+      document.getElementById('add-guests-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'add-guests-modal') closeGuestsModal();
+      });
       
       // Check if cancelled from Stripe
       if (urlParams.get('cancelled') === 'true') {
@@ -1421,148 +1632,6 @@
           emptyEl.classList.remove('hidden');
         }
       }
-
-      // Load game comments
-      async function loadComments() {
-        const loadingEl = document.getElementById('comments-loading');
-        const listEl = document.getElementById('comments-list');
-        const emptyEl = document.getElementById('comments-empty');
-        const countEl = document.getElementById('comments-count');
-
-        try {
-          const response = await fetch(`${API_URL}/api/games/${gameId}/comments`);
-          if (!response.ok) throw new Error('Failed to load comments');
-
-          const comments = await response.json();
-
-          // Hide loading
-          loadingEl.classList.add('hidden');
-
-          if (comments.length === 0) {
-            emptyEl.classList.remove('hidden');
-            countEl.textContent = '(0)';
-            return;
-          }
-
-          // Render comments safely using textContent (XSS prevention)
-          listEl.innerHTML = '';
-          comments.forEach(comment => {
-            const div = document.createElement('div');
-            div.className = 'bg-white border border-zinc-200 rounded-lg p-4';
-
-            const header = document.createElement('div');
-            header.className = 'flex items-center gap-3 mb-2';
-
-            // Avatar - check if user has a jersey avatar
-            const avatar = document.createElement('div');
-            if (comment.author?.avatar && typeof AVATAR_GALLERY !== 'undefined') {
-              // User has a selected avatar - render jersey
-              avatar.innerHTML = AVATAR_GALLERY.renderAvatar(comment.author.avatar, 'sm');
-            } else {
-              // Fallback to initials circle
-              avatar.className = 'w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700';
-              avatar.textContent = comment.author?.initials || '?';
-            }
-
-            const meta = document.createElement('div');
-            const nameEl = document.createElement('span');
-            nameEl.className = 'text-sm font-bold text-zinc-900';
-            nameEl.textContent = comment.author?.name || 'Anonymous';
-
-            const timeEl = document.createElement('span');
-            timeEl.className = 'text-xs text-zinc-400 ml-2';
-            timeEl.textContent = formatCommentTime(comment.createdAt);
-
-            meta.appendChild(nameEl);
-            meta.appendChild(timeEl);
-            header.appendChild(avatar);
-            header.appendChild(meta);
-
-            const textEl = document.createElement('p');
-            textEl.className = 'text-sm text-zinc-700';
-            textEl.textContent = comment.text;
-
-            div.appendChild(header);
-            div.appendChild(textEl);
-            listEl.appendChild(div);
-          });
-
-          countEl.textContent = `(${comments.length})`;
-          emptyEl.classList.add('hidden');
-
-        } catch (err) {
-          console.error('Failed to load comments:', err);
-          loadingEl.classList.add('hidden');
-          emptyEl.classList.remove('hidden');
-        }
-      }
-
-      // Format comment time as relative time
-      function formatCommentTime(dateStr) {
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
-
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
-        return date.toLocaleDateString();
-      }
-
-      // Handle comment form submission
-      document.getElementById('comment-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        // Check honeypot (bot prevention)
-        if (document.getElementById('comment-honeypot').value) {
-          return; // Silently ignore bot submissions
-        }
-
-        const btn = document.getElementById('comment-submit-btn');
-        const name = document.getElementById('comment-name').value.trim();
-        const email = document.getElementById('comment-email').value.trim();
-        const text = document.getElementById('comment-text').value.trim();
-
-        if (!name || !email || !text) return;
-
-        btn.disabled = true;
-        btn.textContent = 'Posting...';
-
-        // Include userId if logged in (for avatar display)
-        let userId = null;
-        if (AuthService.isAuthenticated()) {
-          const user = AuthService.getUser();
-          if (user && user._id) userId = user._id;
-        }
-
-        try {
-          const response = await fetch(`${API_URL}/api/games/${gameId}/comments`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, text, userId })
-          });
-
-          if (!response.ok) {
-            const data = await response.json();
-            throw new Error(data.error || 'Failed to post comment');
-          }
-
-          // Clear form and reload comments
-          document.getElementById('comment-form').reset();
-          await loadComments();
-
-        } catch (err) {
-          console.error('Failed to post comment:', err);
-          alert(err.message || 'Failed to post comment. Please try again.');
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Post';
-        }
-      });
 
       // Handle waitlist form submission
       document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
