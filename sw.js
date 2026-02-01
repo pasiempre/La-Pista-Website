@@ -1,5 +1,5 @@
-// LaPista Service Worker v4.1 - Added auth & account pages
-const CACHE_NAME = 'lapista-v4.1';
+// LaPista Service Worker v4.2 - Fixed filenames
+const CACHE_NAME = 'lapista-v4.2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -14,7 +14,9 @@ const STATIC_ASSETS = [
   '/profile-page.html',
   '/edit-profile-page.html',
   '/login-page.html',
-  '/register-page.html',
+  '/signup-page.html',
+  '/forgot-password.html',
+  '/reset-password.html',
   '/my-games.html',
   '/payment-methods.html',
   '/css/styles.css',
@@ -24,11 +26,8 @@ const STATIC_ASSETS = [
   '/js/i18n.js',
   '/js/auth.js',
   '/js/avatars.js',
-  '/lapista%20cashapp%20qr.jpg',
   '/LaPista Logo 1.png',
-  '/Game photo 1.png',
-  '/Game photo 2.png',
-  // Videos not cached (too large for service worker cache)
+  // Note: Removed files with spaces in names (cause caching issues)
 ];
 
 // Install event - cache static assets
