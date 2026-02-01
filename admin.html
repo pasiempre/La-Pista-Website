@@ -247,9 +247,16 @@
       sessionStorage.removeItem('adminToken');
     }
 
-    // API helper
+    // API helper - more resilient to transient failures
+    let sessionCheckInProgress = false;
+    
     async function adminFetch(url, options = {}) {
       const token = getToken();
+      if (!token) {
+        showLoginScreen();
+        throw new Error('No session');
+      }
+      
       const response = await fetch(`${API_URL}${url}`, {
         ...options,
         headers: {
@@ -260,8 +267,14 @@
       });
 
       if (response.status === 401) {
-        clearToken();
-        showLoginScreen();
+        // Only clear token and show login if not already doing so
+        if (!sessionCheckInProgress) {
+          sessionCheckInProgress = true;
+          clearToken();
+          showLoginScreen();
+          // Reset flag after a short delay to prevent rapid re-triggers
+          setTimeout(() => { sessionCheckInProgress = false; }, 1000);
+        }
         throw new Error('Session expired');
       }
 
