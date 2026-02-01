@@ -409,4 +409,32 @@ ratingSchema.index({ gameId: 1, raterEmail: 1 }, { unique: true });
 
 const Rating = mongoose.model('Rating', ratingSchema);
 
-module.exports = { Game, RSVP, Venue, Waitlist, GameTemplate, Comment, Notification, User, Rating };
+// ============================================
+// ADMIN SESSION SCHEMA (persistent sessions)
+// ============================================
+const adminSessionSchema = new mongoose.Schema({
+  token: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  expiresAt: {
+    type: Date,
+    required: true,
+    index: true
+  },
+  ip: String,
+  userAgent: String
+});
+
+// TTL index - MongoDB will auto-delete expired sessions
+adminSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+const AdminSession = mongoose.model('AdminSession', adminSessionSchema);
+
+module.exports = { Game, RSVP, Venue, Waitlist, GameTemplate, Comment, Notification, User, Rating, AdminSession };

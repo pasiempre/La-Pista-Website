@@ -7,7 +7,7 @@ const Stripe = require('stripe');
 const { Resend } = require('resend');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Game, RSVP, Venue, Waitlist, GameTemplate, Comment, Notification, User, Rating } = require('./models');
+const { Game, RSVP, Venue, Waitlist, GameTemplate, Comment, Notification, User, Rating, AdminSession } = require('./models');
 const rateLimit = require('express-rate-limit');
 
 // Initialize
@@ -115,54 +115,44 @@ const JWT_SECRET = process.env.JWT_SECRET || 'lapista-dev-secret-change-in-produ
 const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days
 
 // ============================================
-// ADMIN SESSION MANAGEMENT
+// ADMIN SESSION MANAGEMENT (MongoDB-backed)
 // ============================================
 const crypto = require('crypto');
 
-// In-memory session store (migrate to Redis when scaling)
-const adminSessions = new Map();
 const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000; // 4 hours
 
-// Clean up expired sessions every 15 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, session] of adminSessions) {
-    if (now > session.expiresAt) {
-      adminSessions.delete(token);
-      console.log('🧹 Cleaned up expired admin session');
-    }
-  }
-}, 15 * 60 * 1000);
-
-// Admin session authentication middleware
-const adminSessionAuth = (req, res, next) => {
+// Admin session authentication middleware (uses MongoDB)
+const adminSessionAuth = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.replace('Bearer ', '');
 
-  if (!token || !adminSessions.has(token)) {
+  if (!token) {
     return res.status(401).json({ error: 'Admin authentication required' });
   }
 
-  const session = adminSessions.get(token);
-  if (Date.now() > session.expiresAt) {
-    adminSessions.delete(token);
-    return res.status(401).json({ error: 'Session expired' });
+  try {
+    // Find session in MongoDB
+    const session = await AdminSession.findOne({ token });
+    
+    if (!session) {
+      return res.status(401).json({ error: 'Invalid or expired session' });
+    }
+
+    if (Date.now() > session.expiresAt.getTime()) {
+      // Clean up expired session
+      await AdminSession.deleteOne({ token });
+      return res.status(401).json({ error: 'Session expired' });
+    }
+
+    // Log admin activity (without sensitive data)
+    console.log(`👤 Admin action: ${req.method} ${req.path} from ${req.ip}`);
+
+    req.adminSession = session;
+    next();
+  } catch (err) {
+    console.error('Admin auth error:', err);
+    return res.status(500).json({ error: 'Authentication check failed' });
   }
-
-  // 🔒 SECURITY: IP binding disabled for now (load balancer can cause inconsistent IPs)
-  // TODO: Re-enable with x-forwarded-for parsing if needed
-  // const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
-  // if (session.ip && session.ip !== clientIp) {
-  //   console.warn(`⚠️ Admin session IP mismatch: expected ${session.ip}, got ${clientIp}. Invalidating session.`);
-  //   adminSessions.delete(token);
-  //   return res.status(401).json({ error: 'Session invalidated due to IP change. Please login again.' });
-  // }
-
-  // Log admin activity (without sensitive data)
-  console.log(`👤 Admin action: ${req.method} ${req.path} from ${req.ip}`);
-
-  req.adminSession = session;
-  next();
 };
 
 // ============================================
@@ -1393,33 +1383,45 @@ app.post('/api/admin/login', adminLimiter, async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  // Generate secure session token
-  const sessionToken = crypto.randomBytes(32).toString('hex');
-  const expiresAt = Date.now() + ADMIN_SESSION_DURATION;
+  try {
+    // Generate secure session token
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + ADMIN_SESSION_DURATION);
 
-  // Store session
-  adminSessions.set(sessionToken, {
-    createdAt: Date.now(),
-    expiresAt,
-    ip: req.ip
-  });
+    // Store session in MongoDB (survives server restarts!)
+    await AdminSession.create({
+      token: sessionToken,
+      expiresAt,
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
 
-  console.log(`✅ Admin logged in from ${req.ip}`);
+    console.log(`✅ Admin logged in from ${req.ip}`);
 
-  res.json({
-    token: sessionToken,
-    expiresIn: '4h'
-  });
+    res.json({
+      token: sessionToken,
+      expiresIn: '4h'
+    });
+  } catch (err) {
+    console.error('Error creating admin session:', err);
+    res.status(500).json({ error: 'Failed to create session' });
+  }
 });
 
 // Admin logout - destroys session
-app.post('/api/admin/logout', (req, res) => {
+app.post('/api/admin/logout', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.replace('Bearer ', '');
 
-  if (token && adminSessions.has(token)) {
-    adminSessions.delete(token);
-    console.log(`👋 Admin logged out from ${req.ip}`);
+  if (token) {
+    try {
+      const result = await AdminSession.deleteOne({ token });
+      if (result.deletedCount > 0) {
+        console.log(`👋 Admin logged out from ${req.ip}`);
+      }
+    } catch (err) {
+      console.error('Error deleting admin session:', err);
+    }
   }
 
   res.json({ success: true });

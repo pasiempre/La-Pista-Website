@@ -345,13 +345,18 @@
       sessionStorage.removeItem('adminToken');
     }
 
-    // API helper - more resilient to transient failures
-    let sessionCheckInProgress = false;
+    // Track if we're already handling session expiry
+    let sessionExpired = false;
     
     async function adminFetch(url, options = {}) {
+      // If session already marked as expired, don't make more requests
+      if (sessionExpired) {
+        throw new Error('Session expired');
+      }
+      
       const token = getToken();
       if (!token) {
-        showLoginScreen();
+        handleSessionExpired('No session token');
         throw new Error('No session');
       }
       
@@ -365,18 +370,36 @@
       });
 
       if (response.status === 401) {
-        // Only clear token and show login if not already doing so
-        if (!sessionCheckInProgress) {
-          sessionCheckInProgress = true;
-          clearToken();
-          showLoginScreen();
-          // Reset flag after a short delay to prevent rapid re-triggers
-          setTimeout(() => { sessionCheckInProgress = false; }, 1000);
-        }
+        handleSessionExpired('Server rejected token');
         throw new Error('Session expired');
       }
 
       return response;
+    }
+    
+    // Centralized session expiry handler
+    function handleSessionExpired(reason) {
+      if (sessionExpired) return; // Already handling
+      
+      sessionExpired = true;
+      console.log('Session expired:', reason);
+      
+      // Close any open modals first
+      closeGameModal();
+      
+      clearToken();
+      showLoginScreen();
+      
+      // Show a helpful message
+      const errorDiv = document.getElementById('login-error');
+      errorDiv.textContent = 'Session expired. Please login again.';
+      errorDiv.classList.remove('hidden');
+      
+      // Reset flag after delay so user can try logging in again
+      setTimeout(() => { 
+        sessionExpired = false;
+        errorDiv.classList.add('hidden');
+      }, 3000);
     }
 
     // UI helpers
@@ -388,6 +411,8 @@
     function showDashboard() {
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
+      // Reset expired flag when dashboard is shown (successful login)
+      sessionExpired = false;
       loadStats();
       loadGames();
     }
