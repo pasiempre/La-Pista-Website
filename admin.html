@@ -298,15 +298,22 @@
     function getNextDayOfWeek(dayName) {
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const targetDay = days.indexOf(dayName);
+      if (targetDay === -1) {
+        console.error('Invalid day name:', dayName);
+        return new Date();
+      }
+      
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
       const currentDay = today.getDay();
       let daysUntil = targetDay - currentDay;
-      if (daysUntil <= 0) daysUntil += 7; // Next week if today or past
+      if (daysUntil <= 0) daysUntil += 7; // If today or past, go to next week
       
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + daysUntil);
+      
+      console.log(`Next ${dayName}: ${nextDate.toDateString()} (in ${daysUntil} days)`);
       return nextDate;
     }
 
