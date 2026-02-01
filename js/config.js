@@ -33,7 +33,7 @@ const LAPISTA_CONFIG = {
   // For local dev without Stripe, payment features will be disabled
   STRIPE_PUBLISHABLE_KEY: window.location.hostname === 'localhost'
     ? 'pk_test_YOUR_TEST_KEY'  // Get from https://dashboard.stripe.com/test/apikeys
-    : 'pk_live_YOUR_LIVE_KEY'  // Get from https://dashboard.stripe.com/apikeys
+    : 'pk_live_51SkX8V5JxIIzfhAALpG95UvVJ5HGRN105wyP2IupwRivAVijXY7tp4FmPVQIYlotTsw53FBjPSHzwX9rNgzpzoiR001WlxMTtb'  // REPLACE with your real key from Stripe
 };
 
 // Freeze config to prevent accidental modification
