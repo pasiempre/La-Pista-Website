@@ -699,9 +699,20 @@
       }
       updateWeekRange();
 
-      // Format date for display
-      function formatGameDate(dateStr) {
-        const date = new Date(dateStr);
+      // Format day for display - use stored dayOfWeek to avoid timezone issues
+      function formatGameDay(game) {
+        // Prefer the stored dayOfWeek field (avoids timezone conversion issues)
+        if (game.dayOfWeek) {
+          const dayMap = {
+            'Sunday': 'Sun', 'Monday': 'Mon', 'Tuesday': 'Tue', 
+            'Wednesday': 'Wed', 'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat',
+            'Sun': 'Sun', 'Mon': 'Mon', 'Tue': 'Tue', 
+            'Wed': 'Wed', 'Thu': 'Thu', 'Fri': 'Fri', 'Sat': 'Sat'
+          };
+          return dayMap[game.dayOfWeek] || game.dayOfWeek.slice(0, 3);
+        }
+        // Fallback to calculating from date
+        const date = new Date(game.date);
         return date.toLocaleDateString('en-US', {
           timeZone: 'America/Chicago',
           weekday: 'short'
@@ -757,7 +768,7 @@
             </h3>
             <div class="text-xs text-zinc-500 font-mono mb-4 flex items-center gap-1">
               <span class="iconify" data-icon="lucide:map-pin" data-width="1.2"></span>
-              ${venueName} • ${formatGameDate(game.date)} ${game.time}
+              ${venueName} • ${formatGameDay(game)} ${game.time}
             </div>
             <div class="mt-auto flex items-center justify-between pt-3 border-t ${isFull ? 'border-amber-200' : 'border-zinc-100'} w-full">
               <span class="text-xs font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">$${game.price.toFixed(2)}</span>
