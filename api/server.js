@@ -149,13 +149,14 @@ const adminSessionAuth = (req, res, next) => {
     return res.status(401).json({ error: 'Session expired' });
   }
 
-  // 🔒 SECURITY: IP binding enforcement
-  // Invalidate session if IP changes (prevents session hijacking)
-  if (session.ip && session.ip !== req.ip) {
-    console.warn(`⚠️ Admin session IP mismatch: expected ${session.ip}, got ${req.ip}. Invalidating session.`);
-    adminSessions.delete(token);
-    return res.status(401).json({ error: 'Session invalidated due to IP change. Please login again.' });
-  }
+  // 🔒 SECURITY: IP binding disabled for now (load balancer can cause inconsistent IPs)
+  // TODO: Re-enable with x-forwarded-for parsing if needed
+  // const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+  // if (session.ip && session.ip !== clientIp) {
+  //   console.warn(`⚠️ Admin session IP mismatch: expected ${session.ip}, got ${clientIp}. Invalidating session.`);
+  //   adminSessions.delete(token);
+  //   return res.status(401).json({ error: 'Session invalidated due to IP change. Please login again.' });
+  // }
 
   // Log admin activity (without sensitive data)
   console.log(`👤 Admin action: ${req.method} ${req.path} from ${req.ip}`);
