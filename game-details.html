@@ -1107,17 +1107,6 @@
         if (emailInput && user.email) emailInput.value = user.email;
         if (phoneInput && user.phone) phoneInput.value = user.phone;
         
-        // Auto-fill comment form
-        const commentNameInput = document.getElementById('comment-name');
-        const commentEmailInput = document.getElementById('comment-email');
-        
-        if (commentNameInput && user.firstName) {
-          commentNameInput.value = `${user.firstName} ${user.lastName || ''}`.trim();
-        }
-        if (commentEmailInput && user.email) {
-          commentEmailInput.value = user.email;
-        }
-        
         // Auto-fill waitlist form
         const waitlistNameInput = document.getElementById('waitlist-name');
         const waitlistEmailInput = document.getElementById('waitlist-email');

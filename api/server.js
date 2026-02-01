@@ -1887,9 +1887,9 @@ app.post('/api/games/:gameId/comments', commentLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    // Validate gameId format (LP-XXXX pattern)
+    // Validate gameId format (LP-XXXX or LP-YYYY-XXX pattern)
     const gameId = req.params.gameId;
-    if (!gameId || typeof gameId !== 'string' || !/^LP-\d{1,10}$/.test(gameId)) {
+    if (!gameId || typeof gameId !== 'string' || !/^LP-\d{1,4}(-\d{1,4})?$/.test(gameId)) {
       return res.status(400).json({ error: 'Invalid game ID format' });
     }
 
@@ -2626,7 +2626,8 @@ app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    if (game.status !== 'scheduled') {
+    // Check if game is open for booking (scheduled or open status)
+    if (!['scheduled', 'open'].includes(game.status)) {
       return res.status(400).json({ error: 'Game is no longer available for booking' });
     }
 
@@ -2637,6 +2638,7 @@ app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
     }
 
     const amount = Math.round(game.price * totalPlayers * 100); // cents
+    const totalAmount = game.price * totalPlayers; // For RSVP record
 
     // Create PaymentIntent and confirm immediately
     const paymentIntent = await stripe.paymentIntents.create({
@@ -2669,11 +2671,22 @@ app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
         email: user.email,
         phone: user.phone || ''
       },
-      guests: guests.map(g => ({
-        firstName: g.firstName,
-        lastName: g.lastName
-      })),
+      guests: guests.map(g => {
+        // Handle both name formats: { name } or { firstName, lastName }
+        if (g.name) {
+          const nameParts = g.name.trim().split(' ');
+          return {
+            firstName: nameParts[0] || g.name,
+            lastName: nameParts.slice(1).join(' ') || ''
+          };
+        }
+        return {
+          firstName: g.firstName || '',
+          lastName: g.lastName || ''
+        };
+      }),
       totalPlayers,
+      totalAmount, // Store the total for records
       paymentMethod: 'stripe',
       paymentStatus: 'paid',
       stripeSessionId: paymentIntent.id,

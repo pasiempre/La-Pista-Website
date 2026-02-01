@@ -1,5 +1,5 @@
-// LaPista Service Worker v4.2 - Fixed filenames
-const CACHE_NAME = 'lapista-v4.2';
+// LaPista Service Worker v4.3 - Fixed response cloning
+const CACHE_NAME = 'lapista-v4.3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -88,7 +88,7 @@ self.addEventListener('fetch', (event) => {
               // Only cache complete responses (not 206 partial)
               if (response.ok && response.status !== 206) {
                 caches.open(CACHE_NAME).then((cache) => {
-                  cache.put(request, response);
+                  cache.put(request, response.clone()); // Clone before consuming
                 });
               }
             }).catch(() => {})
