@@ -218,25 +218,25 @@ const GameTemplate = mongoose.model('GameTemplate', gameTemplateSchema);
 // COMMENT SCHEMA (for game discussions)
 // ============================================
 const commentSchema = new mongoose.Schema({
-  gameId: { 
-    type: String, 
+  gameId: {
+    type: String,
     required: true,
     index: true
   },
   author: {
     name: { type: String, required: true },
     email: { type: String, required: true },
-    initials: { type: String } // e.g., "CM" for Carlos M.
+    initials: { type: String }, // e.g., "CM" for Carlos M.
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Link to user if logged in
+    avatar: { type: String } // Avatar ID if user has one selected
   },
-  text: { 
-    type: String, 
+  text: {
+    type: String,
     required: true,
     maxLength: 500
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false
   }
+  // Note: Comment deletion disabled to reduce attack surface
+  // If admin moderation needed, add deleteToken field and admin-only endpoint
 }, { timestamps: true });
 
 const Comment = mongoose.model('Comment', commentSchema);
@@ -312,7 +312,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  avatar: String, // URL to profile photo
+  avatar: String, // Avatar ID from gallery (e.g., 'messi', 'ronaldo')
   skillLevel: { 
     type: String, 
     enum: ['beginner', 'intermediate', 'advanced', 'pro'],
@@ -367,7 +367,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  lastLoginAt: Date
+  lastLoginAt: Date,
+  // Stripe customer ID for saved payment methods
+  stripeCustomerId: {
+    type: String,
+    sparse: true  // Allow null/undefined, but enforce uniqueness when set
+  }
 }, { timestamps: true });
 
 // Note: email index defined in schema field with index: true

@@ -1,5 +1,5 @@
-// LaPista Service Worker v4.0 - Full i18n translations
-const CACHE_NAME = 'lapista-v4';
+// LaPista Service Worker v4.1 - Added auth & account pages
+const CACHE_NAME = 'lapista-v4.1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -11,11 +11,19 @@ const STATIC_ASSETS = [
   '/cancel.html',
   '/terms.html',
   '/waiver.html',
+  '/profile-page.html',
+  '/edit-profile-page.html',
+  '/login-page.html',
+  '/register-page.html',
+  '/my-games.html',
+  '/payment-methods.html',
   '/css/styles.css',
   '/js/config.js',
   '/js/qrcode.min.js',
   '/js/translations.js',
   '/js/i18n.js',
+  '/js/auth.js',
+  '/js/avatars.js',
   '/lapista%20cashapp%20qr.jpg',
   '/LaPista Logo 1.png',
   '/Game photo 1.png',
@@ -56,6 +64,9 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
+  // Skip external URLs (Stripe, CDNs, etc.) - let browser handle them directly
+  if (url.origin !== location.origin) return;
+
   // API requests - network first, no cache
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
@@ -75,7 +86,8 @@ self.addEventListener('fetch', (event) => {
           // Return cached version and update cache in background
           event.waitUntil(
             fetch(request).then((response) => {
-              if (response.ok) {
+              // Only cache complete responses (not 206 partial)
+              if (response.ok && response.status !== 206) {
                 caches.open(CACHE_NAME).then((cache) => {
                   cache.put(request, response);
                 });
@@ -87,8 +99,8 @@ self.addEventListener('fetch', (event) => {
         
         // Not in cache - fetch from network
         return fetch(request).then((response) => {
-          // Cache successful responses
-          if (response.ok && url.origin === location.origin) {
+          // Cache successful complete responses only (not 206 partial)
+          if (response.ok && response.status !== 206) {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(request, responseClone);

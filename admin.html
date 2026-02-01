@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard | LaPista.ATX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <style>
+    .font-display { font-family: 'Oswald', sans-serif; }
+    body { font-family: 'Space Grotesk', sans-serif; }
+  </style>
+</head>
+<body class="bg-zinc-100 min-h-screen">
+  <!-- Login Screen -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm">
+      <div class="text-center mb-8">
+        <span class="font-display font-bold text-2xl tracking-tighter">
+          LaPista<span class="text-green-500">.ATX</span>
+        </span>
+        <p class="text-zinc-500 text-sm mt-2">Admin Dashboard</p>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">
+            Admin Key
+          </label>
+          <input type="password" id="admin-key" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-4 py-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                 placeholder="Enter admin key">
+        </div>
+        <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm"></div>
+        <button type="submit" id="login-btn"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide py-3 rounded-md transition-colors">
+          Login
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard (hidden until logged in) -->
+  <div id="dashboard" class="hidden">
+    <!-- Header -->
+    <header class="bg-white border-b border-zinc-200 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="font-display font-bold text-xl tracking-tighter">
+            LaPista<span class="text-green-500">.ATX</span>
+          </span>
+          <span class="text-xs font-bold text-zinc-400 uppercase tracking-wide bg-zinc-100 px-2 py-1 rounded">Admin</span>
+        </div>
+        <button onclick="logout()" class="text-sm text-zinc-500 hover:text-red-600 flex items-center gap-2">
+          <span class="iconify" data-icon="lucide:log-out"></span>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-lg p-6 border border-zinc-200">
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">Active Games</div>
+          <div id="stat-active-games" class="text-3xl font-black text-zinc-900">-</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-zinc-200">
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">This Week RSVPs</div>
+          <div id="stat-week-rsvps" class="text-3xl font-black text-green-600">-</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-zinc-200">
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">Total RSVPs</div>
+          <div id="stat-total-rsvps" class="text-3xl font-black text-zinc-900">-</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 border border-zinc-200">
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">Total Revenue</div>
+          <div id="stat-revenue" class="text-3xl font-black text-green-600">-</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-4 border-b border-zinc-200 mb-6">
+        <button onclick="showTab('games')" id="tab-games" class="tab-btn px-4 py-3 text-sm font-bold uppercase tracking-wide text-green-600 border-b-2 border-green-600">
+          Games
+        </button>
+        <button onclick="showTab('rsvps')" id="tab-rsvps" class="tab-btn px-4 py-3 text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-zinc-600">
+          RSVPs
+        </button>
+      </div>
+
+      <!-- Games Tab -->
+      <div id="content-games">
+        <div class="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+          <div class="p-4 border-b border-zinc-200 flex justify-between items-center">
+            <h2 class="font-bold text-zinc-900">All Games</h2>
+            <div class="flex gap-2">
+              <button onclick="loadGames()" class="text-sm text-zinc-500 hover:text-zinc-700 flex items-center gap-1 px-3 py-1.5 border border-zinc-200 rounded-md">
+                <span class="iconify" data-icon="lucide:refresh-cw"></span>
+                Refresh
+              </button>
+              <button onclick="showCreateGameModal()" class="text-sm text-white bg-green-600 hover:bg-green-700 flex items-center gap-1 px-3 py-1.5 rounded-md font-bold">
+                <span class="iconify" data-icon="lucide:plus"></span>
+                New Game
+              </button>
+            </div>
+          </div>
+          <div id="games-list" class="divide-y divide-zinc-100">
+            <div class="p-8 text-center text-zinc-500">Loading games...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RSVPs Tab -->
+      <div id="content-rsvps" class="hidden">
+        <div class="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+          <div class="p-4 border-b border-zinc-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h2 class="font-bold text-zinc-900 mb-2">View RSVPs by Game</h2>
+              <select id="rsvp-game-select" onchange="loadRSVPs(this.value)"
+                      class="w-full md:w-auto bg-zinc-50 border border-zinc-200 rounded-md px-4 py-2 text-sm">
+                <option value="">Select a game...</option>
+              </select>
+            </div>
+            <button id="export-csv-btn" onclick="exportCSV()" class="hidden text-sm text-zinc-600 hover:text-zinc-800 flex items-center gap-1 px-3 py-1.5 border border-zinc-200 rounded-md">
+              <span class="iconify" data-icon="lucide:download"></span>
+              Export CSV
+            </button>
+          </div>
+          <div id="rsvps-list" class="divide-y divide-zinc-100">
+            <div class="p-8 text-center text-zinc-500">Select a game to view RSVPs</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create/Edit Game Modal -->
+  <div id="game-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-zinc-200 flex justify-between items-center">
+        <h3 id="modal-title" class="font-bold text-xl text-zinc-900">New Game</h3>
+        <button onclick="closeGameModal()" class="text-zinc-400 hover:text-zinc-600">
+          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        </button>
+      </div>
+      <form id="game-form" class="p-6 space-y-4">
+        <input type="hidden" id="edit-game-id">
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Title</label>
+          <input type="text" id="game-title" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none"
+                 placeholder="Sunday Pickup">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Day of Week</label>
+            <select id="game-day" required class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+              <option value="Sunday">Sunday</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Time</label>
+            <input type="text" id="game-time" required
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                   placeholder="8:00 PM">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Date</label>
+          <input type="date" id="game-date" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Venue Name</label>
+          <input type="text" id="game-venue-name" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                 placeholder="Shady Lane Fields">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Venue Address</label>
+          <input type="text" id="game-venue-address" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                 placeholder="757 Shady Ln, Austin, TX 78702">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Capacity</label>
+            <input type="number" id="game-capacity" required min="1" max="100"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                   value="24">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Price ($)</label>
+            <input type="number" id="game-price" step="0.01" min="0"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                   value="5.99">
+          </div>
+        </div>
+
+        <div id="modal-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm"></div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeGameModal()" class="flex-1 px-4 py-2 border border-zinc-200 rounded-md text-sm font-bold text-zinc-600 hover:bg-zinc-50">
+            Cancel
+          </button>
+          <button type="submit" id="modal-submit-btn" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-sm font-bold text-white">
+            Create Game
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script>
+    // Use centralized config for API URL
+    const API_URL = LAPISTA_CONFIG.API_URL;
+
+    // Session management
+    function getToken() {
+      return sessionStorage.getItem('adminToken');
+    }
+
+    function setToken(token) {
+      sessionStorage.setItem('adminToken', token);
+    }
+
+    function clearToken() {
+      sessionStorage.removeItem('adminToken');
+    }
+
+    // API helper
+    async function adminFetch(url, options = {}) {
+      const token = getToken();
+      const response = await fetch(`${API_URL}${url}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          ...options.headers
+        }
+      });
+
+      if (response.status === 401) {
+        clearToken();
+        showLoginScreen();
+        throw new Error('Session expired');
+      }
+
+      return response;
+    }
+
+    // UI helpers
+    function showLoginScreen() {
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      loadStats();
+      loadGames();
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-green-600', 'border-b-2', 'border-green-600');
+        btn.classList.add('text-zinc-400');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('text-zinc-400');
+      document.getElementById(`tab-${tab}`).classList.add('text-green-600', 'border-b-2', 'border-green-600');
+
+      document.getElementById('content-games').classList.add('hidden');
+      document.getElementById('content-rsvps').classList.add('hidden');
+      document.getElementById(`content-${tab}`).classList.remove('hidden');
+
+      if (tab === 'rsvps') {
+        populateGameSelect();
+      }
+    }
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('login-btn');
+      const errorDiv = document.getElementById('login-error');
+      const key = document.getElementById('admin-key').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+      errorDiv.classList.add('hidden');
+
+      try {
+        const response = await fetch(`${API_URL}/api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        setToken(data.token);
+        showDashboard();
+
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    });
+
+    // Logout
+    async function logout() {
+      try {
+        await adminFetch('/api/admin/logout', { method: 'POST' });
+      } catch (err) {}
+      clearToken();
+      showLoginScreen();
+      document.getElementById('admin-key').value = '';
+    }
+
+    // Load stats
+    async function loadStats() {
+      try {
+        const response = await adminFetch('/api/admin/stats');
+        const stats = await response.json();
+
+        document.getElementById('stat-active-games').textContent = stats.activeGames;
+        document.getElementById('stat-week-rsvps').textContent = stats.weekRSVPs;
+        document.getElementById('stat-total-rsvps').textContent = stats.totalRSVPs;
+        document.getElementById('stat-revenue').textContent = `$${stats.totalRevenue.toFixed(2)}`;
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    // Load games
+    let gamesData = [];
+    async function loadGames() {
+      try {
+        const response = await adminFetch('/api/admin/games');
+        gamesData = await response.json();
+
+        const list = document.getElementById('games-list');
+
+        if (gamesData.length === 0) {
+          list.innerHTML = '<div class="p-8 text-center text-zinc-500">No games found</div>';
+          return;
+        }
+
+        list.innerHTML = gamesData.map(game => {
+          const date = new Date(game.date);
+          const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          const isPast = date < new Date();
+          const isCancelled = game.status === 'cancelled';
+          const statusClass = isCancelled ? 'bg-red-100 text-red-700' :
+                             isPast ? 'bg-zinc-100 text-zinc-500' :
+                             'bg-green-100 text-green-700';
+          const statusText = isCancelled ? 'Cancelled' : isPast ? 'Completed' : 'Active';
+          const filled = game.capacity - (game.spotsRemaining || 0);
+
+          return `
+            <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-zinc-50">
+              <div class="flex items-center gap-4">
+                <div class="text-xs font-bold text-zinc-400 bg-zinc-100 px-2 py-1 rounded">${game.gameId}</div>
+                <div>
+                  <div class="font-bold text-zinc-900">${escapeHtml(game.title)}</div>
+                  <div class="text-sm text-zinc-500">${escapeHtml(game.venue?.name || 'TBD')} - ${dateStr} ${game.time}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-sm">
+                  <span class="font-bold">${filled}</span>
+                  <span class="text-zinc-400">/ ${game.capacity}</span>
+                </div>
+                <span class="text-xs font-bold px-2 py-1 rounded ${statusClass}">${statusText}</span>
+                ${!isPast && !isCancelled ? `
+                  <button onclick="showEditGameModal('${game.gameId}')" class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Edit">
+                    <span class="iconify" data-icon="lucide:pencil"></span>
+                  </button>
+                  <button onclick="cancelGame('${game.gameId}')" class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded" title="Cancel">
+                    <span class="iconify" data-icon="lucide:x-circle"></span>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to load games:', err);
+        document.getElementById('games-list').innerHTML =
+          '<div class="p-8 text-center text-red-500">Failed to load games</div>';
+      }
+    }
+
+    // Create Game Modal
+    function showCreateGameModal() {
+      document.getElementById('modal-title').textContent = 'New Game';
+      document.getElementById('modal-submit-btn').textContent = 'Create Game';
+      document.getElementById('edit-game-id').value = '';
+      document.getElementById('game-form').reset();
+      document.getElementById('game-capacity').value = '24';
+      document.getElementById('game-price').value = '5.99';
+      document.getElementById('modal-error').classList.add('hidden');
+      document.getElementById('game-modal').classList.remove('hidden');
+    }
+
+    // Edit Game Modal
+    function showEditGameModal(gameId) {
+      const game = gamesData.find(g => g.gameId === gameId);
+      if (!game) return;
+
+      document.getElementById('modal-title').textContent = 'Edit Game';
+      document.getElementById('modal-submit-btn').textContent = 'Save Changes';
+      document.getElementById('edit-game-id').value = gameId;
+      document.getElementById('game-title').value = game.title;
+      document.getElementById('game-day').value = game.dayOfWeek;
+      document.getElementById('game-time').value = game.time;
+      document.getElementById('game-date').value = new Date(game.date).toISOString().split('T')[0];
+      document.getElementById('game-venue-name').value = game.venue?.name || '';
+      document.getElementById('game-venue-address').value = game.venue?.address || '';
+      document.getElementById('game-capacity').value = game.capacity;
+      document.getElementById('game-price').value = game.price;
+      document.getElementById('modal-error').classList.add('hidden');
+      document.getElementById('game-modal').classList.remove('hidden');
+    }
+
+    function closeGameModal() {
+      document.getElementById('game-modal').classList.add('hidden');
+    }
+
+    // Game form submit
+    document.getElementById('game-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('modal-submit-btn');
+      const errorDiv = document.getElementById('modal-error');
+      const editId = document.getElementById('edit-game-id').value;
+      const isEdit = !!editId;
+
+      const gameData = {
+        title: document.getElementById('game-title').value,
+        dayOfWeek: document.getElementById('game-day').value,
+        time: document.getElementById('game-time').value,
+        date: document.getElementById('game-date').value,
+        venue: {
+          name: document.getElementById('game-venue-name').value,
+          address: document.getElementById('game-venue-address').value
+        },
+        capacity: parseInt(document.getElementById('game-capacity').value),
+        price: parseFloat(document.getElementById('game-price').value)
+      };
+
+      btn.disabled = true;
+      btn.textContent = isEdit ? 'Saving...' : 'Creating...';
+      errorDiv.classList.add('hidden');
+
+      try {
+        const url = isEdit ? `/api/admin/games/${editId}` : '/api/admin/games';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        const response = await adminFetch(url, {
+          method,
+          body: JSON.stringify(gameData)
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to save game');
+        }
+
+        closeGameModal();
+        loadGames();
+        loadStats();
+
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = isEdit ? 'Save Changes' : 'Create Game';
+      }
+    });
+
+    // Cancel game
+    async function cancelGame(gameId) {
+      if (!confirm(`Are you sure you want to cancel game ${gameId}? This cannot be undone.`)) {
+        return;
+      }
+
+      try {
+        const response = await adminFetch(`/api/admin/games/${gameId}/cancel`, {
+          method: 'PUT'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to cancel game');
+        }
+
+        loadGames();
+        loadStats();
+      } catch (err) {
+        alert('Failed to cancel game: ' + err.message);
+      }
+    }
+
+    // Populate game select for RSVPs
+    function populateGameSelect() {
+      const select = document.getElementById('rsvp-game-select');
+      const upcomingGames = gamesData.filter(g => new Date(g.date) >= new Date() && g.status !== 'cancelled');
+
+      select.innerHTML = '<option value="">Select a game...</option>' +
+        upcomingGames.map(g => {
+          const date = new Date(g.date);
+          const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          return `<option value="${g.gameId}">${g.title} - ${dateStr}</option>`;
+        }).join('');
+    }
+
+    // Current RSVPs data for export
+    let currentRSVPs = [];
+    let currentGameId = '';
+
+    // Load RSVPs for a game
+    async function loadRSVPs(gameId) {
+      currentGameId = gameId;
+
+      if (!gameId) {
+        document.getElementById('rsvps-list').innerHTML =
+          '<div class="p-8 text-center text-zinc-500">Select a game to view RSVPs</div>';
+        document.getElementById('export-csv-btn').classList.add('hidden');
+        return;
+      }
+
+      try {
+        const response = await adminFetch(`/api/admin/games/${gameId}/rsvps`);
+        currentRSVPs = await response.json();
+
+        const list = document.getElementById('rsvps-list');
+        const exportBtn = document.getElementById('export-csv-btn');
+
+        if (currentRSVPs.length === 0) {
+          list.innerHTML = '<div class="p-8 text-center text-zinc-500">No RSVPs for this game</div>';
+          exportBtn.classList.add('hidden');
+          return;
+        }
+
+        exportBtn.classList.remove('hidden');
+
+        let totalCheckedIn = currentRSVPs.filter(r => r.checkedIn).length;
+
+        list.innerHTML = `
+          <div class="p-3 bg-zinc-50 border-b border-zinc-200 flex justify-between items-center text-sm">
+            <span class="font-bold text-zinc-600">${currentRSVPs.length} RSVPs (${currentRSVPs.reduce((sum, r) => sum + r.totalPlayers, 0)} players)</span>
+            <span class="text-zinc-500">Checked in: <span id="checkin-count" class="font-bold">${totalCheckedIn}</span> / ${currentRSVPs.length}</span>
+          </div>
+        ` + currentRSVPs.map((rsvp, index) => {
+          const statusClass = rsvp.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700';
+
+          return `
+            <div class="p-4 flex items-center justify-between hover:bg-zinc-50">
+              <div class="flex items-center gap-4">
+                <label class="relative flex items-center cursor-pointer">
+                  <input type="checkbox" ${rsvp.checkedIn ? 'checked' : ''}
+                         onchange="toggleCheckin('${rsvp._id}', this.checked)"
+                         class="sr-only peer">
+                  <div class="w-6 h-6 rounded border-2 border-zinc-300 peer-checked:border-green-500 peer-checked:bg-green-500 flex items-center justify-center transition-colors">
+                    <span class="iconify text-white ${rsvp.checkedIn ? '' : 'hidden'}" data-icon="lucide:check"></span>
+                  </div>
+                </label>
+                <div class="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-sm font-bold text-zinc-600">
+                  ${index + 1}
+                </div>
+                <div>
+                  <div class="font-bold text-zinc-900">${escapeHtml(rsvp.player?.firstName || '')} ${escapeHtml(rsvp.player?.lastName || '')}</div>
+                  <div class="text-sm text-zinc-500">${escapeHtml(rsvp.player?.email || '')} ${rsvp.player?.phone ? '· ' + escapeHtml(rsvp.player.phone) : ''}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 text-sm">
+                <div class="text-zinc-500">${rsvp.totalPlayers} player${rsvp.totalPlayers > 1 ? 's' : ''}</div>
+                <div class="font-bold">$${(rsvp.totalAmount || 0).toFixed(2)}</div>
+                <span class="text-xs font-bold px-2 py-1 rounded ${statusClass}">${rsvp.paymentStatus}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to load RSVPs:', err);
+        document.getElementById('rsvps-list').innerHTML =
+          '<div class="p-8 text-center text-red-500">Failed to load RSVPs</div>';
+      }
+    }
+
+    // Toggle check-in
+    async function toggleCheckin(rsvpId, checkedIn) {
+      try {
+        const response = await adminFetch(`/api/admin/rsvps/${rsvpId}/checkin`, {
+          method: 'PUT',
+          body: JSON.stringify({ checkedIn })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update check-in');
+        }
+
+        // Update local data and counter
+        const rsvp = currentRSVPs.find(r => r._id === rsvpId);
+        if (rsvp) {
+          rsvp.checkedIn = checkedIn;
+          const totalCheckedIn = currentRSVPs.filter(r => r.checkedIn).length;
+          document.getElementById('checkin-count').textContent = totalCheckedIn;
+        }
+
+      } catch (err) {
+        alert('Failed to update check-in: ' + err.message);
+        // Reload to reset state
+        loadRSVPs(currentGameId);
+      }
+    }
+
+    // Export to CSV
+    function exportCSV() {
+      if (!currentRSVPs.length) return;
+
+      const game = gamesData.find(g => g.gameId === currentGameId);
+      const dateStr = game ? new Date(game.date).toLocaleDateString('en-US') : currentGameId;
+
+      const headers = ['#', 'First Name', 'Last Name', 'Email', 'Phone', 'Players', 'Amount', 'Payment', 'Checked In'];
+      const rows = currentRSVPs.map((rsvp, index) => [
+        index + 1,
+        rsvp.player?.firstName || '',
+        rsvp.player?.lastName || '',
+        rsvp.player?.email || '',
+        rsvp.player?.phone || '',
+        rsvp.totalPlayers,
+        `$${(rsvp.totalAmount || 0).toFixed(2)}`,
+        rsvp.paymentStatus,
+        rsvp.checkedIn ? 'Yes' : 'No'
+      ]);
+
+      const csv = [headers, ...rows].map(row =>
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `RSVPs-${currentGameId}-${dateStr.replace(/\//g, '-')}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // XSS prevention helper
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Check session on page load
+    async function checkSession() {
+      const token = getToken();
+      if (!token) {
+        showLoginScreen();
+        return;
+      }
+
+      try {
+        const response = await adminFetch('/api/admin/verify');
+        if (response.ok) {
+          showDashboard();
+        } else {
+          showLoginScreen();
+        }
+      } catch (err) {
+        showLoginScreen();
+      }
+    }
+
+    // Initialize
+    checkSession();
+  </script>
+</body>
+</html>

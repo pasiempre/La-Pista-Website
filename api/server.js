@@ -54,9 +54,9 @@ app.use(helmet({
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.stripe.com", "https://api.iconify.design", "https://cdn.tailwindcss.com", "https://code.iconify.design", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://images.unsplash.com", "https://www.transparenttextures.com"],
-      frameSrc: ["https://js.stripe.com", "https://www.google.com", "https://maps.google.com"]
+      imgSrc: ["'self'", "data:", "blob:", "https:", "https://q.stripe.com", "https://m.stripe.com", "https://m.stripe.network", "https://b.stripecdn.com"],
+      connectSrc: ["'self'", "https://api.stripe.com", "https://js.stripe.com", "https://m.stripe.network", "https://api.iconify.design", "https://cdn.tailwindcss.com", "https://code.iconify.design", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://images.unsplash.com", "https://www.transparenttextures.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com", "https://www.google.com", "https://maps.google.com"]
     }
   }
 }));
@@ -92,8 +92,15 @@ const codeLookupLimiter = rateLimit({
 // 🔒 SECURITY: Rate limiter for admin endpoints (prevents abuse)
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Max 5 admin requests per 15 min per IP
+  max: 20, // Max 20 admin requests per 15 min per IP
   message: { error: 'Too many admin requests, please try again later.' }
+});
+
+// 🔒 SECURITY: Rate limiter for comments (prevents spam)
+const commentLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // Max 5 comments per minute per IP
+  message: { error: 'Too many comments, please slow down.' }
 });
 
 // ============================================
@@ -106,6 +113,56 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
 }
 const JWT_SECRET = process.env.JWT_SECRET || 'lapista-dev-secret-change-in-production';
 const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days
+
+// ============================================
+// ADMIN SESSION MANAGEMENT
+// ============================================
+const crypto = require('crypto');
+
+// In-memory session store (migrate to Redis when scaling)
+const adminSessions = new Map();
+const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000; // 4 hours
+
+// Clean up expired sessions every 15 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, session] of adminSessions) {
+    if (now > session.expiresAt) {
+      adminSessions.delete(token);
+      console.log('🧹 Cleaned up expired admin session');
+    }
+  }
+}, 15 * 60 * 1000);
+
+// Admin session authentication middleware
+const adminSessionAuth = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.replace('Bearer ', '');
+
+  if (!token || !adminSessions.has(token)) {
+    return res.status(401).json({ error: 'Admin authentication required' });
+  }
+
+  const session = adminSessions.get(token);
+  if (Date.now() > session.expiresAt) {
+    adminSessions.delete(token);
+    return res.status(401).json({ error: 'Session expired' });
+  }
+
+  // 🔒 SECURITY: IP binding enforcement
+  // Invalidate session if IP changes (prevents session hijacking)
+  if (session.ip && session.ip !== req.ip) {
+    console.warn(`⚠️ Admin session IP mismatch: expected ${session.ip}, got ${req.ip}. Invalidating session.`);
+    adminSessions.delete(token);
+    return res.status(401).json({ error: 'Session invalidated due to IP change. Please login again.' });
+  }
+
+  // Log admin activity (without sensitive data)
+  console.log(`👤 Admin action: ${req.method} ${req.path} from ${req.ip}`);
+
+  req.adminSession = session;
+  next();
+};
 
 // ============================================
 // AUTH MIDDLEWARE
@@ -540,7 +597,8 @@ app.get('/api/health', (req, res) => {
 // Get all games
 app.get('/api/games', async (req, res) => {
   try {
-    const games = await Game.find({ status: { $in: ['open', 'scheduled'] } })
+    // Include 'full' status so users can join waitlist
+    const games = await Game.find({ status: { $in: ['open', 'scheduled', 'full'] } })
       .sort({ date: 1 });
     res.json(games);
   } catch (err) {
@@ -789,6 +847,7 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
         quantity: totalPlayers,
       }],
       mode: 'payment',
+      allow_promotion_codes: true, // Enable Stripe promo codes at checkout
       success_url: successUrl,
       cancel_url: cancelUrl,
       customer_email: email,
@@ -1319,6 +1378,246 @@ app.get('/api/templates', async (req, res) => {
   }
 });
 
+// ============================================
+// ADMIN SESSION ENDPOINTS
+// ============================================
+
+// Admin login - creates a session token
+app.post('/api/admin/login', adminLimiter, async (req, res) => {
+  const { key } = req.body;
+
+  if (!key || key !== process.env.ADMIN_SECRET_KEY) {
+    console.log(`⚠️ Failed admin login attempt from ${req.ip}`);
+    // Generic error to prevent key enumeration
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  // Generate secure session token
+  const sessionToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = Date.now() + ADMIN_SESSION_DURATION;
+
+  // Store session
+  adminSessions.set(sessionToken, {
+    createdAt: Date.now(),
+    expiresAt,
+    ip: req.ip
+  });
+
+  console.log(`✅ Admin logged in from ${req.ip}`);
+
+  res.json({
+    token: sessionToken,
+    expiresIn: '4h'
+  });
+});
+
+// Admin logout - destroys session
+app.post('/api/admin/logout', (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.replace('Bearer ', '');
+
+  if (token && adminSessions.has(token)) {
+    adminSessions.delete(token);
+    console.log(`👋 Admin logged out from ${req.ip}`);
+  }
+
+  res.json({ success: true });
+});
+
+// Admin verify - check if session is valid
+app.get('/api/admin/verify', adminLimiter, adminSessionAuth, (req, res) => {
+  res.json({
+    valid: true,
+    expiresAt: req.adminSession.expiresAt
+  });
+});
+
+// Admin stats
+app.get('/api/admin/stats', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const [totalGames, activeGames, totalRSVPs, weekRSVPs, revenueResult] = await Promise.all([
+      Game.countDocuments(),
+      Game.countDocuments({ status: { $in: ['open', 'scheduled'] }, date: { $gte: now } }),
+      RSVP.countDocuments({ status: 'confirmed' }),
+      RSVP.countDocuments({ status: 'confirmed', createdAt: { $gte: startOfWeek } }),
+      RSVP.aggregate([
+        { $match: { paymentStatus: 'paid' } },
+        { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      ])
+    ]);
+
+    res.json({
+      totalGames,
+      activeGames,
+      totalRSVPs,
+      weekRSVPs,
+      totalRevenue: revenueResult[0]?.total || 0
+    });
+  } catch (err) {
+    console.error('Admin stats error:', err);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// Admin - Get all games (including past/cancelled)
+app.get('/api/admin/games', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const games = await Game.find().sort({ date: -1 }).limit(100);
+    res.json(games);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch games' });
+  }
+});
+
+// Admin - Get RSVPs for a game
+app.get('/api/admin/games/:gameId/rsvps', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const rsvps = await RSVP.find({
+      gameId: req.params.gameId,
+      status: { $ne: 'cancelled' }
+    }).sort({ createdAt: -1 });
+    res.json(rsvps);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch RSVPs' });
+  }
+});
+
+// Admin - Update game
+app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const { title, time, date, capacity, status, venue } = req.body;
+
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (time) updateData.time = time;
+    if (date) updateData.date = new Date(date);
+    if (capacity) updateData.capacity = parseInt(capacity);
+    if (status) updateData.status = status;
+    if (venue) updateData.venue = venue;
+
+    const game = await Game.findOneAndUpdate(
+      { gameId: req.params.gameId },
+      updateData,
+      { new: true }
+    );
+
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    console.log(`📝 Admin updated game ${req.params.gameId}`);
+    res.json(game);
+  } catch (err) {
+    console.error('Update game error:', err);
+    res.status(500).json({ error: 'Failed to update game' });
+  }
+});
+
+// Admin - Create new game
+app.post('/api/admin/games', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const { title, dayOfWeek, time, date, venue, capacity, price } = req.body;
+
+    // Validate required fields
+    if (!title || !dayOfWeek || !time || !date || !venue) {
+      return res.status(400).json({ error: 'Missing required fields: title, dayOfWeek, time, date, venue' });
+    }
+
+    // Generate unique game ID
+    const year = new Date().getFullYear();
+    const lastGame = await Game.findOne({ gameId: { $regex: `^LP-${year}` } })
+      .sort({ gameId: -1 });
+
+    let nextNum = 1;
+    if (lastGame) {
+      const match = lastGame.gameId.match(/LP-\d+-(\d+)/);
+      if (match) nextNum = parseInt(match[1]) + 1;
+    }
+    const gameId = `LP-${year}-${String(nextNum).padStart(3, '0')}`;
+
+    const game = new Game({
+      gameId,
+      title,
+      dayOfWeek,
+      time,
+      date: new Date(date),
+      venue: {
+        name: venue.name,
+        address: venue.address,
+        mapsUrl: venue.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(venue.address)}`
+      },
+      capacity: capacity || 24,
+      spotsRemaining: capacity || 24,
+      price: price || 5.99,
+      status: 'open'
+    });
+
+    await game.save();
+    console.log(`✅ Admin created game ${gameId}`);
+    res.status(201).json(game);
+  } catch (err) {
+    console.error('Create game error:', err);
+    res.status(500).json({ error: 'Failed to create game' });
+  }
+});
+
+// Admin - Cancel game
+app.put('/api/admin/games/:gameId/cancel', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const game = await Game.findOneAndUpdate(
+      { gameId: req.params.gameId },
+      { status: 'cancelled' },
+      { new: true }
+    );
+
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    console.log(`❌ Admin cancelled game ${req.params.gameId}`);
+    res.json(game);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to cancel game' });
+  }
+});
+
+// Admin - Check-in player
+app.put('/api/admin/rsvps/:rsvpId/checkin', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const { checkedIn } = req.body;
+
+    const rsvp = await RSVP.findByIdAndUpdate(
+      req.params.rsvpId,
+      { checkedIn: checkedIn !== false },
+      { new: true }
+    );
+
+    if (!rsvp) {
+      return res.status(404).json({ error: 'RSVP not found' });
+    }
+
+    console.log(`${checkedIn ? '✅' : '⬜'} Admin ${checkedIn ? 'checked in' : 'unchecked'} ${rsvp.player.firstName} ${rsvp.player.lastName}`);
+    res.json(rsvp);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update check-in status' });
+  }
+});
+
+// Admin - Get waitlist for a game
+app.get('/api/admin/games/:gameId/waitlist', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const waitlist = await Waitlist.find({ gameId: req.params.gameId }).sort({ createdAt: 1 });
+    res.json(waitlist);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch waitlist' });
+  }
+});
+
 // Create a template
 // 🔒 SECURITY: Rate limited to prevent abuse
 app.post('/api/templates', adminLimiter, async (req, res) => {
@@ -1543,13 +1842,15 @@ app.post('/api/seed', async (req, res) => {
 // Get comments for a game
 app.get('/api/games/:gameId/comments', async (req, res) => {
   try {
-    const comments = await Comment.find({ 
+    // 🔒 SECURITY: Only return public fields, exclude email
+    const comments = await Comment.find({
       gameId: req.params.gameId,
-      isDeleted: false 
+      isDeleted: false
     })
+    .select('author.name author.initials author.avatar text createdAt')
     .sort({ createdAt: -1 })
     .limit(50);
-    
+
     res.json(comments);
   } catch (err) {
     console.error('Error fetching comments:', err);
@@ -1558,68 +1859,94 @@ app.get('/api/games/:gameId/comments', async (req, res) => {
 });
 
 // Add a comment to a game
-app.post('/api/games/:gameId/comments', async (req, res) => {
+app.post('/api/games/:gameId/comments', commentLimiter, async (req, res) => {
   try {
-    const { name, email, text } = req.body;
-    
-    if (!name || !email || !text) {
+    const { name, email, text, userId } = req.body;
+
+    // 🔒 SECURITY: Type validation - prevent NoSQL injection via object payloads
+    if (typeof name !== 'string' || typeof email !== 'string' || typeof text !== 'string') {
+      return res.status(400).json({ error: 'Invalid input types' });
+    }
+
+    if (!name.trim() || !email.trim() || !text.trim()) {
       return res.status(400).json({ error: 'Name, email, and text are required' });
     }
-    
+
+    if (name.length > 50) {
+      return res.status(400).json({ error: 'Name too long (max 50 characters)' });
+    }
+
     if (text.length > 500) {
       return res.status(400).json({ error: 'Comment too long (max 500 characters)' });
     }
-    
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Validate gameId format (LP-XXXX pattern)
+    const gameId = req.params.gameId;
+    if (!gameId || typeof gameId !== 'string' || !/^LP-\d{1,10}$/.test(gameId)) {
+      return res.status(400).json({ error: 'Invalid game ID format' });
+    }
+
+    // 🔒 SECURITY: Sanitize inputs - strip HTML tags to prevent stored XSS
+    const sanitizedName = name.trim().replace(/<[^>]*>/g, '').slice(0, 50);
+    const sanitizedText = text.trim().replace(/<[^>]*>/g, '').slice(0, 500);
+    const sanitizedEmail = email.toLowerCase().trim().slice(0, 100);
+    const sanitizedGameId = gameId.slice(0, 20); // Already validated format
+
     // Generate initials from name
-    const nameParts = name.trim().split(' ');
-    const initials = nameParts.length >= 2 
+    const nameParts = sanitizedName.split(' ').filter(p => p.length > 0);
+    const initials = nameParts.length >= 2
       ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
-      : name.substring(0, 2).toUpperCase();
-    
+      : sanitizedName.substring(0, 2).toUpperCase();
+
+    // Look up user avatar if userId provided
+    let userAvatar = null;
+    let validUserId = null;
+    if (userId && typeof userId === 'string' && mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId).select('avatar email');
+      // Verify email matches to prevent impersonation
+      if (user && user.email.toLowerCase() === sanitizedEmail) {
+        userAvatar = user.avatar || null;
+        validUserId = user._id;
+      }
+    }
+
     const comment = await Comment.create({
-      gameId: req.params.gameId,
+      gameId: sanitizedGameId,
       author: {
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        initials
+        name: sanitizedName,
+        email: sanitizedEmail,
+        initials,
+        userId: validUserId,
+        avatar: userAvatar
       },
-      text: text.trim()
+      text: sanitizedText
     });
-    
-    // Create notification for game host/participants (optional - can expand later)
-    // For now, just return the comment
-    
-    res.status(201).json(comment);
+
+    res.status(201).json({
+      _id: comment._id,
+      author: { 
+        name: comment.author.name, 
+        initials: comment.author.initials,
+        avatar: comment.author.avatar 
+      },
+      text: comment.text,
+      createdAt: comment.createdAt
+    });
   } catch (err) {
     console.error('Error creating comment:', err);
     res.status(500).json({ error: 'Failed to create comment' });
   }
 });
 
-// Delete a comment (soft delete)
-app.delete('/api/comments/:commentId', async (req, res) => {
-  try {
-    const { email } = req.body;
-    
-    const comment = await Comment.findById(req.params.commentId);
-    if (!comment) {
-      return res.status(404).json({ error: 'Comment not found' });
-    }
-    
-    // Only allow author to delete their own comment
-    if (comment.author.email !== email?.toLowerCase()) {
-      return res.status(403).json({ error: 'Not authorized to delete this comment' });
-    }
-    
-    comment.isDeleted = true;
-    await comment.save();
-    
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Error deleting comment:', err);
-    res.status(500).json({ error: 'Failed to delete comment' });
-  }
-});
+// 🔒 SECURITY: Comment deletion disabled - reduces attack surface
+// If comment moderation is needed, add admin-only endpoint with adminSessionAuth + adminLimiter
+// app.delete('/api/comments/:commentId', adminLimiter, adminSessionAuth, async (req, res) => { ... });
 
 // ============================================
 // NOTIFICATIONS API
@@ -2014,6 +2341,376 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Change password error:', err);
     res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// Forgot password - request reset email
+app.post('/api/auth/forgot-password', authLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    
+    // 🔒 SECURITY: Always return success to prevent email enumeration
+    const successMessage = 'If an account exists with this email, a password reset link has been sent.';
+    
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user || user.authProvider !== 'email') {
+      // User doesn't exist or uses social auth, but return success anyway
+      return res.json({ success: true, message: successMessage });
+    }
+    
+    // Generate secure reset token
+    const crypto = require('crypto');
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    
+    // Store hashed token with 1-hour expiry
+    user.passwordResetToken = resetTokenHash;
+    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await user.save();
+    
+    // Send reset email
+    if (resend) {
+      const resetUrl = `${FRONTEND_URL}/reset-password.html?token=${resetToken}`;
+      
+      try {
+        await resend.emails.send({
+          from: 'LaPista.ATX <noreply@lapista-atx.com>',
+          to: user.email,
+          subject: 'Reset Your Password - LaPista.ATX',
+          html: `
+            <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #18181b; font-size: 28px; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: -1px;">
+                  LaPista<span style="color: #22c55e;">.ATX</span>
+                </h1>
+              </div>
+              
+              <div style="background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; padding: 32px;">
+                <h2 style="color: #18181b; font-size: 20px; font-weight: 700; margin: 0 0 16px 0;">
+                  Reset Your Password
+                </h2>
+                <p style="color: #71717a; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+                  We received a request to reset your password. Click the button below to create a new password. This link expires in 1 hour.
+                </p>
+                
+                <a href="${resetUrl}" style="display: inline-block; background: #22c55e; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 28px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Reset Password
+                </a>
+                
+                <p style="color: #a1a1aa; font-size: 13px; margin: 24px 0 0 0;">
+                  If you didn't request this, you can safely ignore this email.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin-top: 24px;">
+                <p style="color: #a1a1aa; font-size: 12px; margin: 0;">
+                  © ${new Date().getFullYear()} LaPista.ATX • Austin's Pickup Soccer Community
+                </p>
+              </div>
+            </div>
+          `
+        });
+        console.log(`✅ Password reset email sent to user: ${user._id}`);
+      } catch (emailErr) {
+        console.error('Failed to send reset email:', emailErr);
+        // Don't fail the request if email fails - user can retry
+      }
+    }
+    
+    res.json({ success: true, message: successMessage });
+    
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Failed to process request' });
+  }
+});
+
+// Reset password with token
+app.post('/api/auth/reset-password', authLimiter, async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token and new password are required' });
+    }
+    
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+    
+    // Hash the provided token to compare with stored hash
+    const crypto = require('crypto');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    
+    // Find user with valid reset token
+    const user = await User.findOne({
+      passwordResetToken: tokenHash,
+      passwordResetExpires: { $gt: new Date() }
+    });
+    
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+    
+    // Hash new password
+    const salt = await bcrypt.genSalt(12);
+    user.passwordHash = await bcrypt.hash(newPassword, salt);
+    
+    // Clear reset token (single use)
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    
+    await user.save();
+    
+    console.log(`✅ Password reset completed: ${user._id}`);
+    res.json({ success: true, message: 'Password has been reset successfully' });
+    
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// ============================================
+// PAYMENT METHODS ROUTES (Stripe)
+// 🔒 SECURITY: All endpoints require authentication
+// ============================================
+
+// Get saved payment methods for the authenticated user
+app.get('/api/payment-methods', authenticateToken, async (req, res) => {
+  try {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Payment service not available' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user || !user.stripeCustomerId) {
+      return res.json({ paymentMethods: [] });
+    }
+
+    // Get payment methods from Stripe
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: 'card'
+    });
+
+    // Return only safe, necessary data
+    const safePaymentMethods = paymentMethods.data.map(pm => ({
+      id: pm.id,
+      brand: pm.card.brand,
+      last4: pm.card.last4,
+      expMonth: pm.card.exp_month,
+      expYear: pm.card.exp_year,
+      isDefault: false // Will implement default card logic later
+    }));
+
+    res.json({ paymentMethods: safePaymentMethods });
+  } catch (err) {
+    console.error('Error fetching payment methods:', err);
+    res.status(500).json({ error: 'Failed to fetch payment methods' });
+  }
+});
+
+// Create a SetupIntent to add a new payment method
+app.post('/api/payment-methods/setup', authenticateToken, async (req, res) => {
+  try {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Payment service not available' });
+    }
+
+    let user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create or get Stripe customer
+    let customerId = user.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
+        metadata: {
+          userId: user._id.toString()
+        }
+      });
+      customerId = customer.id;
+      
+      // Save customer ID to user
+      user.stripeCustomerId = customerId;
+      await user.save();
+    }
+
+    // Create SetupIntent for collecting payment method
+    const setupIntent = await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      metadata: {
+        userId: user._id.toString()
+      }
+    });
+
+    res.json({
+      clientSecret: setupIntent.client_secret
+    });
+  } catch (err) {
+    console.error('Error creating setup intent:', err);
+    res.status(500).json({ error: 'Failed to setup payment method' });
+  }
+});
+
+// Delete a saved payment method
+app.delete('/api/payment-methods/:paymentMethodId', authenticateToken, async (req, res) => {
+  try {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Payment service not available' });
+    }
+
+    const { paymentMethodId } = req.params;
+    const user = await User.findById(req.user.userId);
+    
+    if (!user || !user.stripeCustomerId) {
+      return res.status(404).json({ error: 'No saved payment methods' });
+    }
+
+    // Verify the payment method belongs to this customer
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+    if (paymentMethod.customer !== user.stripeCustomerId) {
+      return res.status(403).json({ error: 'Payment method not found' });
+    }
+
+    // Detach the payment method from the customer
+    await stripe.paymentMethods.detach(paymentMethodId);
+
+    res.json({ success: true, message: 'Payment method removed' });
+  } catch (err) {
+    console.error('Error deleting payment method:', err);
+    if (err.type === 'StripeInvalidRequestError') {
+      return res.status(404).json({ error: 'Payment method not found' });
+    }
+    res.status(500).json({ error: 'Failed to delete payment method' });
+  }
+});
+
+// Charge a saved payment method
+app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
+  try {
+    if (!stripe) {
+      return res.status(503).json({ error: 'Payment service not available' });
+    }
+
+    const { paymentMethodId, gameId, guests = [] } = req.body;
+    
+    if (!paymentMethodId || !gameId) {
+      return res.status(400).json({ error: 'Payment method and game ID required' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user || !user.stripeCustomerId) {
+      return res.status(400).json({ error: 'No saved payment methods' });
+    }
+
+    // Verify the payment method belongs to this customer
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+    if (paymentMethod.customer !== user.stripeCustomerId) {
+      return res.status(403).json({ error: 'Invalid payment method' });
+    }
+
+    // Get game data
+    const game = await Game.findOne({ gameId });
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    if (game.status !== 'scheduled') {
+      return res.status(400).json({ error: 'Game is no longer available for booking' });
+    }
+
+    // Calculate total
+    const totalPlayers = 1 + (guests?.length || 0);
+    if (game.spotsRemaining < totalPlayers) {
+      return res.status(400).json({ error: `Only ${game.spotsRemaining} spots remaining` });
+    }
+
+    const amount = Math.round(game.price * totalPlayers * 100); // cents
+
+    // Create PaymentIntent and confirm immediately
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: 'usd',
+      customer: user.stripeCustomerId,
+      payment_method: paymentMethodId,
+      confirm: true,
+      off_session: true,
+      metadata: {
+        gameId,
+        userId: user._id.toString(),
+        totalPlayers: totalPlayers.toString()
+      }
+    });
+
+    if (paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({ error: 'Payment failed' });
+    }
+
+    // Generate confirmation code
+    const confirmationCode = generateConfirmationCode().toUpperCase();
+
+    // Create RSVP
+    const rsvp = await RSVP.create({
+      gameId,
+      player: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone || ''
+      },
+      guests: guests.map(g => ({
+        firstName: g.firstName,
+        lastName: g.lastName
+      })),
+      totalPlayers,
+      paymentMethod: 'stripe',
+      paymentStatus: 'paid',
+      stripeSessionId: paymentIntent.id,
+      confirmationCode,
+      status: 'confirmed',
+      waiverAccepted: true, // User already accepted waiver at signup/previous booking
+      waiverAcceptedAt: new Date()
+    });
+
+    // Update game spots
+    game.spotsRemaining = Math.max(0, game.spotsRemaining - totalPlayers);
+    await game.save();
+
+    // Update user stats
+    user.gamesPlayed = (user.gamesPlayed || 0) + 1;
+    await user.save();
+
+    res.json({
+      success: true,
+      confirmationCode,
+      message: 'Booking confirmed!'
+    });
+
+  } catch (err) {
+    console.error('Error charging payment method:', err);
+    
+    // Handle specific Stripe errors
+    if (err.type === 'StripeCardError') {
+      return res.status(400).json({ error: err.message });
+    }
+    if (err.code === 'authentication_required') {
+      return res.status(400).json({ 
+        error: 'This card requires authentication. Please use a different card or pay at checkout.',
+        requiresAction: true
+      });
+    }
+    
+    res.status(500).json({ error: 'Payment failed' });
   }
 });
 

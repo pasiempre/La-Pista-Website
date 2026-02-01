@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - LaPista.ATX</title>
+  <meta name="description" content="Manage your LaPista.ATX profile and view your game history.">
+  <meta property="og:title" content="My Profile - LaPista.ATX">
+  <meta property="og:description" content="Manage your profile and view your game history.">
+  <meta property="og:image" content="/LaPista Logo 1.png">
+  <meta name="auth-required" content="true">
+  <meta name="theme-color" content="#18181b">
+  <link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+  <link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/config.js"></script>
+  <script src="/js/translations.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/avatars.js"></script>
+</head>
+<body class="min-h-screen bg-[#FAFAFA] antialiased">
+  
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
+  
+  <!-- Mobile Menu Panel -->
+  <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
+    <div class="flex items-center justify-between p-6 border-b border-zinc-800">
+      <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">
+        LaPista<span class="text-green-500">.ATX</span>
+      </span>
+      <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
+        <span class="iconify text-2xl" data-icon="lucide:x"></span>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+      <nav class="flex flex-col gap-4">
+        <a href="index.html#schedule" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Games</a>
+        <a href="about-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">About</a>
+        <a href="faq-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">FAQ</a>
+        <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Contact</a>
+      </nav>
+      <div class="border-t border-zinc-800 pt-8 mt-auto">
+        <div class="flex gap-4 flex-wrap mb-4">
+          <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+            <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
+          </a>
+          <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+            <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
+          </a>
+          <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+            <span class="iconify text-xl" data-icon="mdi:facebook" data-width="20"></span>
+          </a>
+          <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+            <span class="iconify text-xl" data-icon="ic:baseline-tiktok" data-width="20"></span>
+          </a>
+        </div>
+        <button data-lang-toggle class="text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-green-500 transition-colors">ES</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navbar -->
+  <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <button class="md:hidden text-zinc-500" onclick="toggleMobileMenu()">
+        <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+      </button>
+      <a href="index.html" class="flex items-center group">
+        <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+      </a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="index.html#schedule" class="hidden md:flex bg-zinc-900 hover:bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-md transition-all items-center gap-2 shadow-sm uppercase tracking-wide">
+        <span class="iconify text-green-400" data-icon="lucide:calendar" data-width="16"></span>
+        Find a Game
+      </a>
+      <button onclick="handleSignOut()" class="text-sm font-bold text-zinc-500 hover:text-red-600 transition-colors uppercase tracking-wide flex items-center gap-2">
+        <span class="iconify" data-icon="lucide:log-out" data-width="16"></span>
+        <span class="hidden sm:inline">Sign Out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-2xl mx-auto px-4 py-8 md:py-12">
+    
+    <!-- Loading State -->
+    <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+      <span class="iconify animate-spin text-green-600 text-4xl mb-4" data-icon="lucide:loader-2"></span>
+      <p class="text-zinc-500 font-medium">Loading your profile...</p>
+    </div>
+
+    <!-- Profile Content (hidden until loaded) -->
+    <div id="profile-content" class="hidden">
+      
+      <!-- Profile Header -->
+      <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 md:p-8 mb-6">
+        <div class="flex items-start gap-6">
+          <!-- Avatar -->
+          <div class="shrink-0">
+            <div id="user-avatar" class="w-20 h-20 md:w-24 md:h-24">
+              <!-- Avatar will be rendered by JS -->
+            </div>
+          </div>
+          
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <h1 id="user-fullname" class="text-2xl md:text-3xl font-black text-zinc-900 uppercase font-display tracking-tight truncate">
+              Loading...
+            </h1>
+            <p id="user-email" class="text-zinc-500 font-medium truncate mb-4">
+              --
+            </p>
+            <a href="edit-profile-page.html" class="inline-flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 transition-colors uppercase tracking-wide">
+              <span class="iconify" data-icon="lucide:edit-3" data-width="14"></span>
+              Edit Profile
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <!-- Games Played -->
+        <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+          <div class="text-3xl font-black text-zinc-900 font-display" id="stat-games">0</div>
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Games</div>
+        </div>
+        
+        <!-- Week Streak -->
+        <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+          <div class="text-3xl font-black text-zinc-900 font-display" id="stat-streak">0</div>
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Week Streak</div>
+        </div>
+        
+        <!-- Rating -->
+        <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+          <div class="text-3xl font-black text-zinc-900 font-display flex items-center justify-center gap-1">
+            <span id="stat-rating">--</span>
+            <span class="iconify text-amber-400 text-xl" data-icon="lucide:star" data-width="20"></span>
+          </div>
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Rating</div>
+        </div>
+        
+        <!-- Skill Level -->
+        <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+          <div class="text-xl font-black text-green-600 font-display uppercase" id="stat-skill">--</div>
+          <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Skill</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-zinc-100">
+          <h2 class="text-xs font-black text-zinc-400 uppercase tracking-widest">Quick Actions</h2>
+        </div>
+        <div class="divide-y divide-zinc-100">
+          <a href="index.html#schedule" class="flex items-center gap-4 px-6 py-4 hover:bg-zinc-50 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+              <span class="iconify" data-icon="lucide:calendar-plus" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Book a Game</div>
+              <div class="text-sm text-zinc-500">Find and join upcoming games</div>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:chevron-right" data-width="20"></span>
+          </a>
+          
+          <a href="my-games.html" class="flex items-center gap-4 px-6 py-4 hover:bg-zinc-50 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+              <span class="iconify" data-icon="lucide:history" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">My Games</div>
+              <div class="text-sm text-zinc-500">View your game history & upcoming</div>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:chevron-right" data-width="20"></span>
+          </a>
+          
+          <a href="edit-profile-page.html" class="flex items-center gap-4 px-6 py-4 hover:bg-zinc-50 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-600">
+              <span class="iconify" data-icon="lucide:user-cog" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Edit Profile</div>
+              <div class="text-sm text-zinc-500">Update your name, phone, skill level</div>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:chevron-right" data-width="20"></span>
+          </a>
+          
+          <a href="payment-methods.html" class="flex items-center gap-4 px-6 py-4 hover:bg-zinc-50 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+              <span class="iconify" data-icon="lucide:credit-card" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Payment Methods</div>
+              <div class="text-sm text-zinc-500">Manage saved cards for faster checkout</div>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:chevron-right" data-width="20"></span>
+          </a>
+          
+          <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="flex items-center gap-4 px-6 py-4 hover:bg-zinc-50 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+              <span class="iconify" data-icon="mdi:whatsapp" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Join WhatsApp Group</div>
+              <div class="text-sm text-zinc-500">Connect with other players</div>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:external-link" data-width="16"></span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Account Section -->
+      <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-zinc-100">
+          <h2 class="text-xs font-black text-zinc-400 uppercase tracking-widest">Account</h2>
+        </div>
+        <div class="divide-y divide-zinc-100">
+          <div class="flex items-center gap-4 px-6 py-4">
+            <div class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-600">
+              <span class="iconify" data-icon="lucide:mail" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Email</div>
+              <div class="text-sm text-zinc-500" id="account-email">--</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4 px-6 py-4">
+            <div class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-600">
+              <span class="iconify" data-icon="lucide:phone" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Phone</div>
+              <div class="text-sm text-zinc-500" id="account-phone">Not set</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4 px-6 py-4">
+            <div class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-600">
+              <span class="iconify" data-icon="lucide:calendar" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-zinc-900">Member Since</div>
+              <div class="text-sm text-zinc-500" id="account-joined">--</div>
+            </div>
+          </div>
+          
+          <button onclick="handleSignOut()" class="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-colors text-left">
+            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center text-red-600">
+              <span class="iconify" data-icon="lucide:log-out" data-width="20"></span>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-red-600">Sign Out</div>
+              <div class="text-sm text-zinc-500">Log out of your account</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-zinc-900 text-white mt-12">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div class="col-span-2 md:col-span-1">
+          <div class="font-display font-bold text-2xl uppercase italic tracking-tighter mb-4">
+            LaPista<span class="text-green-500">.ATX</span>
+          </div>
+          <p class="text-zinc-400 text-sm">Austin's pickup soccer community</p>
+        </div>
+        <div>
+          <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">Links</h4>
+          <ul class="space-y-2 text-sm text-zinc-300">
+            <li><a href="index.html#schedule" class="hover:text-green-500 transition-colors">Games</a></li>
+            <li><a href="about-page.html" class="hover:text-green-500 transition-colors">About</a></li>
+            <li><a href="faq-page.html" class="hover:text-green-500 transition-colors">FAQ</a></li>
+            <li><a href="contact-page.html" class="hover:text-green-500 transition-colors">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">Legal</h4>
+          <ul class="space-y-2 text-sm text-zinc-300">
+            <li><a href="terms.html" class="hover:text-green-500 transition-colors">Terms</a></li>
+            <li><a href="terms.html" class="hover:text-green-500 transition-colors">Privacy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">Follow</h4>
+          <div class="flex gap-4 flex-wrap">
+            <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="lucide:instagram" data-width="18"></span>
+            </a>
+            <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:whatsapp" data-width="18"></span>
+            </a>
+            <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="mdi:facebook" data-width="18"></span>
+            </a>
+            <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify" data-icon="ic:baseline-tiktok" data-width="18"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row justify-between items-center text-xs text-zinc-600 font-bold uppercase tracking-wide pt-8 border-t border-zinc-800">
+        <div>© <span data-year>2025</span> LaPista.ATX</div>
+        <div class="flex items-center gap-6 mt-4 md:mt-0">
+          <button data-lang-toggle class="text-zinc-400 hover:text-green-500 transition-colors">ES</button>
+          <a href="terms.html" class="hover:text-zinc-400">Privacy Policy</a>
+          <a href="terms.html" class="hover:text-zinc-400">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const panel = document.getElementById('mobile-menu-panel');
+      overlay.classList.toggle('hidden');
+      panel.classList.toggle('-translate-x-full');
+    }
+
+    // Sign out handler
+    function handleSignOut() {
+      AuthService.signOut();
+      showToast('Signed out successfully', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+
+    // Format date
+    function formatDate(dateStr) {
+      if (!dateStr) return '--';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for auth to be ready, then load profile
+      function loadProfile() {
+        // Check authentication
+        if (!AuthService.isAuthenticated()) {
+          localStorage.setItem('authRedirect', window.location.href);
+          window.location.href = 'login-page.html';
+          return;
+        }
+
+        // Get user data
+        const user = AuthService.getUser();
+        
+        // Hide loading, show content
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('profile-content').classList.remove('hidden');
+        
+        // Populate profile data
+        const initials = AuthService.getInitials();
+        
+        // Render avatar (jersey or initials fallback)
+        const avatarContainer = document.getElementById('user-avatar');
+        if (user.avatar && AVATAR_GALLERY.getById(user.avatar)) {
+          avatarContainer.innerHTML = AVATAR_GALLERY.renderAvatar(user.avatar, 'xl');
+        } else {
+          // Fallback to initials
+          avatarContainer.innerHTML = `
+            <div class="w-full h-full rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-2xl md:text-3xl font-bold shadow-lg">
+              ${initials}
+            </div>
+          `;
+        }
+        
+        document.getElementById('user-fullname').textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Player';
+        document.getElementById('user-email').textContent = user.email || '--';
+        
+        // Stats
+        document.getElementById('stat-games').textContent = user.gamesPlayed || 0;
+        document.getElementById('stat-streak').textContent = user.weekStreak || 0;
+        document.getElementById('stat-rating').textContent = user.averageRating > 0 ? user.averageRating.toFixed(1) : '--';
+        document.getElementById('stat-skill').textContent = user.skillLevel || 'Intermediate';
+        
+        // Account info
+        document.getElementById('account-email').textContent = user.email || '--';
+        document.getElementById('account-phone').textContent = user.phone || 'Not set';
+        document.getElementById('account-joined').textContent = formatDate(user.createdAt);
+      }
+
+      // Check if auth is already initialized
+      if (AuthService.isReady()) {
+        loadProfile();
+      } else {
+        AuthService.onAuthStateChange(() => loadProfile());
+      }
+    });
+  </script>
+</body>
+</html>

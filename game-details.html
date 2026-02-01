@@ -18,6 +18,8 @@
 <script src="/js/config.js"></script>
 <script src="/js/translations.js"></script>
 <script src="/js/i18n.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/avatars.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
     <!-- Mobile Menu Overlay -->
@@ -38,12 +40,18 @@
           <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Contact</a>
         </nav>
         <div class="border-t border-zinc-800 pt-8 mt-auto">
-          <div class="flex gap-4">
+          <div class="flex gap-4 flex-wrap">
             <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
             </a>
             <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
+            </a>
+            <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="mdi:facebook" data-width="20"></span>
+            </a>
+            <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="ic:baseline-tiktok" data-width="20"></span>
             </a>
           </div>
         </div>
@@ -77,10 +85,14 @@
             Contact
           </a>
         </nav>
-        <!-- Language Toggle -->
-        <button data-lang-toggle class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center text-xs font-bold text-zinc-700 transition-all" aria-label="Toggle language">
-          ES
-        </button>
+        <!-- Auth Button (shown when logged out) -->
+        <a href="login-page.html" data-auth-button class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-green-500 flex items-center justify-center text-zinc-600 hover:text-green-600 transition-all" aria-label="Sign in">
+          <span class="iconify" data-icon="lucide:user" data-width="18"></span>
+        </a>
+        <!-- User Menu (shown when logged in) -->
+        <a href="profile-page.html" data-user-menu class="hidden w-9 h-9 rounded-md bg-green-600 hover:bg-green-700 flex items-center justify-center text-xs font-bold text-white transition-all" aria-label="View profile">
+          <span data-user-initials>--</span>
+        </a>
       </div>
     </header>
 
@@ -244,30 +256,7 @@
         </div>
       </div>
 
-      <!-- 5. WhatsApp Group -->
-      <div class="mb-12">
-        <div class="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
-          <div class="absolute top-0 right-0 opacity-10 pointer-events-none">
-            <span class="iconify text-9xl text-green-600 transform translate-x-1/4 -translate-y-1/4" data-icon="mdi:whatsapp"></span>
-          </div>
-
-          <div class="relative z-10">
-            <h3 class="text-xl font-bold text-green-800 uppercase font-display mb-2" data-i18n="gameDetails.gameChat">
-              Game Chat
-            </h3>
-            <p class="text-sm font-medium text-green-700 max-w-md" data-i18n="gameDetails.gameChatDesc">
-              Join the game chat for live updates, carpooling, and to connect with other players before the match.
-            </p>
-          </div>
-
-          <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="relative z-10 shrink-0 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide px-6 py-3 rounded-md shadow-sm transition-all flex items-center gap-2 group">
-            <span class="iconify text-xl" data-icon="mdi:whatsapp"></span>
-            <span data-i18n="gameDetails.joinWhatsApp">Join WhatsApp Group</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- 6. RSVP Form -->
+      <!-- 5. RSVP Form -->
       <div class="mb-16">
         <div class="flex items-center gap-3 mb-6">
           <div class="h-px flex-1 bg-zinc-200"></div>
@@ -275,6 +264,52 @@
             Reserve Your Spot
           </h2>
           <div class="h-px flex-1 bg-zinc-200"></div>
+        </div>
+
+        <!-- Quick Book Section (for logged-in users with saved cards) -->
+        <div id="quick-book-section" class="hidden bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl overflow-hidden mb-6">
+          <div class="p-6">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <span class="iconify text-green-600 text-2xl" data-icon="lucide:zap"></span>
+              </div>
+              <div>
+                <h3 class="text-lg font-black text-green-800 uppercase tracking-tight font-display">Quick Book</h3>
+                <p class="text-sm text-green-700">Book instantly with your saved card</p>
+              </div>
+            </div>
+            
+            <!-- Saved Card Display -->
+            <div class="bg-white rounded-lg border border-green-200 p-4 mb-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <span id="quick-card-brand" class="text-blue-600 font-bold">VISA</span>
+                  <span class="text-zinc-600 font-medium">•••• <span id="quick-card-last4">4242</span></span>
+                </div>
+                <a href="payment-methods.html" class="text-xs font-bold text-green-600 hover:text-green-700 uppercase">Change</a>
+              </div>
+            </div>
+            
+            <!-- Price Display -->
+            <div class="flex items-center justify-between mb-4 px-1">
+              <span class="text-sm font-bold text-green-700 uppercase">Total</span>
+              <span class="text-2xl font-black text-green-600" id="quick-book-total">$5.99</span>
+            </div>
+            
+            <!-- Quick Book Button -->
+            <button type="button" id="quick-book-btn" onclick="handleQuickBook()"
+                    class="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest text-sm rounded-lg transition-all flex items-center justify-center gap-2">
+              <span class="iconify" data-icon="lucide:zap" data-width="20"></span>
+              <span id="quick-book-btn-text">Book Now</span>
+            </button>
+            
+            <p class="text-xs text-center text-green-600 mt-3">
+              Just for you • <span class="cursor-pointer underline" onclick="showFullForm()">Need to add guests?</span>
+            </p>
+            
+            <!-- Quick Book Error -->
+            <div id="quick-book-error" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
+          </div>
         </div>
 
         <!-- Waitlist Section (shown when game is full) -->
@@ -293,21 +328,21 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-1">
                   <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Name</label>
-                  <input type="text" id="waitlist-name" required 
-                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                  <input type="text" id="waitlist-name" required
+                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400"
                          placeholder="Your name">
                 </div>
                 <div class="space-y-1">
                   <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Email</label>
-                  <input type="email" id="waitlist-email" required 
-                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                  <input type="email" id="waitlist-email" required
+                         class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400"
                          placeholder="your@email.com">
                 </div>
               </div>
               <div class="space-y-1">
                 <label class="block text-xs font-bold text-amber-600 uppercase tracking-wide">Phone (optional)</label>
-                <input type="tel" id="waitlist-phone" 
-                       class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400" 
+                <input type="tel" id="waitlist-phone"
+                       class="w-full bg-white border border-amber-200 rounded-md px-4 py-3 text-sm font-medium text-zinc-900 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none transition-all placeholder-zinc-400"
                        placeholder="(512) 555-0123">
               </div>
               <div id="waitlist-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm font-medium"></div>
@@ -317,7 +352,7 @@
                   <span>You're on the waitlist! We'll email you if a spot opens.</span>
                 </div>
               </div>
-              <button type="submit" id="waitlist-btn" 
+              <button type="submit" id="waitlist-btn"
                       class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-black uppercase tracking-widest text-sm rounded transition-all">
                 Join Waitlist
               </button>
@@ -333,7 +368,7 @@
             <form id="rsvp-form" class="space-y-6">
               <!-- Game ID (hidden) -->
               <input type="hidden" id="gameId" name="gameId" value="LP-001">
-              
+
               <!-- Personal Info -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-1">
@@ -370,12 +405,12 @@
                 <div id="guests-container" class="space-y-4">
                   <!-- Guest rows will be added here dynamically -->
                 </div>
-                
+
                 <button type="button" id="add-guest-btn" onclick="addGuest()" class="mt-4 text-xs font-bold text-green-600 hover:text-green-700 uppercase tracking-wide flex items-center gap-2 transition-colors">
                   <span class="iconify" data-icon="lucide:plus-circle" data-width="1.2em"></span>
                   <span id="add-guest-text">Add a Guest (<span id="guests-remaining">4</span> max)</span>
                 </button>
-                
+
                 <p id="no-spots-warning" class="hidden mt-2 text-xs text-amber-600 font-medium">
                   ⚠️ Not enough spots available to add more guests.
                 </p>
@@ -458,6 +493,98 @@
           </div>
         </div>
       </div>
+
+      <!-- 6. WhatsApp Group -->
+      <div class="mb-12">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 opacity-10 pointer-events-none">
+            <span class="iconify text-9xl text-green-600 transform translate-x-1/4 -translate-y-1/4" data-icon="mdi:whatsapp"></span>
+          </div>
+
+          <div class="relative z-10">
+            <h3 class="text-xl font-bold text-green-800 uppercase font-display mb-2" data-i18n="gameDetails.gameChat">
+              Game Chat
+            </h3>
+            <p class="text-sm font-medium text-green-700 max-w-md" data-i18n="gameDetails.gameChatDesc">
+              Join the game chat for live updates, carpooling, and to connect with other players before the match.
+            </p>
+          </div>
+
+          <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="relative z-10 shrink-0 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide px-6 py-3 rounded-md shadow-sm transition-all flex items-center gap-2 group">
+            <span class="iconify text-xl" data-icon="mdi:whatsapp"></span>
+            <span data-i18n="gameDetails.joinWhatsApp">Join WhatsApp Group</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 6. Who's Playing Section -->
+      <div class="mb-12">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
+          Who's Playing <span id="players-count" class="text-zinc-300">(0)</span>
+        </h3>
+        <div id="players-section" class="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
+          <div id="players-loading" class="flex items-center justify-center py-4">
+            <span class="iconify animate-spin text-zinc-400 text-xl mr-2" data-icon="lucide:loader-2"></span>
+            <span class="text-sm text-zinc-500">Loading players...</span>
+          </div>
+          <div id="players-list" class="hidden flex flex-wrap gap-2">
+            <!-- Populated by JavaScript -->
+          </div>
+          <div id="players-empty" class="hidden text-center py-4">
+            <span class="iconify text-zinc-300 text-3xl mb-2" data-icon="lucide:users"></span>
+            <p class="text-sm text-zinc-500">Be the first to sign up!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Game Discussion -->
+      <div class="mb-12">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4">
+          Discussion <span id="comments-count" class="text-zinc-300">(0)</span>
+        </h3>
+
+        <!-- Comment Form -->
+        <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-4 mb-4">
+          <form id="comment-form" class="space-y-3">
+            <!-- Honeypot field for bot prevention -->
+            <input type="text" name="website" id="comment-honeypot" class="hidden" tabindex="-1" autocomplete="off">
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <input type="text" id="comment-name" required maxlength="50"
+                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                     placeholder="Your name">
+              <input type="email" id="comment-email" required maxlength="100"
+                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                     placeholder="Your email (not shown)">
+            </div>
+            <div class="flex gap-3">
+              <input type="text" id="comment-text" required maxlength="500"
+                     class="flex-1 bg-white border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none"
+                     placeholder="Ask a question or share something...">
+              <button type="submit" id="comment-submit-btn"
+                      class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-md transition-colors">
+                Post
+              </button>
+            </div>
+            <p class="text-[10px] text-zinc-400">Your email is used for verification only and won't be displayed.</p>
+          </form>
+        </div>
+
+        <!-- Comments List -->
+        <div id="comments-section" class="space-y-3">
+          <div id="comments-loading" class="flex items-center justify-center py-6">
+            <span class="iconify animate-spin text-zinc-400 text-xl mr-2" data-icon="lucide:loader-2"></span>
+            <span class="text-sm text-zinc-500">Loading comments...</span>
+          </div>
+          <div id="comments-list">
+            <!-- Populated by JavaScript -->
+          </div>
+          <div id="comments-empty" class="hidden text-center py-6">
+            <span class="iconify text-zinc-300 text-3xl mb-2" data-icon="lucide:message-circle"></span>
+            <p class="text-sm text-zinc-500">No comments yet. Be the first to start the discussion!</p>
+          </div>
+        </div>
+      </div>
       </div><!-- Close game-content -->
     </main>
 
@@ -522,12 +649,18 @@
             <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4" data-i18n="footer.follow">
               Follow
             </h4>
-            <div class="flex gap-4">
+            <div class="flex gap-4 flex-wrap">
               <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                 <span class="iconify text-lg" data-icon="lucide:instagram" data-width="18"></span>
               </a>
               <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                 <span class="iconify text-lg" data-icon="mdi:whatsapp" data-width="18"></span>
+              </a>
+              <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify text-lg" data-icon="mdi:facebook" data-width="18"></span>
+              </a>
+              <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify text-lg" data-icon="ic:baseline-tiktok" data-width="18"></span>
               </a>
             </div>
           </div>
@@ -618,7 +751,13 @@
           if (gameData.spotsRemaining === 0) {
             showWaitlistSection();
           }
-          
+
+          // Load who's playing list
+          loadPlayers();
+
+          // Load comments
+          loadComments();
+
           // Update totals
           updateTotals();
           
@@ -922,6 +1061,164 @@
       // Load game data on page load
       loadGameData();
       
+      // Auto-fill forms for logged-in users
+      function autoFillFormsIfLoggedIn() {
+        if (!AuthService.isAuthenticated()) return;
+        
+        const user = AuthService.getUser();
+        if (!user) return;
+        
+        // Auto-fill RSVP form
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        
+        if (firstNameInput && user.firstName) firstNameInput.value = user.firstName;
+        if (lastNameInput && user.lastName) lastNameInput.value = user.lastName;
+        if (emailInput && user.email) emailInput.value = user.email;
+        if (phoneInput && user.phone) phoneInput.value = user.phone;
+        
+        // Auto-fill comment form
+        const commentNameInput = document.getElementById('comment-name');
+        const commentEmailInput = document.getElementById('comment-email');
+        
+        if (commentNameInput && user.firstName) {
+          commentNameInput.value = `${user.firstName} ${user.lastName || ''}`.trim();
+        }
+        if (commentEmailInput && user.email) {
+          commentEmailInput.value = user.email;
+        }
+        
+        // Auto-fill waitlist form
+        const waitlistNameInput = document.getElementById('waitlist-name');
+        const waitlistEmailInput = document.getElementById('waitlist-email');
+        const waitlistPhoneInput = document.getElementById('waitlist-phone');
+        
+        if (waitlistNameInput && user.firstName) {
+          waitlistNameInput.value = `${user.firstName} ${user.lastName || ''}`.trim();
+        }
+        if (waitlistEmailInput && user.email) waitlistEmailInput.value = user.email;
+        if (waitlistPhoneInput && user.phone) waitlistPhoneInput.value = user.phone;
+      }
+      
+      // Run auto-fill when auth is ready
+      if (AuthService.isReady()) {
+        autoFillFormsIfLoggedIn();
+        checkQuickBookAvailability();
+      } else {
+        AuthService.onAuthStateChange(() => {
+          autoFillFormsIfLoggedIn();
+          checkQuickBookAvailability();
+        });
+      }
+      
+      // State for quick book
+      let quickBookCard = null;
+      
+      // Check if user can use Quick Book (logged in + has saved card)
+      async function checkQuickBookAvailability() {
+        if (!AuthService.isAuthenticated()) return;
+        
+        // Check if Stripe is configured (publishable key not placeholder)
+        const stripeKey = LAPISTA_CONFIG.STRIPE_PUBLISHABLE_KEY;
+        if (!stripeKey || stripeKey.includes('YOUR_')) return;
+        
+        try {
+          const token = AuthService.getToken();
+          const response = await fetch(`${API_URL}/api/payment-methods`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          
+          // Skip if payment service not available (503)
+          if (!response.ok || response.status === 503) return;
+          
+          const data = await response.json();
+          const cards = data.paymentMethods || [];
+          
+          if (cards.length > 0) {
+            // User has saved cards - show Quick Book
+            quickBookCard = cards[0]; // Use first card
+            showQuickBookSection(quickBookCard);
+          }
+        } catch (err) {
+          console.error('Error checking payment methods:', err);
+        }
+      }
+      
+      // Show Quick Book section
+      function showQuickBookSection(card) {
+        if (!gameData || gameData.spotsRemaining === 0) return;
+        
+        const section = document.getElementById('quick-book-section');
+        const brandEl = document.getElementById('quick-card-brand');
+        const last4El = document.getElementById('quick-card-last4');
+        const totalEl = document.getElementById('quick-book-total');
+        
+        // Update card display
+        brandEl.textContent = card.brand.toUpperCase();
+        last4El.textContent = card.last4;
+        
+        // Update price
+        const price = gameData ? gameData.price : PRICE_PER_PERSON;
+        totalEl.textContent = `$${price.toFixed(2)}`;
+        
+        // Show section
+        section.classList.remove('hidden');
+      }
+      
+      // Show full form (hide quick book)
+      function showFullForm() {
+        document.getElementById('quick-book-section').classList.add('hidden');
+        document.getElementById('rsvp-form-container').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      // Handle Quick Book
+      async function handleQuickBook() {
+        if (!quickBookCard || !gameData) return;
+        
+        const btn = document.getElementById('quick-book-btn');
+        const btnText = document.getElementById('quick-book-btn-text');
+        const errorEl = document.getElementById('quick-book-error');
+        
+        btn.disabled = true;
+        btnText.textContent = 'Booking...';
+        errorEl.classList.add('hidden');
+        
+        try {
+          const token = AuthService.getToken();
+          const response = await fetch(`${API_URL}/api/payment-methods/charge`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              paymentMethodId: quickBookCard.id,
+              gameId: gameId,
+              guests: [] // Quick Book is for solo booking
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.error || 'Booking failed');
+          }
+          
+          // Success! Redirect to confirmation
+          window.location.href = `confirmation-page.html?code=${data.confirmationCode}`;
+          
+        } catch (err) {
+          console.error('Quick Book error:', err);
+          errorEl.textContent = err.message || 'Failed to book. Please try the full form.';
+          errorEl.classList.remove('hidden');
+          
+          btn.disabled = false;
+          btnText.textContent = 'Book Now';
+        }
+      }
+      
       // Check if cancelled from Stripe
       if (urlParams.get('cancelled') === 'true') {
         const errorDiv = document.getElementById('form-error');
@@ -1061,7 +1358,209 @@
           console.error('Failed to load waitlist count:', err);
         }
       }
-      
+
+      // Load players who have signed up
+      async function loadPlayers() {
+        const loadingEl = document.getElementById('players-loading');
+        const listEl = document.getElementById('players-list');
+        const emptyEl = document.getElementById('players-empty');
+        const countEl = document.getElementById('players-count');
+
+        try {
+          const response = await fetch(`${API_URL}/api/games/${gameId}/rsvps`);
+          if (!response.ok) throw new Error('Failed to load players');
+
+          const rsvps = await response.json();
+
+          // Hide loading
+          loadingEl.classList.add('hidden');
+
+          if (rsvps.length === 0) {
+            emptyEl.classList.remove('hidden');
+            countEl.textContent = '(0)';
+            return;
+          }
+
+          // Count total players including guests and render safely (XSS prevention)
+          let totalPlayers = 0;
+          listEl.innerHTML = ''; // Clear previous content
+
+          rsvps.forEach(rsvp => {
+            const players = rsvp.totalPlayers || 1;
+            totalPlayers += players;
+
+            // Create chip element safely using DOM methods
+            const chip = document.createElement('span');
+            chip.className = 'px-3 py-1.5 bg-white border border-zinc-200 rounded-full text-sm font-medium text-zinc-700';
+
+            // Safely set name using textContent (XSS safe)
+            const firstName = rsvp.player?.firstName || 'Player';
+            const lastInitial = rsvp.player?.lastName ? rsvp.player.lastName.charAt(0) + '.' : '';
+            chip.textContent = `${firstName} ${lastInitial}`;
+
+            // Add guest count if applicable
+            if (players > 1) {
+              const guestSpan = document.createElement('span');
+              guestSpan.className = 'text-zinc-400';
+              guestSpan.textContent = ` +${players - 1}`;
+              chip.appendChild(guestSpan);
+            }
+
+            listEl.appendChild(chip);
+          });
+
+          listEl.classList.remove('hidden');
+          countEl.textContent = `(${totalPlayers})`;
+
+        } catch (err) {
+          console.error('Failed to load players:', err);
+          loadingEl.classList.add('hidden');
+          emptyEl.classList.remove('hidden');
+        }
+      }
+
+      // Load game comments
+      async function loadComments() {
+        const loadingEl = document.getElementById('comments-loading');
+        const listEl = document.getElementById('comments-list');
+        const emptyEl = document.getElementById('comments-empty');
+        const countEl = document.getElementById('comments-count');
+
+        try {
+          const response = await fetch(`${API_URL}/api/games/${gameId}/comments`);
+          if (!response.ok) throw new Error('Failed to load comments');
+
+          const comments = await response.json();
+
+          // Hide loading
+          loadingEl.classList.add('hidden');
+
+          if (comments.length === 0) {
+            emptyEl.classList.remove('hidden');
+            countEl.textContent = '(0)';
+            return;
+          }
+
+          // Render comments safely using textContent (XSS prevention)
+          listEl.innerHTML = '';
+          comments.forEach(comment => {
+            const div = document.createElement('div');
+            div.className = 'bg-white border border-zinc-200 rounded-lg p-4';
+
+            const header = document.createElement('div');
+            header.className = 'flex items-center gap-3 mb-2';
+
+            // Avatar - check if user has a jersey avatar
+            const avatar = document.createElement('div');
+            if (comment.author?.avatar && typeof AVATAR_GALLERY !== 'undefined') {
+              // User has a selected avatar - render jersey
+              avatar.innerHTML = AVATAR_GALLERY.renderAvatar(comment.author.avatar, 'sm');
+            } else {
+              // Fallback to initials circle
+              avatar.className = 'w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700';
+              avatar.textContent = comment.author?.initials || '?';
+            }
+
+            const meta = document.createElement('div');
+            const nameEl = document.createElement('span');
+            nameEl.className = 'text-sm font-bold text-zinc-900';
+            nameEl.textContent = comment.author?.name || 'Anonymous';
+
+            const timeEl = document.createElement('span');
+            timeEl.className = 'text-xs text-zinc-400 ml-2';
+            timeEl.textContent = formatCommentTime(comment.createdAt);
+
+            meta.appendChild(nameEl);
+            meta.appendChild(timeEl);
+            header.appendChild(avatar);
+            header.appendChild(meta);
+
+            const textEl = document.createElement('p');
+            textEl.className = 'text-sm text-zinc-700';
+            textEl.textContent = comment.text;
+
+            div.appendChild(header);
+            div.appendChild(textEl);
+            listEl.appendChild(div);
+          });
+
+          countEl.textContent = `(${comments.length})`;
+          emptyEl.classList.add('hidden');
+
+        } catch (err) {
+          console.error('Failed to load comments:', err);
+          loadingEl.classList.add('hidden');
+          emptyEl.classList.remove('hidden');
+        }
+      }
+
+      // Format comment time as relative time
+      function formatCommentTime(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString();
+      }
+
+      // Handle comment form submission
+      document.getElementById('comment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Check honeypot (bot prevention)
+        if (document.getElementById('comment-honeypot').value) {
+          return; // Silently ignore bot submissions
+        }
+
+        const btn = document.getElementById('comment-submit-btn');
+        const name = document.getElementById('comment-name').value.trim();
+        const email = document.getElementById('comment-email').value.trim();
+        const text = document.getElementById('comment-text').value.trim();
+
+        if (!name || !email || !text) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Posting...';
+
+        // Include userId if logged in (for avatar display)
+        let userId = null;
+        if (AuthService.isAuthenticated()) {
+          const user = AuthService.getUser();
+          if (user && user._id) userId = user._id;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/games/${gameId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, text, userId })
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to post comment');
+          }
+
+          // Clear form and reload comments
+          document.getElementById('comment-form').reset();
+          await loadComments();
+
+        } catch (err) {
+          console.error('Failed to post comment:', err);
+          alert(err.message || 'Failed to post comment. Please try again.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Post';
+        }
+      });
+
       // Handle waitlist form submission
       document.getElementById('waitlist-form').addEventListener('submit', async function(e) {
         e.preventDefault();

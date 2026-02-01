@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Games - LaPista.ATX</title>
+  <meta name="description" content="View your game history and upcoming reservations at LaPista.ATX.">
+  <meta property="og:title" content="My Games - LaPista.ATX">
+  <meta property="og:description" content="View your game history and upcoming reservations.">
+  <meta property="og:image" content="/LaPista Logo 1.png">
+  <meta name="auth-required" content="true">
+  <meta name="theme-color" content="#18181b">
+  <link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+  <link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/config.js"></script>
+  <script src="/js/translations.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/avatars.js"></script>
+</head>
+<body class="min-h-screen bg-[#FAFAFA] antialiased flex flex-col">
+  
+  <!-- Navbar -->
+  <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+    <a href="index.html" class="flex items-center group">
+      <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+    </a>
+    <div class="flex items-center gap-4">
+      <a href="profile-page.html" class="inline-flex items-center gap-2 text-sm font-bold text-zinc-600 hover:text-green-600 transition-colors uppercase tracking-wide">
+        <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+        Profile
+      </a>
+      <a href="index.html#schedule" class="hidden md:flex bg-zinc-900 hover:bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-md transition-all items-center gap-2 shadow-sm uppercase tracking-wide">
+        <span class="iconify text-green-400" data-icon="lucide:calendar" data-width="16"></span>
+        Book a Game
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 px-4 py-8 md:py-12">
+    <div class="max-w-3xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-black text-zinc-900 uppercase font-display tracking-tight mb-2">
+          My Games
+        </h1>
+        <p class="text-zinc-500 font-medium">
+          Your game history and upcoming reservations.
+        </p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+        <span class="iconify animate-spin text-green-600 text-4xl mb-4" data-icon="lucide:loader-2"></span>
+        <p class="text-zinc-500 font-medium">Loading your games...</p>
+      </div>
+
+      <!-- Content (hidden until loaded) -->
+      <div id="content" class="hidden">
+        
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+            <div class="text-3xl font-black text-zinc-900 font-display" id="stat-total">0</div>
+            <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Total Games</div>
+          </div>
+          <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+            <div class="text-3xl font-black text-green-600 font-display" id="stat-upcoming">0</div>
+            <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Upcoming</div>
+          </div>
+          <div class="bg-white rounded-xl border border-zinc-200 p-4 text-center">
+            <div class="text-3xl font-black text-zinc-900 font-display" id="stat-past">0</div>
+            <div class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Played</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-zinc-200">
+          <button type="button" id="tab-upcoming" onclick="showTab('upcoming')" 
+                  class="px-4 py-3 text-sm font-bold uppercase tracking-wide transition-colors border-b-2 -mb-px tab-active">
+            Upcoming
+          </button>
+          <button type="button" id="tab-past" onclick="showTab('past')" 
+                  class="px-4 py-3 text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-zinc-600 transition-colors border-b-2 border-transparent -mb-px">
+            Past Games
+          </button>
+        </div>
+
+        <!-- Upcoming Games List -->
+        <div id="upcoming-games" class="space-y-4">
+          <div id="upcoming-empty" class="hidden text-center py-12 bg-zinc-50 rounded-xl border border-zinc-200">
+            <span class="iconify text-zinc-300 text-5xl mb-4" data-icon="lucide:calendar"></span>
+            <h3 class="text-lg font-bold text-zinc-900 mb-2">No Upcoming Games</h3>
+            <p class="text-zinc-500 mb-4">You don't have any games booked yet.</p>
+            <a href="index.html#schedule" class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors uppercase tracking-wide">
+              <span class="iconify" data-icon="lucide:plus" data-width="18"></span>
+              Book a Game
+            </a>
+          </div>
+          <div id="upcoming-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Past Games List -->
+        <div id="past-games" class="hidden space-y-4">
+          <div id="past-empty" class="hidden text-center py-12 bg-zinc-50 rounded-xl border border-zinc-200">
+            <span class="iconify text-zinc-300 text-5xl mb-4" data-icon="lucide:history"></span>
+            <h3 class="text-lg font-bold text-zinc-900 mb-2">No Past Games</h3>
+            <p class="text-zinc-500">Your game history will appear here after you play.</p>
+          </div>
+          <div id="past-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-200 py-6 px-4 text-center mt-auto">
+    <div class="flex items-center justify-center gap-6 text-xs font-bold text-zinc-400 uppercase tracking-wide">
+      <span>© <span data-year>2025</span> LaPista.ATX</span>
+      <a href="terms.html" class="hover:text-zinc-600 transition-colors">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    const API_URL = LAPISTA_CONFIG.API_URL;
+    let allRsvps = [];
+    let currentTab = 'upcoming';
+
+    // Initialize page
+    async function init() {
+      // Require authentication
+      const user = await requireAuth();
+      if (!user) return;
+
+      // Load user's RSVPs
+      await loadMyGames();
+    }
+
+    // Load user's game history
+    async function loadMyGames() {
+      const loadingEl = document.getElementById('loading-state');
+      const contentEl = document.getElementById('content');
+
+      try {
+        const token = AuthService.getToken();
+        const response = await fetch(`${API_URL}/api/user/rsvps`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load games');
+        }
+
+        allRsvps = await response.json();
+
+        // Hide loading, show content
+        loadingEl.classList.add('hidden');
+        contentEl.classList.remove('hidden');
+
+        // Update stats and render
+        updateStats();
+        renderGames();
+
+      } catch (err) {
+        console.error('Error loading games:', err);
+        loadingEl.innerHTML = `
+          <span class="iconify text-red-500 text-4xl mb-4" data-icon="lucide:alert-circle"></span>
+          <p class="text-zinc-500 font-medium">Failed to load games. Please try again.</p>
+          <button onclick="loadMyGames()" class="mt-4 text-green-600 hover:text-green-700 font-bold">
+            Retry
+          </button>
+        `;
+      }
+    }
+
+    // Update stats display
+    function updateStats() {
+      const now = new Date();
+      
+      const upcoming = allRsvps.filter(r => new Date(r.game?.date) >= now);
+      const past = allRsvps.filter(r => new Date(r.game?.date) < now);
+
+      document.getElementById('stat-total').textContent = allRsvps.length;
+      document.getElementById('stat-upcoming').textContent = upcoming.length;
+      document.getElementById('stat-past').textContent = past.length;
+    }
+
+    // Render games based on current tab
+    function renderGames() {
+      const now = new Date();
+      const upcoming = allRsvps.filter(r => new Date(r.game?.date) >= now);
+      const past = allRsvps.filter(r => new Date(r.game?.date) < now);
+
+      // Render upcoming
+      const upcomingList = document.getElementById('upcoming-list');
+      const upcomingEmpty = document.getElementById('upcoming-empty');
+      
+      if (upcoming.length === 0) {
+        upcomingEmpty.classList.remove('hidden');
+        upcomingList.innerHTML = '';
+      } else {
+        upcomingEmpty.classList.add('hidden');
+        upcomingList.innerHTML = upcoming.map(renderGameCard).join('');
+      }
+
+      // Render past
+      const pastList = document.getElementById('past-list');
+      const pastEmpty = document.getElementById('past-empty');
+      
+      if (past.length === 0) {
+        pastEmpty.classList.remove('hidden');
+        pastList.innerHTML = '';
+      } else {
+        pastEmpty.classList.add('hidden');
+        pastList.innerHTML = past.map(renderGameCard).join('');
+      }
+    }
+
+    // Render a single game card
+    function renderGameCard(rsvp) {
+      const game = rsvp.game || {};
+      const gameDate = new Date(game.date);
+      const now = new Date();
+      const isPast = gameDate < now;
+      const isToday = gameDate.toDateString() === now.toDateString();
+
+      // Format date
+      const dateStr = gameDate.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+
+      // Payment status badge
+      let statusBadge = '';
+      if (rsvp.paymentStatus === 'paid') {
+        statusBadge = `<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded uppercase">Paid</span>`;
+      } else if (rsvp.paymentStatus === 'pending') {
+        statusBadge = `<span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded uppercase">Pay at Game</span>`;
+      }
+
+      // Today badge
+      const todayBadge = isToday ? `<span class="px-2 py-1 bg-green-600 text-white text-xs font-bold rounded uppercase animate-pulse">Today!</span>` : '';
+
+      return `
+        <div class="bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-md transition-shadow ${isPast ? 'opacity-75' : ''}">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                ${todayBadge}
+                ${statusBadge}
+                <span class="text-xs font-mono text-zinc-400">${game.gameId || 'N/A'}</span>
+              </div>
+              <h3 class="font-bold text-lg text-zinc-900 mb-1">${escapeHtml(game.title || 'Pickup Game')}</h3>
+              <div class="flex flex-wrap items-center gap-4 text-sm text-zinc-600">
+                <span class="flex items-center gap-1.5">
+                  <span class="iconify text-zinc-400" data-icon="lucide:calendar" data-width="16"></span>
+                  ${dateStr}
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <span class="iconify text-zinc-400" data-icon="lucide:clock" data-width="16"></span>
+                  ${game.time || '--'}
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <span class="iconify text-zinc-400" data-icon="lucide:map-pin" data-width="16"></span>
+                  ${escapeHtml(game.venue?.name || 'TBD')}
+                </span>
+              </div>
+              ${rsvp.totalPlayers > 1 ? `
+                <p class="text-xs text-zinc-500 mt-2">
+                  <span class="iconify" data-icon="lucide:users" data-width="14"></span>
+                  You + ${rsvp.totalPlayers - 1} guest${rsvp.totalPlayers > 2 ? 's' : ''}
+                </p>
+              ` : ''}
+            </div>
+            <div class="shrink-0">
+              ${!isPast ? `
+                <a href="game-details.html?gameId=${game.gameId}" 
+                   class="inline-flex items-center gap-1.5 text-sm font-bold text-green-600 hover:text-green-700 transition-colors">
+                  View
+                  <span class="iconify" data-icon="lucide:chevron-right" data-width="16"></span>
+                </a>
+              ` : `
+                <span class="text-xs font-bold text-zinc-400 uppercase">Completed</span>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Tab switching
+    function showTab(tab) {
+      currentTab = tab;
+      
+      // Update tab styles
+      document.getElementById('tab-upcoming').classList.toggle('tab-active', tab === 'upcoming');
+      document.getElementById('tab-upcoming').classList.toggle('text-zinc-400', tab !== 'upcoming');
+      document.getElementById('tab-past').classList.toggle('tab-active', tab === 'past');
+      document.getElementById('tab-past').classList.toggle('text-zinc-400', tab !== 'past');
+      
+      // Show/hide content
+      document.getElementById('upcoming-games').classList.toggle('hidden', tab !== 'upcoming');
+      document.getElementById('past-games').classList.toggle('hidden', tab !== 'past');
+    }
+
+    // Initialize
+    init();
+  </script>
+
+  <style>
+    .tab-active {
+      color: #16a34a;
+      border-color: #16a34a;
+    }
+  </style>
+</body>
+</html>

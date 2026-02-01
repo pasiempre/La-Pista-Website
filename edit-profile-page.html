@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - LaPista.ATX</title>
+  <meta name="description" content="Update your LaPista.ATX profile information.">
+  <meta property="og:title" content="Edit Profile - LaPista.ATX">
+  <meta property="og:description" content="Update your profile information.">
+  <meta property="og:image" content="/LaPista Logo 1.png">
+  <meta name="auth-required" content="true">
+  <meta name="theme-color" content="#18181b">
+  <link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+  <link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/config.js"></script>
+  <script src="/js/translations.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/avatars.js"></script>
+</head>
+<body class="min-h-screen bg-[#FAFAFA] antialiased flex flex-col">
+  
+  <!-- Navbar -->
+  <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+    <a href="index.html" class="flex items-center group">
+      <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+    </a>
+    <a href="profile-page.html" class="inline-flex items-center gap-2 text-sm font-bold text-zinc-600 hover:text-green-600 transition-colors uppercase tracking-wide">
+      <span class="iconify" data-icon="lucide:arrow-left" data-width="16"></span>
+      Back to Profile
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 px-4 py-8 md:py-12">
+    <div class="max-w-xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-black text-zinc-900 uppercase font-display tracking-tight mb-2">
+          Edit Profile
+        </h1>
+        <p class="text-zinc-500 font-medium">
+          Update your personal information and preferences.
+        </p>
+      </div>
+
+      <!-- Profile Form -->
+      <form id="profile-form" onsubmit="handleUpdateProfile(event)" class="space-y-6">
+        
+        <!-- Avatar Selection Card -->
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 space-y-5">
+          <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <span class="iconify" data-icon="lucide:shirt" data-width="16"></span>
+            Choose Your Jersey
+          </h2>
+          
+          <!-- Current Avatar Display -->
+          <div class="flex items-center gap-4 p-4 bg-zinc-50 rounded-xl">
+            <div id="current-avatar" class="shrink-0">
+              <!-- Avatar will be rendered here -->
+            </div>
+            <div>
+              <p id="avatar-label" class="font-bold text-zinc-900">Your avatar</p>
+              <p class="text-xs text-zinc-500">Pick a photo below</p>
+            </div>
+          </div>
+          
+          <!-- Avatar Picker -->
+          <div id="avatar-picker-container">
+            <!-- Picker will be rendered here -->
+          </div>
+          
+          <!-- Hidden input to store selected avatar -->
+          <input type="hidden" id="selectedAvatar" name="avatar" value="">
+        </div>
+        
+        <!-- Personal Information Card -->
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 space-y-5">
+          <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+            Personal Information
+          </h2>
+          
+          <!-- Name Row -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="firstName" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                First Name
+              </label>
+              <input 
+                type="text" 
+                id="firstName" 
+                name="firstName"
+                required
+                class="w-full px-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="John"
+              >
+            </div>
+            <div>
+              <label for="lastName" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                Last Name
+              </label>
+              <input 
+                type="text" 
+                id="lastName" 
+                name="lastName"
+                required
+                class="w-full px-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="Doe"
+              >
+            </div>
+          </div>
+          
+          <!-- Phone -->
+          <div>
+            <label for="phone" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              Phone Number <span class="text-zinc-400">(Optional)</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <span class="iconify" data-icon="lucide:phone" data-width="18"></span>
+              </span>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone"
+                class="w-full pl-11 pr-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="(512) 555-0123"
+              >
+            </div>
+            <p class="text-xs text-zinc-400 mt-1.5">Used for game reminders and updates</p>
+          </div>
+        </div>
+
+        <!-- Game Preferences Card -->
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 space-y-5">
+          <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <span class="iconify" data-icon="lucide:trophy" data-width="16"></span>
+            Game Preferences
+          </h2>
+          
+          <!-- Skill Level -->
+          <div>
+            <label for="skillLevel" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              Skill Level
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <span class="iconify" data-icon="lucide:signal" data-width="18"></span>
+              </span>
+              <select 
+                id="skillLevel" 
+                name="skillLevel"
+                class="w-full pl-11 pr-10 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium appearance-none bg-white cursor-pointer transition-all"
+              >
+                <option value="beginner">Beginner - Just starting out</option>
+                <option value="intermediate">Intermediate - Know the basics</option>
+                <option value="advanced">Advanced - Regular player</option>
+                <option value="pro">Pro - Tournament level</option>
+              </select>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">
+                <span class="iconify" data-icon="lucide:chevron-down" data-width="18"></span>
+              </span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1.5">Helps us match you with similar players</p>
+          </div>
+        </div>
+
+        <!-- Email (Read Only) Card -->
+        <div class="bg-zinc-50 rounded-2xl border border-zinc-200 p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">
+                Email Address
+              </label>
+              <p id="email-display" class="text-zinc-600 font-medium">Loading...</p>
+              <p class="text-xs text-zinc-400 mt-1">Email cannot be changed</p>
+            </div>
+            <span class="iconify text-zinc-300" data-icon="lucide:lock" data-width="20"></span>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
+          <div class="flex items-center gap-2">
+            <span class="iconify shrink-0" data-icon="lucide:alert-circle" data-width="16"></span>
+            <span id="error-text">An error occurred</span>
+          </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm font-medium">
+          <div class="flex items-center gap-2">
+            <span class="iconify shrink-0" data-icon="lucide:check-circle" data-width="16"></span>
+            <span>Profile updated successfully!</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button 
+            type="submit" 
+            id="submit-btn"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-lg transition-all uppercase tracking-wide flex items-center justify-center gap-2 shadow-sm"
+          >
+            <span id="btn-text">Save Changes</span>
+            <span id="btn-loader" class="hidden">
+              <span class="iconify animate-spin" data-icon="lucide:loader-2" data-width="20"></span>
+            </span>
+          </button>
+          <a 
+            href="profile-page.html"
+            class="flex-1 bg-white hover:bg-zinc-50 text-zinc-600 font-bold py-3.5 rounded-lg transition-all uppercase tracking-wide text-center border border-zinc-200"
+          >
+            Cancel
+          </a>
+        </div>
+
+      </form>
+
+      <!-- Change Password Section -->
+      <div class="mt-8 pt-6 border-t border-zinc-200">
+        <button 
+          type="button"
+          onclick="togglePasswordSection()"
+          class="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-zinc-200 hover:border-zinc-300 transition-all group"
+        >
+          <div class="flex items-center gap-3">
+            <span class="iconify text-zinc-400 group-hover:text-green-600 transition-colors" data-icon="lucide:key" data-width="20"></span>
+            <div class="text-left">
+              <p class="font-bold text-zinc-900">Change Password</p>
+              <p class="text-xs text-zinc-400">Update your account password</p>
+            </div>
+          </div>
+          <span id="password-section-icon" class="iconify text-zinc-400 group-hover:text-zinc-600 transition-all" data-icon="lucide:chevron-down" data-width="20"></span>
+        </button>
+        
+        <!-- Password Change Form (Hidden by default) -->
+        <div id="password-section" class="hidden mt-4 bg-white rounded-xl border border-zinc-200 p-6 space-y-4">
+          <div>
+            <label for="currentPassword" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              Current Password
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <span class="iconify" data-icon="lucide:lock" data-width="18"></span>
+              </span>
+              <input 
+                type="password" 
+                id="currentPassword" 
+                autocomplete="current-password"
+                class="w-full pl-11 pr-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="Enter current password"
+              >
+            </div>
+          </div>
+          
+          <div>
+            <label for="newPassword" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              New Password
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <span class="iconify" data-icon="lucide:lock" data-width="18"></span>
+              </span>
+              <input 
+                type="password" 
+                id="newPassword" 
+                autocomplete="new-password"
+                minlength="8"
+                class="w-full pl-11 pr-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="Min. 8 characters"
+              >
+            </div>
+          </div>
+          
+          <div>
+            <label for="confirmNewPassword" class="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">
+              Confirm New Password
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                <span class="iconify" data-icon="lucide:lock" data-width="18"></span>
+              </span>
+              <input 
+                type="password" 
+                id="confirmNewPassword" 
+                autocomplete="new-password"
+                minlength="8"
+                class="w-full pl-11 pr-4 py-3 border border-zinc-200 rounded-lg text-zinc-900 font-medium placeholder:text-zinc-400 transition-all"
+                placeholder="Re-enter new password"
+              >
+            </div>
+          </div>
+          
+          <!-- Password Error/Success Messages -->
+          <div id="password-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
+            <div class="flex items-center gap-2">
+              <span class="iconify shrink-0" data-icon="lucide:alert-circle" data-width="16"></span>
+              <span id="password-error-text">An error occurred</span>
+            </div>
+          </div>
+          
+          <div id="password-success" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm font-medium">
+            <div class="flex items-center gap-2">
+              <span class="iconify shrink-0" data-icon="lucide:check-circle" data-width="16"></span>
+              <span>Password changed successfully!</span>
+            </div>
+          </div>
+          
+          <button 
+            type="button"
+            id="change-password-btn"
+            onclick="handleChangePassword()"
+            class="w-full bg-zinc-900 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-all uppercase tracking-wide flex items-center justify-center gap-2"
+          >
+            <span id="password-btn-text">Update Password</span>
+            <span id="password-btn-loader" class="hidden">
+              <span class="iconify animate-spin" data-icon="lucide:loader-2" data-width="20"></span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-200 py-6 px-4 text-center mt-auto">
+    <div class="flex items-center justify-center gap-6 text-xs font-bold text-zinc-400 uppercase tracking-wide">
+      <span>© <span data-year>2025</span> LaPista.ATX</span>
+      <a href="terms.html" class="hover:text-zinc-600 transition-colors">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    let currentUser = null;
+    let selectedAvatarId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Require authentication
+      currentUser = await requireAuth();
+      if (!currentUser) return;
+
+      // Populate form with current user data
+      document.getElementById('firstName').value = currentUser.firstName || '';
+      document.getElementById('lastName').value = currentUser.lastName || '';
+      document.getElementById('phone').value = currentUser.phone || '';
+      document.getElementById('email-display').textContent = currentUser.email;
+      
+      if (currentUser.skillLevel) {
+        document.getElementById('skillLevel').value = currentUser.skillLevel;
+      }
+      
+      // Initialize avatar selection
+      selectedAvatarId = currentUser.avatar || null;
+      document.getElementById('selectedAvatar').value = selectedAvatarId || '';
+      renderAvatarPicker();
+      updateCurrentAvatarDisplay();
+    });
+    
+    // Render the avatar picker
+    function renderAvatarPicker() {
+      const container = document.getElementById('avatar-picker-container');
+      container.innerHTML = AVATAR_GALLERY.renderPicker(selectedAvatarId);
+      
+      // Add click handlers
+      container.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const avatarId = btn.dataset.avatarId;
+          selectAvatar(avatarId);
+        });
+      });
+    }
+    
+    // Handle avatar selection
+    function selectAvatar(avatarId) {
+      selectedAvatarId = avatarId;
+      document.getElementById('selectedAvatar').value = avatarId;
+      
+      // Update visual selection
+      document.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.avatarId === avatarId);
+      });
+      
+      updateCurrentAvatarDisplay();
+    }
+    
+    // Update the current avatar display
+    function updateCurrentAvatarDisplay() {
+      const container = document.getElementById('current-avatar');
+      const labelEl = document.getElementById('avatar-label');
+      
+      if (selectedAvatarId) {
+        const avatar = AVATAR_GALLERY.getById(selectedAvatarId);
+        if (avatar) {
+          container.innerHTML = AVATAR_GALLERY.renderAvatar(selectedAvatarId, 'lg');
+          labelEl.textContent = 'Your avatar';
+          return;
+        }
+      }
+      
+      // Default - show user initials
+      const initials = (currentUser?.firstName?.[0] || '') + (currentUser?.lastName?.[0] || '');
+      container.innerHTML = `
+        <div class="avatar-default avatar-lg">
+          ${initials || '?'}
+        </div>
+      `;
+      labelEl.textContent = 'Pick a photo below';
+    }
+
+    // Handle profile update
+    async function handleUpdateProfile(event) {
+      event.preventDefault();
+
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnLoader = document.getElementById('btn-loader');
+      const errorDiv = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      const successDiv = document.getElementById('success-message');
+
+      // Hide messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      // Get form data (include avatar)
+      const updates = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        phone: document.getElementById('phone').value.trim() || undefined,
+        skillLevel: document.getElementById('skillLevel').value,
+        avatar: selectedAvatarId || undefined
+      };
+
+      // Validate
+      if (!updates.firstName || !updates.lastName) {
+        errorText.textContent = 'First and last name are required';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      btnText.classList.add('hidden');
+      btnLoader.classList.remove('hidden');
+
+      try {
+        const result = await AuthService.updateProfile(updates);
+
+        if (result.success) {
+          // Update local user data
+          currentUser = { ...currentUser, ...updates };
+          
+          // Show success
+          successDiv.classList.remove('hidden');
+          
+          // Scroll to success message
+          successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Auto-hide success after 3 seconds
+          setTimeout(() => {
+            successDiv.classList.add('hidden');
+          }, 3000);
+        } else {
+          // Show error
+          errorText.textContent = result.error || 'Failed to update profile';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        // Show error
+        errorText.textContent = 'Something went wrong. Please try again.';
+        errorDiv.classList.remove('hidden');
+      }
+
+      // Reset button
+      submitBtn.disabled = false;
+      btnText.classList.remove('hidden');
+      btnLoader.classList.add('hidden');
+    }
+    
+    // Toggle password section visibility
+    function togglePasswordSection() {
+      const section = document.getElementById('password-section');
+      const icon = document.getElementById('password-section-icon');
+      
+      if (section.classList.contains('hidden')) {
+        section.classList.remove('hidden');
+        icon.setAttribute('data-icon', 'lucide:chevron-up');
+      } else {
+        section.classList.add('hidden');
+        icon.setAttribute('data-icon', 'lucide:chevron-down');
+        // Clear fields when closing
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmNewPassword').value = '';
+        document.getElementById('password-error').classList.add('hidden');
+        document.getElementById('password-success').classList.add('hidden');
+      }
+    }
+    
+    // Handle password change
+    async function handleChangePassword() {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+      
+      const btn = document.getElementById('change-password-btn');
+      const btnText = document.getElementById('password-btn-text');
+      const btnLoader = document.getElementById('password-btn-loader');
+      const errorDiv = document.getElementById('password-error');
+      const errorText = document.getElementById('password-error-text');
+      const successDiv = document.getElementById('password-success');
+      
+      // Hide messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      // Validate
+      if (!currentPassword) {
+        errorText.textContent = 'Please enter your current password';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      if (newPassword.length < 8) {
+        errorText.textContent = 'New password must be at least 8 characters';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      if (newPassword !== confirmNewPassword) {
+        errorText.textContent = 'New passwords do not match';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // Show loading
+      btn.disabled = true;
+      btnText.classList.add('hidden');
+      btnLoader.classList.remove('hidden');
+      
+      try {
+        const result = await AuthService.changePassword(currentPassword, newPassword);
+        
+        if (result.success) {
+          // Show success
+          successDiv.classList.remove('hidden');
+          
+          // Clear form
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmNewPassword').value = '';
+          
+          // Auto-hide after 3 seconds
+          setTimeout(() => {
+            successDiv.classList.add('hidden');
+            togglePasswordSection();
+          }, 3000);
+        } else {
+          errorText.textContent = result.error || 'Failed to change password';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorText.textContent = 'Something went wrong. Please try again.';
+        errorDiv.classList.remove('hidden');
+      }
+      
+      // Reset button
+      btn.disabled = false;
+      btnText.classList.remove('hidden');
+      btnLoader.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

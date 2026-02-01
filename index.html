@@ -22,6 +22,7 @@
 <script src="/js/config.js"></script>
 <script src="/js/translations.js"></script>
 <script src="/js/i18n.js"></script>
+<script src="/js/auth.js"></script>
 
 <!-- Google Analytics - Uncomment and add your GA4 ID when ready -->
 <!-- 
@@ -136,12 +137,18 @@
           </ul>
         </div>
         <div class="border-t border-zinc-800 pt-8 mt-auto">
-          <div class="flex gap-4">
+          <div class="flex gap-4 flex-wrap">
             <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
             </a>
             <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
+            </a>
+            <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="mdi:facebook" data-width="20"></span>
+            </a>
+            <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="ic:baseline-tiktok" data-width="20"></span>
             </a>
           </div>
         </div>
@@ -195,10 +202,15 @@
             <span data-i18n="hero.cta">FIND A GAME</span>
           </button>
 
-          <!-- Language Toggle -->
-          <button data-lang-toggle class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 flex items-center justify-center text-xs font-bold text-zinc-700 transition-all" aria-label="Toggle language">
-            ES
-          </button>
+          <!-- Auth Button (shown when logged out) -->
+          <a href="login-page.html" data-auth-button class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-green-500 flex items-center justify-center text-zinc-600 hover:text-green-600 transition-all" aria-label="Sign in">
+            <span class="iconify" data-icon="lucide:user" data-width="18"></span>
+          </a>
+
+          <!-- User Menu (shown when logged in) -->
+          <a href="profile-page.html" data-user-menu class="hidden w-9 h-9 rounded-md bg-green-600 hover:bg-green-700 flex items-center justify-center text-xs font-bold text-white transition-all" aria-label="View profile">
+            <span data-user-initials>--</span>
+          </a>
         </div>
       </header>
 
@@ -410,6 +422,18 @@
               </div>
             </div>
 
+            <!-- Partnered With Section -->
+            <section class="py-12 border-t border-zinc-200 bg-zinc-50">
+              <div class="max-w-4xl mx-auto px-4 text-center">
+                <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6 font-display">
+                  Partnered With
+                </p>
+                <a href="https://sphere.club" target="_blank" rel="noopener noreferrer" class="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                  <img src="/black/sphere-horz-R.png" alt="Sphere Soccer" class="h-48 md:h-56 object-contain mx-auto">
+                </a>
+              </div>
+            </section>
+
             <footer class="bg-zinc-900 text-white pt-20 pb-10">
               <div class="max-w-7xl mx-auto px-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-zinc-800 pb-16">
@@ -470,12 +494,18 @@
                     <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-6" data-i18n="footer.follow">
                       Follow
                     </h4>
-                    <div class="flex gap-4 mb-6">
+                    <div class="flex gap-4 mb-6 flex-wrap">
                       <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                         <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
                       </a>
                       <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                         <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
+                      </a>
+                      <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                        <span class="iconify text-xl" data-icon="mdi:facebook" data-width="20"></span>
+                      </a>
+                      <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                        <span class="iconify text-xl" data-icon="ic:baseline-tiktok" data-width="20"></span>
                       </a>
                     </div>
                     <!-- Language Toggle in Footer -->
@@ -683,24 +713,44 @@
         // Ensure spotsRemaining is bounded between 0 and capacity
         const capacity = game.capacity || 24;
         const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
-        const spotsText = spotsRemaining === 0 ? 'FULL' : `${spotsRemaining} SPOTS`;
-        const spotsClass = spotsRemaining === 0
-          ? 'text-red-600 border-red-200 bg-red-50'
+        const isFull = spotsRemaining === 0;
+        const spotsText = isFull ? 'FULL' : `${spotsRemaining} SPOTS`;
+        const spotsClass = isFull
+          ? 'text-amber-600 border-amber-200 bg-amber-50'
           : 'text-green-600 border-green-200 bg-green-50';
-        const hotBorder = isHot ? 'border-2 border-green-500 shadow-lg' : 'border border-zinc-200';
-        const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
         
+        // Full games get amber border, hot games get green border, default is zinc
+        let borderClass = 'border border-zinc-200';
+        if (isFull) {
+          borderClass = 'border-2 border-amber-400';
+        } else if (isHot) {
+          borderClass = 'border-2 border-green-500 shadow-lg';
+        }
+        
+        const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
+
+        // Show different CTA for full games
+        const ctaText = isFull ? 'Join Waitlist →' : 'View Details →';
+        const ctaClass = isFull ? 'text-amber-600' : 'text-green-600';
+
+        // Badge for full games vs hot games vs normal
+        let badgeHtml = '';
+        if (isFull) {
+          badgeHtml = '<span class="text-[10px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded uppercase tracking-wide flex items-center gap-1"><span class="iconify" data-icon="lucide:clock" data-width="10"></span>GAME FULL</span>';
+        } else if (isHot) {
+          badgeHtml = '<span class="text-[10px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded uppercase tracking-wide">HOT 🔥</span>';
+        } else {
+          badgeHtml = `<span class="text-[10px] font-bold ${spotsClass} border px-1.5 py-0.5 rounded uppercase tracking-wide">${spotsText}</span>`;
+        }
+
         return `
-          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${hotBorder} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200 overflow-hidden">
+          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${borderClass} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200 overflow-hidden${isFull ? ' bg-amber-50/30' : ''}">
             <div class="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
             <div class="flex items-center justify-between mb-2">
               <span class="text-[10px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded uppercase tracking-wide">
                 ${game.gameId}
               </span>
-              ${isHot 
-                ? '<span class="text-[10px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded uppercase tracking-wide">HOT 🔥</span>'
-                : `<span class="text-[10px] font-bold ${spotsClass} border px-1.5 py-0.5 rounded uppercase tracking-wide">${spotsText}</span>`
-              }
+              ${badgeHtml}
             </div>
             <h3 class="text-xl font-bold text-zinc-900 mb-0.5 leading-tight font-display uppercase tracking-tight">
               ${game.title}
@@ -709,10 +759,10 @@
               <span class="iconify" data-icon="lucide:map-pin" data-width="1.2"></span>
               ${venueName} • ${formatGameDate(game.date)} ${game.time}
             </div>
-            <div class="mt-auto flex items-center justify-between pt-3 border-t border-zinc-100 w-full">
-              <span class="text-xs font-black text-green-600">$${game.price.toFixed(2)}</span>
-              <span class="text-[10px] font-bold uppercase tracking-wide text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                View Details →
+            <div class="mt-auto flex items-center justify-between pt-3 border-t ${isFull ? 'border-amber-200' : 'border-zinc-100'} w-full">
+              <span class="text-xs font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">$${game.price.toFixed(2)}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wide ${ctaClass} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                ${isFull ? '<span class="iconify" data-icon="lucide:bell" data-width="12"></span>' : ''}${ctaText}
               </span>
             </div>
           </a>

@@ -731,13 +731,307 @@ app.use(Sentry.Handlers.errorHandler());
 
 ---
 
+## Security-Focused Implementation Plan
+
+**Last Updated:** January 29, 2026
+
+### Build vs Buy Decision
+
+| Component | Decision | Service | Cost |
+|-----------|----------|---------|------|
+| User Authentication | **Build** (already exists) | - | $0 |
+| Admin Authentication | **Build** | - | $0 |
+| Session Storage | **Buy when scaling** | DO Managed Redis | $15/mo |
+| Transactional Email | **Keep** | Resend | Pay-per-use |
+| Payments | **Keep** | Stripe | 2.9% + $0.30 |
+| SMS Reminders | **Buy when needed** | Twilio | Pay-per-use |
+| Error Tracking | **Buy** | Sentry | Free tier |
+| Analytics | **Buy** | GA4 + Meta Pixel | Free |
+
+**Decision: No Supabase migration needed.** Current stack handles all requirements.
+
+---
+
+### Phase 1: Admin Dashboard (PRIORITY - Security Critical)
+
+**Goal:** Secure admin interface for game management
+
+#### 1.1 Backend: Session-Based Admin Auth
+```
+Location: api/server.js
+```
+
+**Requirements:**
+- [ ] Create `/api/admin/login` endpoint with rate limiting (5 req/15 min)
+- [ ] Generate cryptographically random session tokens (32+ bytes)
+- [ ] Store sessions in memory with explicit expiration (4 hours)
+- [ ] Bind sessions to IP address (log warning if IP changes)
+- [ ] Create `/api/admin/logout` endpoint
+- [ ] Add session cleanup on interval (every 15 min)
+- [ ] Log all admin actions: timestamp, IP, endpoint, success/failure
+- [ ] Never log tokens or secrets
+
+**Session Storage Migration Path:**
+```
+Phase 1: In-memory Map (current scale)
+Phase 2: DigitalOcean Managed Redis ($15/mo) when:
+  - Multiple app instances needed
+  - Deploys causing session loss becomes annoying
+```
+
+#### 1.2 Frontend: Admin Login Page
+```
+Location: admin.html (new file)
+```
+
+**Requirements:**
+- [ ] Password input field (NOT URL query param)
+- [ ] Store session token in `sessionStorage` (cleared on tab close)
+- [ ] Auto-logout on token expiration
+- [ ] Show login screen if no valid session
+
+#### 1.3 Admin Dashboard Features
+- [ ] View all games (upcoming, past, cancelled)
+- [ ] Create/edit/cancel games
+- [ ] View RSVPs per game with player details
+- [ ] Quick stats: games this week, total RSVPs, revenue
+
+**Security Checklist:**
+- [ ] All admin endpoints use `adminAuth` middleware
+- [ ] All admin endpoints use `adminLimiter` rate limiting
+- [ ] Admin audit log captures all mutations
+- [ ] No PII in logs (use user IDs, not emails)
+
+---
+
+### Phase 2: Promo Code System
+
+**Goal:** Allow discount codes at checkout
+
+#### 2.1 Simple Approach (Recommended)
+```
+Location: api/server.js (checkout endpoint)
+```
+
+**Implementation:**
+- [ ] Add `allow_promotion_codes: true` to Stripe checkout session
+- [ ] Done - Stripe handles validation, UI, and abuse prevention
+
+**Do NOT build:**
+- Custom `/api/validate-promo` endpoint (re-introduces enumeration risk)
+- Custom promo code UI (Stripe's is better)
+
+#### 2.2 If Custom Validation Needed Later
+**Requirements (only if business requires):**
+- [ ] Rate limit: 5 requests/minute per IP
+- [ ] Generic error messages: "Invalid or expired code"
+- [ ] Consistent response timing (200ms + random jitter)
+- [ ] Never reveal if code exists but is expired vs doesn't exist
+
+---
+
+### Phase 3: Game Comments
+
+**Goal:** Allow discussion on game pages
+
+#### 3.1 Backend Security
+```
+Location: api/server.js
+```
+
+**Requirements:**
+- [ ] Rate limit: 5 comments/minute per IP
+- [ ] Input validation: name (50 chars), text (500 chars)
+- [ ] Use sanitization library (DOMPurify or sanitize-html), NOT regex
+- [ ] Validate gameId format before database query
+- [ ] Don't store or display email unless user is authenticated
+
+#### 3.2 Frontend Security
+```
+Location: game-details.html
+```
+
+**Requirements:**
+- [ ] Render comments with `textContent`, NEVER `innerHTML`
+- [ ] Add honeypot field for basic bot prevention
+- [ ] Client-side length validation before submit
+
+#### 3.3 Anti-Spam (Lightweight)
+- [ ] Honeypot hidden field (bots fill it, humans don't)
+- [ ] Minimum time between page load and submit (3 seconds)
+- [ ] Consider requiring RSVP to comment (prevents drive-by spam)
+
+---
+
+### Phase 4: User Accounts & Login UI
+
+**Goal:** Frontend for existing auth system
+
+#### 4.1 Auth System Status
+```
+✅ Already implemented in api/server.js:
+- POST /api/auth/register (bcrypt hashing)
+- POST /api/auth/login (JWT tokens)
+- User model with email, passwordHash
+- authenticateToken middleware
+
+❌ Missing:
+- Frontend login/register pages
+- Password reset flow
+- Account settings page
+```
+
+#### 4.2 Implementation Tasks
+
+**Frontend Pages:**
+- [ ] Create `login.html` with email/password form
+- [ ] Create `register.html` with registration form
+- [ ] Create `my-account.html` for profile and RSVP history
+- [ ] Add login state to navbar (show name or "Login" button)
+- [ ] Store JWT in `localStorage` (or HttpOnly cookie if preferred)
+
+**Password Reset Flow:**
+- [ ] Create `/api/auth/forgot-password` endpoint
+- [ ] Generate one-time token (expires in 1 hour)
+- [ ] Send reset email via Resend
+- [ ] Create `/api/auth/reset-password` endpoint
+- [ ] Generic responses: "If email exists, reset link sent"
+- [ ] Rate limit: 3 requests/hour per email
+
+**Security Checklist:**
+- [ ] bcrypt with 12+ rounds (already done)
+- [ ] JWT secret rotation plan documented
+- [ ] Session invalidation on password change
+- [ ] Rate limit login attempts (already done: 10/15 min)
+
+---
+
+### Phase 5: SMS Reminders (Twilio)
+
+**Goal:** Send game reminders 2 hours before
+
+#### 5.1 Prerequisites
+- [ ] Twilio account with verified phone number
+- [ ] Environment variables: TWILIO_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE
+
+#### 5.2 Security Requirements
+
+**Phone Number Storage:**
+- [ ] Store phone numbers encrypted (AES-256), NOT hashed
+- [ ] Hashing doesn't work if you need to display/confirm the number
+- [ ] Encrypt with key from environment variable
+- [ ] Decrypt only when sending SMS
+
+**Anti-Abuse:**
+- [ ] Only send to users with completed paid RSVPs
+- [ ] Restrict to US phone numbers only (+1)
+- [ ] Rate limit: 1 SMS per RSVP, 3 SMS requests/hour per IP
+- [ ] Log SMS sends for abuse detection (without full phone number)
+
+**Implementation:**
+- [ ] Add phone field to RSVP form (optional)
+- [ ] Create `/api/reminders/opt-in` endpoint
+- [ ] Create cron job or scheduled task for reminders
+- [ ] Include opt-out link in every SMS
+
+---
+
+### Phase 6: Referral Program
+
+**Goal:** "Refer a friend, both get $2 off"
+
+#### 6.1 Security Requirements
+
+**Referral Code Generation:**
+- [ ] Use cryptographically random codes (12+ chars)
+- [ ] NOT sequential (REF001, REF002 = guessable)
+- [ ] Format: `REF-` + 12 random alphanumeric chars
+
+**Claim Validation:**
+- [ ] Require referee to complete a paid RSVP first
+- [ ] Verify referee identity via confirmation code, NOT free-form email
+- [ ] Prevent self-referrals (compare normalized emails)
+- [ ] One referral claim per referee (unique constraint)
+- [ ] Rate limit claims: 10/hour per IP
+
+**Fraud Prevention:**
+- [ ] Both parties must have completed paid RSVPs
+- [ ] Consider: same IP can't be both referrer and referee
+- [ ] Consider: require different payment methods
+- [ ] Log all referral claims for audit
+
+---
+
+### Infrastructure Additions (When Needed)
+
+#### Redis for Session Storage
+**When to add:** Multiple app instances OR deploy-caused session loss is problematic
+**Service:** DigitalOcean Managed Redis ($15/mo)
+**Implementation:**
+```javascript
+// Replace in-memory Map with Redis
+const Redis = require('ioredis');
+const redis = new Redis(process.env.REDIS_URL);
+
+// Store session
+await redis.setex(`admin:${token}`, 14400, JSON.stringify(sessionData));
+
+// Get session
+const session = JSON.parse(await redis.get(`admin:${token}`));
+```
+
+#### Sentry for Error Tracking
+**When to add:** Now (free tier is sufficient)
+**Service:** Sentry (free tier: 5K errors/month)
+**Implementation:**
+```javascript
+const Sentry = require('@sentry/node');
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+app.use(Sentry.Handlers.requestHandler());
+// ... routes ...
+app.use(Sentry.Handlers.errorHandler());
+```
+
+---
+
+### Security Principles (Cross-Cutting)
+
+1. **Consistent Error Messages**
+   - Never reveal whether a resource exists
+   - "Invalid credentials" not "User not found" vs "Wrong password"
+
+2. **Rate Limiting on All Abuse-Prone Endpoints**
+   - Auth: 10 req/15 min
+   - Admin: 5 req/15 min
+   - Comments: 5 req/min
+   - SMS: 3 req/hour
+   - Referral claims: 10 req/hour
+
+3. **Input Validation**
+   - Validate type (string, not object)
+   - Validate length (max limits)
+   - Sanitize before storage and display
+
+4. **Logging**
+   - Log security events: failed logins, rate limits, admin actions
+   - Never log: passwords, tokens, full credit cards, full phone numbers
+   - Use user IDs instead of emails where possible
+
+5. **Secrets Management**
+   - All secrets in environment variables
+   - Document rotation schedule
+   - Fail fast if required secrets missing in production
+
+---
+
 ## Notes
 
 - All time estimates assume single developer
 - Backend changes require deployment to production server
 - Test all payment-related changes in Stripe test mode first
 - Keep mobile-first approach for all new UI
+- Security assessment should be reviewed after each major feature
 
 ---
 
-*Last reviewed: January 20, 2026*
+*Last reviewed: January 29, 2026*

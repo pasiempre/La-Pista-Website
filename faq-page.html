@@ -18,6 +18,7 @@
 <script src="/js/config.js"></script>
 <script src="/js/translations.js"></script>
 <script src="/js/i18n.js"></script>
+<script src="/js/auth.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
     <!-- Mobile Menu Overlay -->
@@ -38,12 +39,18 @@
           <a href="contact-page.html" class="text-3xl font-black text-white uppercase italic font-display tracking-tight hover:text-green-500 transition-colors">Contact</a>
         </nav>
         <div class="border-t border-zinc-800 pt-8 mt-auto">
-          <div class="flex gap-4 mb-4">
+          <div class="flex gap-4 mb-4 flex-wrap">
             <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="lucide:instagram" data-width="20"></span>
             </a>
             <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
               <span class="iconify text-xl" data-icon="mdi:whatsapp" data-width="20"></span>
+            </a>
+            <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="mdi:facebook" data-width="20"></span>
+            </a>
+            <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-10 h-10 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+              <span class="iconify text-xl" data-icon="ic:baseline-tiktok" data-width="20"></span>
             </a>
           </div>
           <button data-lang-toggle class="text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-green-500 transition-colors">
@@ -80,9 +87,14 @@
             Contact
           </a>
         </nav>
-        <button data-lang-toggle class="text-xs font-bold uppercase tracking-wide text-zinc-500 hover:text-green-600 transition-colors px-2 py-1 border border-zinc-200 rounded">
-          ES
-        </button>
+        <!-- Auth Button (shown when logged out) -->
+        <a href="login-page.html" data-auth-button class="w-8 h-8 rounded border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-green-500 flex items-center justify-center text-zinc-600 hover:text-green-600 transition-all" aria-label="Sign in">
+          <span class="iconify" data-icon="lucide:user" data-width="16"></span>
+        </a>
+        <!-- User Menu (shown when logged in) -->
+        <a href="profile-page.html" data-user-menu class="hidden w-8 h-8 rounded bg-green-600 hover:bg-green-700 flex items-center justify-center text-xs font-bold text-white transition-all" aria-label="View profile">
+          <span data-user-initials>--</span>
+        </a>
       </div>
     </header>
 
@@ -304,12 +316,18 @@
             <h4 class="font-bold uppercase tracking-widest text-xs text-zinc-500 mb-4">
               Follow
             </h4>
-            <div class="flex gap-4">
+            <div class="flex gap-4 flex-wrap">
               <a href="https://www.instagram.com/lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                 <span class="iconify text-lg" data-icon="lucide:instagram" data-width="18"></span>
               </a>
               <a href="https://chat.whatsapp.com/Gqkat9jvT1cAVURDjR9DqA" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
                 <span class="iconify text-lg" data-icon="mdi:whatsapp" data-width="18"></span>
+              </a>
+              <a href="https://www.facebook.com/groups/868317082761568" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify text-lg" data-icon="mdi:facebook" data-width="18"></span>
+              </a>
+              <a href="https://www.tiktok.com/@lapista.atx" target="_blank" class="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-green-600 hover:text-white transition-all">
+                <span class="iconify text-lg" data-icon="ic:baseline-tiktok" data-width="18"></span>
               </a>
             </div>
           </div>

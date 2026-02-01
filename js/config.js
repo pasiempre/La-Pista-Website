@@ -26,7 +26,14 @@ const LAPISTA_CONFIG = {
   EMAIL: 'lapista.atx@gmail.com',
 
   // Current year (for copyright)
-  CURRENT_YEAR: new Date().getFullYear()
+  CURRENT_YEAR: new Date().getFullYear(),
+
+  // Stripe publishable key (public - safe to expose in frontend)
+  // These are placeholders - replace with your actual keys from Stripe Dashboard
+  // For local dev without Stripe, payment features will be disabled
+  STRIPE_PUBLISHABLE_KEY: window.location.hostname === 'localhost'
+    ? 'pk_test_YOUR_TEST_KEY'  // Get from https://dashboard.stripe.com/test/apikeys
+    : 'pk_live_YOUR_LIVE_KEY'  // Get from https://dashboard.stripe.com/apikeys
 };
 
 // Freeze config to prevent accidental modification

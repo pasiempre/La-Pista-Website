@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Methods - LaPista.ATX</title>
+  <meta name="description" content="Manage your saved payment methods for faster checkout.">
+  <meta property="og:title" content="Payment Methods - LaPista.ATX">
+  <meta property="og:description" content="Manage your saved payment methods.">
+  <meta property="og:image" content="/LaPista Logo 1.png">
+  <meta name="auth-required" content="true">
+  <meta name="theme-color" content="#18181b">
+  <link rel="icon" type="image/png" href="/LaPista Logo 1.png">
+  <link rel="apple-touch-icon" href="/LaPista Logo 1.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/config.js"></script>
+  <script src="/js/translations.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/auth.js"></script>
+</head>
+<body class="min-h-screen bg-[#FAFAFA] antialiased flex flex-col">
+  
+  <!-- Navbar -->
+  <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
+    <a href="index.html" class="flex items-center group">
+      <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+    </a>
+    <a href="profile-page.html" class="inline-flex items-center gap-2 text-sm font-bold text-zinc-600 hover:text-green-600 transition-colors uppercase tracking-wide">
+      <span class="iconify" data-icon="lucide:arrow-left" data-width="16"></span>
+      Back to Profile
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 px-4 py-8 md:py-12">
+    <div class="max-w-xl mx-auto">
+      
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-black text-zinc-900 uppercase font-display tracking-tight mb-2">
+          Payment Methods
+        </h1>
+        <p class="text-zinc-500 font-medium">
+          Save a card for faster checkout on future games.
+        </p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" class="flex flex-col items-center justify-center py-20">
+        <span class="iconify animate-spin text-green-600 text-4xl mb-4" data-icon="lucide:loader-2"></span>
+        <p class="text-zinc-500 font-medium">Loading payment methods...</p>
+      </div>
+
+      <!-- Content -->
+      <div id="content" class="hidden space-y-6">
+        
+        <!-- Saved Cards List -->
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-zinc-100">
+            <h2 class="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+              <span class="iconify" data-icon="lucide:credit-card" data-width="16"></span>
+              Saved Cards
+            </h2>
+          </div>
+          
+          <div id="cards-list" class="divide-y divide-zinc-100">
+            <!-- Cards populated by JavaScript -->
+          </div>
+          
+          <div id="no-cards" class="hidden p-6 text-center">
+            <span class="iconify text-zinc-300 text-4xl mb-3" data-icon="lucide:credit-card"></span>
+            <p class="text-zinc-500 mb-1">No saved payment methods</p>
+            <p class="text-xs text-zinc-400">Add a card for faster checkout</p>
+          </div>
+        </div>
+
+        <!-- Add New Card Button -->
+        <button type="button" id="add-card-btn" onclick="showAddCardForm()"
+                class="w-full bg-zinc-900 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all uppercase tracking-wide flex items-center justify-center gap-2">
+          <span class="iconify" data-icon="lucide:plus" data-width="20"></span>
+          Add a Card
+        </button>
+
+        <!-- Add Card Form (Hidden by default) -->
+        <div id="add-card-section" class="hidden bg-white rounded-2xl border border-zinc-200 shadow-sm p-6">
+          <h3 class="text-sm font-bold text-zinc-900 mb-4">Add New Card</h3>
+          
+          <!-- Stripe Elements Container -->
+          <div id="card-element" class="p-4 border border-zinc-200 rounded-lg bg-zinc-50 mb-4">
+            <!-- Stripe Card Element will be mounted here -->
+          </div>
+          
+          <!-- Error Display -->
+          <div id="card-errors" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium mb-4">
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex gap-3">
+            <button type="button" id="save-card-btn" onclick="saveCard()"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-all uppercase tracking-wide">
+              Save Card
+            </button>
+            <button type="button" onclick="hideAddCardForm()"
+                    class="flex-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 font-bold py-3 rounded-lg transition-all uppercase tracking-wide">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Security Note -->
+        <div class="flex items-start gap-3 p-4 bg-zinc-50 rounded-lg">
+          <span class="iconify text-zinc-400 mt-0.5" data-icon="lucide:shield-check" data-width="20"></span>
+          <div>
+            <p class="text-sm text-zinc-600 font-medium">Your payment info is secure</p>
+            <p class="text-xs text-zinc-400">Cards are securely stored by Stripe. We never see your full card number.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-200 py-6 px-4 text-center mt-auto">
+    <div class="flex items-center justify-center gap-6 text-xs font-bold text-zinc-400 uppercase tracking-wide">
+      <span>© <span data-year>2025</span> LaPista.ATX</span>
+      <a href="terms.html" class="hover:text-zinc-600 transition-colors">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    const API_URL = LAPISTA_CONFIG.API_URL;
+    const STRIPE_PUBLISHABLE_KEY = LAPISTA_CONFIG.STRIPE_PUBLISHABLE_KEY;
+    
+    let stripe = null;
+    let cardElement = null;
+    let setupIntentSecret = null;
+
+    // Initialize page
+    async function init() {
+      const user = await requireAuth();
+      if (!user) return;
+
+      // Initialize Stripe (only if key is configured)
+      if (STRIPE_PUBLISHABLE_KEY && !STRIPE_PUBLISHABLE_KEY.includes('YOUR_')) {
+        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+      }
+
+      // Load payment methods
+      await loadPaymentMethods();
+    }
+
+    // Load saved payment methods
+    async function loadPaymentMethods() {
+      const loadingEl = document.getElementById('loading-state');
+      const contentEl = document.getElementById('content');
+
+      try {
+        // Check if Stripe is configured on frontend
+        if (!stripe) {
+          loadingEl.innerHTML = `
+            <span class="iconify text-amber-500 text-4xl mb-4" data-icon="lucide:credit-card"></span>
+            <p class="text-zinc-700 font-bold mb-2">Payment Methods Coming Soon</p>
+            <p class="text-zinc-500 text-sm">This feature isn't configured yet.<br>Pay at the game for now!</p>
+          `;
+          return;
+        }
+
+        const token = AuthService.getToken();
+        const response = await fetch(`${API_URL}/api/payment-methods`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        // Check if payment service is available on backend
+        if (response.status === 503) {
+          loadingEl.innerHTML = `
+            <span class="iconify text-amber-500 text-4xl mb-4" data-icon="lucide:credit-card"></span>
+            <p class="text-zinc-700 font-bold mb-2">Payment Methods Coming Soon</p>
+            <p class="text-zinc-500 text-sm">This feature isn't available yet.<br>Pay at the game for now!</p>
+          `;
+          return;
+        }
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+
+        loadingEl.classList.add('hidden');
+        contentEl.classList.remove('hidden');
+
+        renderCards(data.paymentMethods || []);
+
+      } catch (err) {
+        console.error('Error loading payment methods:', err);
+        loadingEl.innerHTML = `
+          <span class="iconify text-red-500 text-4xl mb-4" data-icon="lucide:alert-circle"></span>
+          <p class="text-zinc-500 font-medium">Failed to load payment methods</p>
+          <button onclick="location.reload()" class="mt-4 text-green-600 hover:text-green-700 font-bold">Retry</button>
+        `;
+      }
+    }
+
+    // Render cards list
+    function renderCards(cards) {
+      const listEl = document.getElementById('cards-list');
+      const noCardsEl = document.getElementById('no-cards');
+
+      if (cards.length === 0) {
+        listEl.classList.add('hidden');
+        noCardsEl.classList.remove('hidden');
+        return;
+      }
+
+      listEl.classList.remove('hidden');
+      noCardsEl.classList.add('hidden');
+
+      listEl.innerHTML = cards.map(card => `
+        <div class="flex items-center justify-between px-6 py-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-8 rounded bg-zinc-100 flex items-center justify-center">
+              ${getCardIcon(card.brand)}
+            </div>
+            <div>
+              <p class="font-bold text-zinc-900">•••• ${card.last4}</p>
+              <p class="text-xs text-zinc-500">Expires ${card.expMonth}/${card.expYear}</p>
+            </div>
+          </div>
+          <button type="button" onclick="deleteCard('${card.id}')" 
+                  class="text-sm font-bold text-red-500 hover:text-red-600 transition-colors uppercase tracking-wide">
+            Remove
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Get card brand icon
+    function getCardIcon(brand) {
+      const icons = {
+        visa: '<span class="text-blue-600 text-xl">VISA</span>',
+        mastercard: '<span class="iconify text-orange-500" data-icon="logos:mastercard" data-width="28"></span>',
+        amex: '<span class="text-blue-500 text-lg font-bold">AMEX</span>',
+        discover: '<span class="text-orange-600 text-sm font-bold">DISC</span>'
+      };
+      return icons[brand] || `<span class="text-zinc-400 text-xs uppercase">${brand}</span>`;
+    }
+
+    // Show add card form
+    async function showAddCardForm() {
+      if (!stripe) {
+        alert('Payment service not available. Please try again later.');
+        return;
+      }
+
+      document.getElementById('add-card-btn').classList.add('hidden');
+      document.getElementById('add-card-section').classList.remove('hidden');
+
+      // Get setup intent from server
+      try {
+        const token = AuthService.getToken();
+        const response = await fetch(`${API_URL}/api/payment-methods/setup`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to initialize');
+
+        const data = await response.json();
+        setupIntentSecret = data.clientSecret;
+
+        // Create Stripe Elements
+        const elements = stripe.elements();
+        cardElement = elements.create('card', {
+          style: {
+            base: {
+              fontSize: '16px',
+              fontFamily: '"Space Grotesk", sans-serif',
+              color: '#18181b',
+              '::placeholder': { color: '#a1a1aa' }
+            },
+            invalid: {
+              color: '#dc2626',
+              iconColor: '#dc2626'
+            }
+          }
+        });
+        cardElement.mount('#card-element');
+
+        // Handle real-time validation errors
+        cardElement.on('change', (event) => {
+          const errorEl = document.getElementById('card-errors');
+          if (event.error) {
+            errorEl.textContent = event.error.message;
+            errorEl.classList.remove('hidden');
+          } else {
+            errorEl.classList.add('hidden');
+          }
+        });
+
+      } catch (err) {
+        console.error('Error initializing card form:', err);
+        hideAddCardForm();
+        alert('Failed to initialize payment form. Please try again.');
+      }
+    }
+
+    // Hide add card form
+    function hideAddCardForm() {
+      document.getElementById('add-card-btn').classList.remove('hidden');
+      document.getElementById('add-card-section').classList.add('hidden');
+      
+      if (cardElement) {
+        cardElement.destroy();
+        cardElement = null;
+      }
+      setupIntentSecret = null;
+    }
+
+    // Save card
+    async function saveCard() {
+      if (!stripe || !cardElement || !setupIntentSecret) {
+        return;
+      }
+
+      const btn = document.getElementById('save-card-btn');
+      const errorEl = document.getElementById('card-errors');
+      
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      errorEl.classList.add('hidden');
+
+      try {
+        const result = await stripe.confirmCardSetup(setupIntentSecret, {
+          payment_method: {
+            card: cardElement
+          }
+        });
+
+        if (result.error) {
+          errorEl.textContent = result.error.message;
+          errorEl.classList.remove('hidden');
+        } else {
+          // Success - reload payment methods
+          hideAddCardForm();
+          await loadPaymentMethods();
+          showToast('Card saved successfully!', 'success');
+        }
+
+      } catch (err) {
+        console.error('Error saving card:', err);
+        errorEl.textContent = 'Failed to save card. Please try again.';
+        errorEl.classList.remove('hidden');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Save Card';
+    }
+
+    // Delete card
+    async function deleteCard(paymentMethodId) {
+      if (!confirm('Remove this card?')) return;
+
+      try {
+        const token = AuthService.getToken();
+        const response = await fetch(`${API_URL}/api/payment-methods/${paymentMethodId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to remove card');
+        }
+
+        await loadPaymentMethods();
+        showToast('Card removed', 'success');
+
+      } catch (err) {
+        console.error('Error deleting card:', err);
+        alert(err.message || 'Failed to remove card');
+      }
+    }
+
+    // Toast notification helper
+    function showToast(message, type = 'info') {
+      // Simple toast - could be enhanced with a proper toast library
+      const toast = document.createElement('div');
+      toast.className = `fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg font-bold text-sm shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-600 text-white' : 'bg-zinc-900 text-white'
+      }`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Initialize
+    init();
+  </script>
+</body>
+</html>
