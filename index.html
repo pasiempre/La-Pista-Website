@@ -192,7 +192,7 @@
             <div class="w-9 h-9 rounded-md border-2 border-white bg-green-700 flex items-center justify-center text-xs font-bold text-white shadow-sm">
               <span class="iconify" data-icon="lucide:user" data-width="16"></span>
             </div>
-            <div id="player-count-badge" class="w-9 h-9 rounded-md border-2 border-white bg-zinc-900 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm" title="Total players">
+            <div id="player-count-badge" class="w-9 h-9 rounded-md border-2 border-white bg-zinc-900 flex items-center justify-center text-xs font-bold text-white cursor-pointer shadow-sm hover:bg-green-600 transition-colors" title="Players joined this week">
               <span class="iconify animate-pulse" data-icon="lucide:loader-2" data-width="14"></span>
             </div>
           </div>
@@ -203,8 +203,9 @@
           </button>
 
           <!-- Auth Button (shown when logged out) -->
-          <a href="login-page.html" data-auth-button class="w-9 h-9 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-green-500 flex items-center justify-center text-zinc-600 hover:text-green-600 transition-all" aria-label="Sign in">
+          <a href="login-page.html" data-auth-button class="flex items-center gap-2 px-3 py-2 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 hover:border-green-500 text-zinc-600 hover:text-green-600 transition-all group" aria-label="Sign in or create account" title="Sign in or create a free account">
             <span class="iconify" data-icon="lucide:user" data-width="18"></span>
+            <span class="hidden sm:inline text-xs font-bold uppercase tracking-wide group-hover:text-green-600">Join</span>
           </a>
 
           <!-- User Menu (shown when logged in) -->
@@ -238,12 +239,17 @@
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button onclick="scrollToSchedule()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-black uppercase tracking-wide rounded-md transition-all shadow-lg shadow-green-900/20 transform hover:-translate-y-1" data-i18n="hero.cta">
-                    VIEW SCHEDULE
+                    FIND A GAME
                   </button>
                   <a href="about-page.html" class="px-8 py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-black uppercase tracking-wide rounded-md transition-all border border-zinc-700" data-i18n="hero.learnMore">
                     HOW IT WORKS
                   </a>
                 </div>
+                <!-- Sign-up prompt for new visitors -->
+                <p class="mt-6 text-sm text-zinc-500">
+                  <a href="login-page.html" class="text-green-400 hover:text-green-300 font-semibold underline underline-offset-2">Create a free account</a>
+                  to book faster & track your games
+                </p>
               </div>
             </div>
 
@@ -626,8 +632,14 @@
             <!-- Quick RSVP CTA -->
             <div class="mb-8 border-t border-dashed border-zinc-200 pt-6">
               <div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span class="iconify text-green-600 text-2xl" data-icon="lucide:calendar-check" data-width="1.5"></span>
+                <div class="relative w-12 h-12 mx-auto mb-4">
+                  <!-- Animated pulsing ring -->
+                  <span class="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-30"></span>
+                  <span class="absolute inset-1 rounded-full bg-green-300 animate-pulse opacity-40"></span>
+                  <!-- Static icon -->
+                  <div class="relative w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <span class="iconify text-green-600 text-2xl" data-icon="lucide:calendar-check" data-width="1.5"></span>
+                  </div>
                 </div>
                 <h4 class="text-lg font-black text-zinc-900 uppercase tracking-tight font-display mb-2">
                   Ready to Play?
@@ -1147,6 +1159,12 @@
         const gameUrl = `game-details.html?gameId=${game.gameId}`;
         if (rsvpBtn) rsvpBtn.href = gameUrl;
         if (detailsLink) detailsLink.href = gameUrl;
+        
+        // Also update mobile sticky CTA
+        const mobileCTAGame = document.getElementById('mobile-cta-game');
+        const mobileCTABtn = document.getElementById('mobile-cta-btn');
+        if (mobileCTAGame) mobileCTAGame.textContent = game.title;
+        if (mobileCTABtn) mobileCTABtn.href = gameUrl;
       }
 
       // Attach click handlers to game cards
@@ -1199,6 +1217,35 @@
           });
         });
       });
+    </script>
+    
+    <!-- Mobile Sticky CTA (only shown on mobile when sidebar isn't visible) -->
+    <div id="mobile-sticky-cta" class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 p-4 z-40 shadow-lg transform translate-y-full transition-transform duration-300">
+      <div class="flex items-center justify-between gap-4 max-w-lg mx-auto">
+        <div class="flex-1 min-w-0">
+          <p id="mobile-cta-game" class="text-sm font-bold text-zinc-900 truncate">Sunday Pickup</p>
+          <p class="text-xs text-zinc-500">Tap to book your spot</p>
+        </div>
+        <a id="mobile-cta-btn" href="game-details.html?gameId=LP-001" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-sm uppercase rounded-md shadow-sm transition-all flex items-center gap-2 flex-shrink-0">
+          <span class="iconify" data-icon="lucide:ticket" data-width="16"></span>
+          Book Now
+        </a>
+      </div>
+    </div>
+    
+    <script>
+      // Show mobile CTA when user scrolls past hero
+      const mobileCta = document.getElementById('mobile-sticky-cta');
+      const mainContainer = document.getElementById('main-scroll-container');
+      if (mobileCta && mainContainer) {
+        mainContainer.addEventListener('scroll', () => {
+          if (mainContainer.scrollTop > 400) {
+            mobileCta.classList.remove('translate-y-full');
+          } else {
+            mobileCta.classList.add('translate-y-full');
+          }
+        });
+      }
     </script>
     
     <!-- Service Worker Registration -->
