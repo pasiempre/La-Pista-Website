@@ -9,7 +9,8 @@ const AVATAR_GALLERY = {
   // Avatar categories
   categories: [
     { id: 'legends', name: 'Legends', icon: 'lucide:trophy' },
-    { id: 'current', name: 'Current Stars', icon: 'lucide:star' }
+    { id: 'current', name: 'Current Stars', icon: 'lucide:star' },
+    { id: 'women', name: "Women's Stars", icon: 'lucide:stars' }
   ],
 
   // Base path for avatar images
@@ -27,7 +28,7 @@ const AVATAR_GALLERY = {
     { id: 'zidane', category: 'legends', fallbackColor: '#1e3a8a' },
     { id: 'ronaldinho', category: 'legends', fallbackColor: '#fcd34d' },
     
-    // Current Stars
+    // Current Stars (Men)
     { id: 'mbappe', category: 'current', fallbackColor: '#1e3a8a' },
     { id: 'haaland', category: 'current', fallbackColor: '#6ee7b7' },
     { id: 'vinicius', category: 'current', fallbackColor: '#fef3c7' },
@@ -37,7 +38,13 @@ const AVATAR_GALLERY = {
     { id: 'kane', category: 'current', fallbackColor: '#dc2626' },
     { id: 'lamine', category: 'current', fallbackColor: '#a50044' },
     { id: 'olise', category: 'current', fallbackColor: '#0053a0' },
-    { id: 'raphinha', category: 'current', fallbackColor: '#a50044' }
+    { id: 'raphinha', category: 'current', fallbackColor: '#a50044' },
+    
+    // Women's Stars
+    { id: 'marta', category: 'women', fallbackColor: '#fbbf24' },      // Brazil - Yellow
+    { id: 'alexis', category: 'women', fallbackColor: '#1e3a8a' },     // USWNT - Navy
+    { id: 'aitana', category: 'women', fallbackColor: '#a50044' },     // Barcelona - Maroon
+    { id: 'kerr', category: 'women', fallbackColor: '#fbbf24' }        // Australia - Gold
   ],
 
   // Get avatar by ID

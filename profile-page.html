@@ -369,7 +369,7 @@
         // Populate profile data
         const initials = AuthService.getInitials();
         
-        // Render avatar (jersey or initials fallback)
+        // Render avatar (photo or initials fallback)
         const avatarContainer = document.getElementById('user-avatar');
         if (user.avatar && AVATAR_GALLERY.getById(user.avatar)) {
           avatarContainer.innerHTML = AVATAR_GALLERY.renderAvatar(user.avatar, 'xl');
