@@ -530,7 +530,7 @@
             <span class="iconify animate-spin text-zinc-400 text-xl mr-2" data-icon="lucide:loader-2"></span>
             <span class="text-sm text-zinc-500">Loading players...</span>
           </div>
-          <div id="players-list" class="hidden flex flex-wrap gap-2">
+          <div id="players-list" class="hidden flex flex-wrap gap-3">
             <!-- Populated by JavaScript -->
           </div>
           <div id="players-empty" class="hidden text-center py-4">
@@ -1562,6 +1562,50 @@
         }
       }
 
+      // Avatar image path
+      const AVATAR_PATH = '/images/avatars/';
+      
+      // Get initials from name
+      function getInitials(firstName, lastName) {
+        return `${(firstName || '?')[0]}${(lastName || '')[0] || ''}`.toUpperCase();
+      }
+      
+      // Create avatar element (returns DOM element)
+      function createAvatarElement(avatar, firstName, lastName, size = 'md') {
+        const initials = getInitials(firstName, lastName);
+        const wrapper = document.createElement('div');
+        
+        // Size classes
+        const sizeClasses = {
+          sm: 'w-6 h-6 text-[10px]',
+          md: 'w-8 h-8 text-xs',
+          lg: 'w-10 h-10 text-sm'
+        };
+        
+        wrapper.className = `${sizeClasses[size] || sizeClasses.md} rounded-full flex-shrink-0 flex items-center justify-center font-bold overflow-hidden`;
+        
+        if (avatar) {
+          // User has an avatar - show the image
+          const img = document.createElement('img');
+          img.src = `${AVATAR_PATH}${avatar}.jpg`;
+          img.alt = '';
+          img.className = 'w-full h-full object-cover';
+          img.onerror = function() {
+            // Fallback to initials if image fails
+            this.style.display = 'none';
+            wrapper.classList.add('bg-emerald-500', 'text-white');
+            wrapper.textContent = initials;
+          };
+          wrapper.appendChild(img);
+        } else {
+          // No avatar - show initials with color
+          wrapper.classList.add('bg-zinc-300', 'text-zinc-600');
+          wrapper.textContent = initials;
+        }
+        
+        return wrapper;
+      }
+
       // Load players who have signed up
       async function loadPlayers() {
         const loadingEl = document.getElementById('players-loading');
@@ -1591,25 +1635,65 @@
           rsvps.forEach(rsvp => {
             const players = rsvp.totalPlayers || 1;
             totalPlayers += players;
-
-            // Create chip element safely using DOM methods
-            const chip = document.createElement('span');
-            chip.className = 'px-3 py-1.5 bg-white border border-zinc-200 rounded-full text-sm font-medium text-zinc-700';
-
-            // Safely set name using textContent (XSS safe)
+            
             const firstName = rsvp.player?.firstName || 'Player';
-            const lastInitial = rsvp.player?.lastName ? rsvp.player.lastName.charAt(0) + '.' : '';
-            chip.textContent = `${firstName} ${lastInitial}`;
+            const lastName = rsvp.player?.lastName || '';
+            const lastInitial = lastName ? lastName.charAt(0) + '.' : '';
+            const avatar = rsvp.player?.avatar || null;
+            const guests = rsvp.guests || [];
+            const guestCount = players - 1;
 
-            // Add guest count if applicable
-            if (players > 1) {
-              const guestSpan = document.createElement('span');
-              guestSpan.className = 'text-zinc-400';
-              guestSpan.textContent = ` +${players - 1}`;
-              chip.appendChild(guestSpan);
+            // Create main player chip with avatar
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-zinc-200 rounded-full shadow-sm';
+            
+            // Add avatar
+            const avatarEl = createAvatarElement(avatar, firstName, lastName, 'sm');
+            chip.appendChild(avatarEl);
+
+            // Add name
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'text-sm font-medium text-zinc-700';
+            nameSpan.textContent = `${firstName} ${lastInitial}`;
+            chip.appendChild(nameSpan);
+
+            // Add guest count badge if applicable
+            if (guestCount > 0) {
+              const guestBadge = document.createElement('span');
+              guestBadge.className = 'px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full';
+              guestBadge.textContent = `+${guestCount}`;
+              chip.appendChild(guestBadge);
             }
 
             listEl.appendChild(chip);
+            
+            // Render each guest as a separate chip with link indicator
+            guests.forEach(guest => {
+              const guestFirstName = guest.firstName || 'Guest';
+              const guestLastName = guest.lastName || '';
+              const guestLastInitial = guestLastName ? guestLastName.charAt(0) + '.' : '';
+              
+              const guestChip = document.createElement('div');
+              guestChip.className = 'inline-flex items-center gap-2 px-3 py-1.5 bg-zinc-100 border border-zinc-200 rounded-full';
+              
+              // Guest avatar (always gray initials - no account)
+              const guestAvatarEl = createAvatarElement(null, guestFirstName, guestLastName, 'sm');
+              guestChip.appendChild(guestAvatarEl);
+              
+              // Guest name
+              const guestNameSpan = document.createElement('span');
+              guestNameSpan.className = 'text-sm font-medium text-zinc-600';
+              guestNameSpan.textContent = `${guestFirstName} ${guestLastInitial}`;
+              guestChip.appendChild(guestNameSpan);
+              
+              // Link indicator showing who registered them
+              const linkSpan = document.createElement('span');
+              linkSpan.className = 'text-[10px] text-zinc-400 flex items-center gap-0.5';
+              linkSpan.innerHTML = `<span class="iconify" data-icon="lucide:link" data-width="10"></span> ${firstName}`;
+              guestChip.appendChild(linkSpan);
+              
+              listEl.appendChild(guestChip);
+            });
           });
 
           listEl.classList.remove('hidden');

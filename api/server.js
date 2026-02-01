@@ -654,13 +654,13 @@ app.get('/api/user/rsvps', authenticateToken, async (req, res) => {
   }
 });
 
-// Get RSVPs for a game (public squad list)
+// Get RSVPs for a game (public squad list with avatars and guests)
 app.get('/api/games/:gameId/rsvps', async (req, res) => {
   try {
     const rsvps = await RSVP.find({ 
       gameId: req.params.gameId,
       status: { $in: ['confirmed', 'pending'] }
-    }).select('player.firstName player.lastName totalPlayers createdAt');
+    }).select('player.firstName player.lastName player.avatar guests totalPlayers createdAt');
     
     res.json(rsvps);
   } catch (err) {
@@ -2671,7 +2671,9 @@ app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        phone: user.phone || ''
+        phone: user.phone || '',
+        userId: user._id, // Link to user account
+        avatar: user.avatar || null // Include avatar if user has one
       },
       guests: guests.map(g => {
         // Handle both name formats: { name } or { firstName, lastName }

@@ -67,7 +67,9 @@ const rsvpSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
-    phone: { type: String }
+    phone: { type: String },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Link to user if logged in
+    avatar: { type: String } // Avatar ID if user has one (e.g., 'messi', 'ronaldo')
   },
   guests: [{
     firstName: String,
