@@ -232,9 +232,11 @@
     // Render a single game card
     function renderGameCard(rsvp) {
       const game = rsvp.game || {};
-      const gameDate = new Date(game.date);
+      const rawDate = new Date(game.date);
+      // Use UTC components to avoid timezone shift (midnight UTC can be "yesterday" in CST)
+      const gameDate = new Date(rawDate.getUTCFullYear(), rawDate.getUTCMonth(), rawDate.getUTCDate());
       const now = new Date();
-      const isPast = gameDate < now;
+      const isPast = gameDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const isToday = gameDate.toDateString() === now.toDateString();
 
       // Format date

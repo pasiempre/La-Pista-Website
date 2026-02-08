@@ -712,7 +712,14 @@
     // Populate game select for RSVPs
     function populateGameSelect() {
       const select = document.getElementById('rsvp-game-select');
-      const upcomingGames = gamesData.filter(g => new Date(g.date) >= new Date() && g.status !== 'cancelled');
+      // Use UTC date components to avoid timezone shift (midnight UTC = "yesterday" in US timezones)
+      const nowDate = new Date();
+      nowDate.setHours(0, 0, 0, 0);
+      const upcomingGames = gamesData.filter(g => {
+        const d = new Date(g.date);
+        const gameDate = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+        return gameDate >= nowDate && g.status !== 'cancelled';
+      });
 
       select.innerHTML = '<option value="">Select a game...</option>' +
         upcomingGames.map(g => {
