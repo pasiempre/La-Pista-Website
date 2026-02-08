@@ -893,10 +893,13 @@
           games.sort((a, b) => new Date(a.date) - new Date(b.date));
           
           // Split into columns based on timing
-          const now = new Date();
+          // Compare against start of today to avoid timezone issues
+          // (game dates are stored as midnight UTC, which can be "yesterday" in local time)
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
           const upcoming = games.filter(g => {
             const gameDate = new Date(g.date);
-            return gameDate > now;
+            return gameDate >= today;
           });
           
           // Handle no upcoming games
