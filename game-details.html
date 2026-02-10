@@ -1087,7 +1087,7 @@
       }
 
       // Load game data on page load
-      loadGameData();
+      const gameDataReady = loadGameData();
       
       // Auto-fill forms for logged-in users
       function autoFillFormsIfLoggedIn() {
@@ -1135,11 +1135,25 @@
       
       // Check if user can use Quick Book (logged in + has saved card)
       async function checkQuickBookAvailability() {
-        if (!AuthService.isAuthenticated()) return;
+        console.log('[QuickBook] Checking availability...');
+        
+        if (!AuthService.isAuthenticated()) {
+          console.log('[QuickBook] ❌ Not authenticated — skipping');
+          return;
+        }
+        console.log('[QuickBook] ✅ Authenticated as', AuthService.getUser()?.email);
+        
+        // Wait for game data to be loaded before checking Quick Book
+        await gameDataReady;
+        console.log('[QuickBook] ✅ Game data loaded — spotsRemaining:', gameData?.spotsRemaining);
         
         // Check if Stripe is configured (publishable key not placeholder)
         const stripeKey = LAPISTA_CONFIG.STRIPE_PUBLISHABLE_KEY;
-        if (!stripeKey || stripeKey.includes('YOUR_')) return;
+        if (!stripeKey || stripeKey.includes('YOUR_')) {
+          console.log('[QuickBook] ❌ Stripe key is placeholder — skipping');
+          return;
+        }
+        console.log('[QuickBook] ✅ Stripe key configured');
         
         try {
           const token = AuthService.getToken();
@@ -1147,25 +1161,37 @@
             headers: { 'Authorization': `Bearer ${token}` }
           });
           
+          console.log('[QuickBook] Payment methods response:', response.status);
+          
           // Skip if payment service not available (503)
-          if (!response.ok || response.status === 503) return;
+          if (!response.ok || response.status === 503) {
+            console.log('[QuickBook] ❌ Payment service unavailable — status:', response.status);
+            return;
+          }
           
           const data = await response.json();
           const cards = data.paymentMethods || [];
+          console.log('[QuickBook] Cards found:', cards.length, cards.map(c => `${c.brand} ••••${c.last4}`));
           
           if (cards.length > 0) {
             // User has saved cards - show Quick Book
             quickBookCard = cards[0]; // Use first card
             showQuickBookSection(quickBookCard);
+          } else {
+            console.log('[QuickBook] ❌ No saved cards — showing full form');
           }
         } catch (err) {
-          console.error('Error checking payment methods:', err);
+          console.error('[QuickBook] ❌ Error checking payment methods:', err);
         }
       }
       
       // Show Quick Book section
       function showQuickBookSection(card) {
-        if (!gameData || gameData.spotsRemaining === 0) return;
+        console.log('[QuickBook] showQuickBookSection called — gameData:', !!gameData, 'spotsRemaining:', gameData?.spotsRemaining);
+        if (!gameData || gameData.spotsRemaining === 0) {
+          console.log('[QuickBook] ❌ No game data or game full — aborting');
+          return;
+        }
         
         const section = document.getElementById('quick-book-section');
         const brandEl = document.getElementById('quick-card-brand');
