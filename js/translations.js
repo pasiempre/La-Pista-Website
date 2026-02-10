@@ -21,7 +21,7 @@ const TRANSLATIONS = {
     'hero.title1': 'PLAY.',
     'hero.title2': 'CONNECT.',
     'hero.title3': 'COMPETE.',
-    'hero.description': 'Join weekly pickup games at quality fields across Austin. All skill levels welcome. $5.99 per game.',
+    'hero.description': "Austin's most affordable pickup soccer. Weekly games at quality fields, all skill levels welcome.",
     'hero.cta': 'View Schedule',
     'hero.learnMore': 'Learn More',
 
@@ -273,7 +273,7 @@ const TRANSLATIONS = {
     'hero.title1': 'JUEGA.',
     'hero.title2': 'CONECTA.',
     'hero.title3': 'COMPITE.',
-    'hero.description': 'Únete a partidos semanales en canchas de calidad en Austin. Todos los niveles son bienvenidos. $5.99 por partido.',
+    'hero.description': 'El fútbol pickup más accesible de Austin. Partidos semanales en canchas de calidad, todos los niveles son bienvenidos.',
     'hero.cta': 'Ver Calendario',
     'hero.learnMore': 'Más Información',
 
