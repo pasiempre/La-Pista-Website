@@ -53,8 +53,9 @@ const AuthService = {
           const serverUser = await response.json();
           this._user = serverUser;
           localStorage.setItem('authUser', JSON.stringify(serverUser));
-        } else if (response.status === 401) {
+        } else if (response.status === 401 || response.status === 403) {
           // Token invalid/expired - clear auth
+          console.warn('[Auth] Token rejected (status ' + response.status + ') — clearing session');
           this._clearAuthData();
         }
       } catch (error) {
