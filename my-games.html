@@ -188,10 +188,10 @@
 
     // Update stats display
     function updateStats() {
-      const now = new Date();
+      const today = todayLocal();
       
-      const upcoming = allRsvps.filter(r => new Date(r.game?.date) >= now);
-      const past = allRsvps.filter(r => new Date(r.game?.date) < now);
+      const upcoming = allRsvps.filter(r => r.game?.date && gameLocalDate(r.game.date) >= today);
+      const past = allRsvps.filter(r => r.game?.date && gameLocalDate(r.game.date) < today);
 
       document.getElementById('stat-total').textContent = allRsvps.length;
       document.getElementById('stat-upcoming').textContent = upcoming.length;
@@ -200,9 +200,9 @@
 
     // Render games based on current tab
     function renderGames() {
-      const now = new Date();
-      const upcoming = allRsvps.filter(r => new Date(r.game?.date) >= now);
-      const past = allRsvps.filter(r => new Date(r.game?.date) < now);
+      const today = todayLocal();
+      const upcoming = allRsvps.filter(r => r.game?.date && gameLocalDate(r.game.date) >= today);
+      const past = allRsvps.filter(r => r.game?.date && gameLocalDate(r.game.date) < today);
 
       // Render upcoming
       const upcomingList = document.getElementById('upcoming-list');
@@ -232,12 +232,10 @@
     // Render a single game card
     function renderGameCard(rsvp) {
       const game = rsvp.game || {};
-      const rawDate = new Date(game.date);
-      // Use UTC components to avoid timezone shift (midnight UTC can be "yesterday" in CST)
-      const gameDate = new Date(rawDate.getUTCFullYear(), rawDate.getUTCMonth(), rawDate.getUTCDate());
-      const now = new Date();
-      const isPast = gameDate < new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const isToday = gameDate.toDateString() === now.toDateString();
+      const gameDate = gameLocalDate(game.date);
+      const today = todayLocal();
+      const isPast = gameDate < today;
+      const isToday = gameDate.toDateString() === today.toDateString();
 
       // Format date
       const dateStr = gameDate.toLocaleDateString('en-US', {

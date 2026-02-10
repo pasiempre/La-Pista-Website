@@ -39,6 +39,27 @@ const LAPISTA_CONFIG = {
 // Freeze config to prevent accidental modification
 Object.freeze(LAPISTA_CONFIG);
 
+/**
+ * Convert a UTC midnight date string to a local Date with the correct calendar date.
+ * Game dates are stored as midnight UTC (e.g. 2026-02-10T00:00:00Z).
+ * In US timezones this shifts to the previous evening (Feb 9 6pm CST),
+ * causing wrong dates to display. This helper extracts the UTC date
+ * components and creates a local Date so Feb 10 UTC = Feb 10 local.
+ */
+function gameLocalDate(dateStr) {
+  const d = new Date(dateStr);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+}
+
+/**
+ * Get "today" as midnight local time for date comparisons.
+ */
+function todayLocal() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}
+
 // Auto-update copyright year in footers
 document.addEventListener('DOMContentLoaded', function() {
   const yearElements = document.querySelectorAll('[data-year]');

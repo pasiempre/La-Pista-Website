@@ -344,7 +344,7 @@
             // Populate confirmation details
             document.getElementById('conf-code').textContent = '#' + rsvp.confirmationCode;
             document.getElementById('conf-game-title').textContent = game.title;
-            document.getElementById('conf-date').textContent = new Date(game.date).toLocaleDateString('en-US', { 
+            document.getElementById('conf-date').textContent = gameLocalDate(game.date).toLocaleDateString('en-US', { 
               weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
             });
             document.getElementById('conf-time').textContent = game.time;
@@ -479,7 +479,7 @@
 
       // Add to Calendar function - generates .ics file download
       function addToCalendar(game, rsvp) {
-        const gameDate = new Date(game.date);
+        const gameDate = gameLocalDate(game.date);
         // Parse time like "8:00 PM" into hours/minutes
         const timeMatch = game.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
         if (timeMatch) {
@@ -527,7 +527,7 @@ END:VCALENDAR`;
       // Share Game function - uses Web Share API or fallback
       function shareGame(game, rsvp) {
         const shareUrl = `${window.location.origin}/game-details.html?gameId=${game.gameId}`;
-        const shareText = `Join me for pickup soccer at ${game.venue.name}! ${game.title} on ${new Date(game.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at ${game.time}.`;
+        const shareText = `Join me for pickup soccer at ${game.venue.name}! ${game.title} on ${gameLocalDate(game.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at ${game.time}.`;
 
         // Try Web Share API (mobile/supported browsers)
         if (navigator.share) {

@@ -518,9 +518,9 @@
         }
 
         list.innerHTML = gamesData.map(game => {
-          const date = new Date(game.date);
+          const date = gameLocalDate(game.date);
           const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-          const isPast = date < new Date();
+          const isPast = date < todayLocal();
           const isCancelled = game.status === 'cancelled';
           const statusClass = isCancelled ? 'bg-red-100 text-red-700' :
                              isPast ? 'bg-zinc-100 text-zinc-500' :
@@ -712,14 +712,8 @@
     // Populate game select for RSVPs
     function populateGameSelect() {
       const select = document.getElementById('rsvp-game-select');
-      // Use UTC date components to avoid timezone shift (midnight UTC = "yesterday" in US timezones)
-      const nowDate = new Date();
-      nowDate.setHours(0, 0, 0, 0);
-      const upcomingGames = gamesData.filter(g => {
-        const d = new Date(g.date);
-        const gameDate = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-        return gameDate >= nowDate && g.status !== 'cancelled';
-      });
+      const today = todayLocal();
+      const upcomingGames = gamesData.filter(g => gameLocalDate(g.date) >= today && g.status !== 'cancelled');
 
       select.innerHTML = '<option value="">Select a game...</option>' +
         upcomingGames.map(g => {
@@ -836,7 +830,7 @@
       if (!currentRSVPs.length) return;
 
       const game = gamesData.find(g => g.gameId === currentGameId);
-      const dateStr = game ? new Date(game.date).toLocaleDateString('en-US') : currentGameId;
+      const dateStr = game ? gameLocalDate(game.date).toLocaleDateString('en-US') : currentGameId;
 
       const headers = ['#', 'First Name', 'Last Name', 'Email', 'Phone', 'Players', 'Amount', 'Payment', 'Checked In'];
       const rows = currentRSVPs.map((rsvp, index) => [

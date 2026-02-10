@@ -185,7 +185,7 @@
         // Populate details
         document.getElementById('detail-code').textContent = rsvp.confirmationCode;
         document.getElementById('detail-game').textContent = game.title;
-        document.getElementById('detail-date').textContent = new Date(game.date).toLocaleDateString('en-US', {
+        document.getElementById('detail-date').textContent = gameLocalDate(game.date).toLocaleDateString('en-US', {
           weekday: 'long', month: 'long', day: 'numeric'
         });
         document.getElementById('detail-players').textContent = rsvp.totalPlayers + ' player(s)';
