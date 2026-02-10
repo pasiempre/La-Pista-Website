@@ -579,7 +579,7 @@
                 PRICE
               </div>
               <div class="text-green-600 font-black text-sm">
-                $5.99
+                <span id="sidebar-price">$5.99</span>
                 <span class="text-zinc-400 font-medium">per person</span>
               </div>
               <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
@@ -1138,6 +1138,12 @@
         // Update time
         if (sbTime && game.time) {
           sbTime.textContent = game.time;
+        }
+        
+        // Update price
+        const sbPrice = document.getElementById('sidebar-price');
+        if (sbPrice && game.price != null) {
+          sbPrice.textContent = `$${game.price.toFixed(2)}`;
         }
         
         // Update spots (with safeguards to prevent negative values)
