@@ -44,6 +44,25 @@ if (!stripe) console.warn('⚠️  Stripe not configured - payments disabled');
 if (!resend) console.warn('⚠️  Resend not configured - emails disabled');
 
 // ============================================
+// CORS MIDDLEWARE (MUST BE BEFORE HELMET)
+// ============================================
+const ALLOWED_ORIGINS = [
+  FRONTEND_URL,
+  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3001', 'http://127.0.0.1:3001'] : [])
+];
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (server-to-server, Stripe webhooks, curl)
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    console.warn('⛔ CORS blocked origin:', origin);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
+console.log('📍 CORS: Restricted to', ALLOWED_ORIGINS.join(', '));
+
+// ============================================
 // SECURITY MIDDLEWARE
 // ============================================
 app.use(helmet({
@@ -113,6 +132,105 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
 }
 const JWT_SECRET = process.env.JWT_SECRET || 'lapista-dev-secret-change-in-production';
 const JWT_EXPIRES_IN = '7d'; // Token expires in 7 days
+
+// ============================================
+// GAME TIME HELPERS
+// ============================================
+
+/**
+ * Parse a game's date + time string into a real Date object (UTC-based for server).
+ * date is stored as midnight UTC, time is a string like "7:00 PM".
+ * We combine them using UTC date components to avoid timezone shifts.
+ */
+function parseGameStartTimeServer(game) {
+  const d = new Date(game.date);
+  // Use UTC date components — games are stored as midnight UTC for the intended day
+  // Apply CST offset (-6h) so 7:00 PM game on Feb 15 UTC → Feb 15 7PM CST = Feb 16 01:00 UTC
+  const year = d.getUTCFullYear();
+  const month = d.getUTCMonth();
+  const day = d.getUTCDate();
+  
+  let hours = 0, minutes = 0;
+  if (game.time) {
+    const match = game.time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match) {
+      hours = parseInt(match[1], 10);
+      minutes = parseInt(match[2], 10);
+      const period = match[3].toUpperCase();
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+    }
+  }
+  
+  // Convert Austin local time → UTC.
+  // CDT (UTC-5) during daylight saving, CST (UTC-6) otherwise.
+  const testDate = new Date(Date.UTC(year, month, day, hours + 6));
+  const isDST = isDaylightSaving(testDate);
+  const offset = isDST ? 5 : 6;
+  
+  return new Date(Date.UTC(year, month, day, hours + offset, minutes));
+}
+
+function isDaylightSaving(date) {
+  // US DST: second Sunday of March to first Sunday of November
+  const year = date.getUTCFullYear();
+  // Second Sunday of March
+  let marchFirst = new Date(Date.UTC(year, 2, 1));
+  let dstStart = new Date(Date.UTC(year, 2, 8 + (7 - marchFirst.getUTCDay()) % 7, 8)); // 2AM CST = 8AM UTC
+  // First Sunday of November
+  let novFirst = new Date(Date.UTC(year, 10, 1));
+  let dstEnd = new Date(Date.UTC(year, 10, 1 + (7 - novFirst.getUTCDay()) % 7, 7)); // 2AM CDT = 7AM UTC
+  
+  return date >= dstStart && date < dstEnd;
+}
+
+/**
+ * Auto-transition games to 'completed' status when they've ended.
+ * Called on each /api/games request to keep data fresh without a cron job.
+ * Throttled to run at most once per 60 seconds.
+ */
+let _lastAutoComplete = 0;
+const AUTO_COMPLETE_THROTTLE_MS = 60 * 1000; // 60 seconds
+
+async function autoCompleteGames() {
+  const now = Date.now();
+  if (now - _lastAutoComplete < AUTO_COMPLETE_THROTTLE_MS) return;
+  _lastAutoComplete = now;
+  
+  try {
+    const now = new Date();
+    // Find active games that might need completing
+    const activeGames = await Game.find({ 
+      status: { $in: ['open', 'scheduled', 'full', 'in-progress'] } 
+    });
+    
+    for (const game of activeGames) {
+      const startTime = parseGameStartTimeServer(game);
+      const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // +2 hours
+      
+      if (now >= endTime) {
+        game.status = 'completed';
+        await game.save();
+        console.log(`✅ Auto-completed game ${game.gameId} (ended at ${endTime.toISOString()})`);
+      } else if (now >= startTime && game.status !== 'in-progress') {
+        game.status = 'in-progress';
+        await game.save();
+        console.log(`⚽ Game ${game.gameId} is now in-progress (started at ${startTime.toISOString()})`);
+      }
+    }
+  } catch (err) {
+    console.error('Error auto-completing games:', err);
+  }
+}
+
+/**
+ * Check if a game has already started (for blocking new RSVPs).
+ */
+function hasGameStarted(game) {
+  const now = new Date();
+  const startTime = parseGameStartTimeServer(game);
+  return now >= startTime;
+}
 
 // ============================================
 // ADMIN SESSION MANAGEMENT (MongoDB-backed)
@@ -190,17 +308,6 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 
-// Middleware
-// 🔒 CORS: Restrict to frontend domain in production, allow all in development
-const corsOrigin = process.env.NODE_ENV === 'production'
-  ? [FRONTEND_URL, 'https://lapista-atx.com'].filter(Boolean)
-  : true;
-
-app.use(cors({
-  origin: corsOrigin,
-  credentials: true
-}));
-
 // Apply rate limiting to API routes
 app.use('/api/', apiLimiter);
 
@@ -240,9 +347,8 @@ app.use((req, res, next) => {
     '.json',                           // Config (manifest.json for PWA)
   ];
 
-  // Allowed directories (for paths without extensions)
+  // Allowed directory prefixes (for sub-paths without extensions)
   const allowedPaths = [
-    '/',              // Root index
     '/js/',           // JavaScript
     '/css/',          // Stylesheets
     '/images/',       // Images
@@ -260,6 +366,7 @@ app.use((req, res, next) => {
     '/SECURITY_ASSESSMENT.md', '/TODO.md', '/README.md',
     '/PRODUCTION_SETUP.md', '/TESTING.md',
     '/server.js', '/models.js',
+    '/search-rsvp.js',
   ];
   if (blockedFiles.some(f => req.path.toLowerCase() === f.toLowerCase())) {
     return res.status(404).send('Not found');
@@ -588,8 +695,11 @@ app.get('/api/health', (req, res) => {
 // Get all games
 app.get('/api/games', async (req, res) => {
   try {
-    // Include 'full' status so users can join waitlist
-    const games = await Game.find({ status: { $in: ['open', 'scheduled', 'full'] } })
+    // Auto-transition games that have started/ended
+    await autoCompleteGames();
+    
+    // Include 'full' and 'in-progress' status so frontend can display them appropriately
+    const games = await Game.find({ status: { $in: ['open', 'scheduled', 'full', 'in-progress'] } })
       .sort({ date: 1 });
     res.json(games);
   } catch (err) {
@@ -700,6 +810,11 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
+    // ⏰ Block RSVPs for games that have already started
+    if (hasGameStarted(game)) {
+      return res.status(400).json({ error: 'This game has already started. RSVPs are closed.' });
+    }
+
     // 🔒 Check for duplicate RSVP (same email + same game)
     const existingRSVP = await RSVP.findOne({
       gameId: sanitize(gameId),
@@ -798,6 +913,11 @@ app.post('/api/checkout', rsvpLimiter, async (req, res) => {
     const game = await Game.findOne({ gameId: sanitize(gameId) });
     if (!game) {
       return res.status(404).json({ error: 'Game not found' });
+    }
+
+    // ⏰ Block checkouts for games that have already started
+    if (hasGameStarted(game)) {
+      return res.status(400).json({ error: 'This game has already started. RSVPs are closed.' });
     }
 
     // 🔒 Check for duplicate RSVP (same email + same game)
@@ -911,6 +1031,21 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
       if (!game) {
         console.error('Game not found for webhook:', metadata.gameId);
         return res.status(400).json({ error: 'Game not found' });
+      }
+
+      // 🔒 Block booking if game has started since checkout was created
+      if (hasGameStarted(game)) {
+        console.warn('⚠️ Webhook rejected — game already started:', metadata.gameId, metadata.confirmationCode);
+        // Refund the payment automatically
+        try {
+          if (session.payment_intent) {
+            await stripe.refunds.create({ payment_intent: session.payment_intent });
+            console.log('💰 Auto-refunded payment for started game:', metadata.confirmationCode);
+          }
+        } catch (refundErr) {
+          console.error('❌ Failed to auto-refund:', refundErr.message);
+        }
+        return res.json({ received: true, rejected: 'game_started', refunded: true });
       }
 
       // 🔒 Check for duplicate RSVP to prevent webhook replay issues
@@ -1735,7 +1870,16 @@ app.post('/api/seed', async (req, res) => {
   }
 
   try {
-    // Clear existing data
+    // ⚠️ SAFETY: Check for existing RSVPs before wiping data
+    const existingRsvps = await RSVP.countDocuments({});
+    if (existingRsvps > 0) {
+      return res.status(400).json({ 
+        error: 'BLOCKED: Database has active RSVPs. Delete them manually before re-seeding.',
+        rsvpCount: existingRsvps
+      });
+    }
+    
+    // Clear existing data (only games/venues, NOT RSVPs unless forced)
     await Game.deleteMany({});
     await Venue.deleteMany({});
 
@@ -1769,7 +1913,7 @@ app.post('/api/seed', async (req, res) => {
       const targetDay = days.indexOf(dayOfWeek);
       const currentDay = today.getDay();
       let daysUntil = targetDay - currentDay;
-      if (daysUntil <= 0) daysUntil += 7;
+      if (daysUntil < 0) daysUntil += 7; // Include today if it matches (changed from <= 0)
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + daysUntil);
       return nextDate;
@@ -2631,6 +2775,11 @@ app.post('/api/payment-methods/charge', authenticateToken, async (req, res) => {
     // Check if game is open for booking (scheduled or open status)
     if (!['scheduled', 'open'].includes(game.status)) {
       return res.status(400).json({ error: 'Game is no longer available for booking' });
+    }
+
+    // ⏰ Block Quick Book for games that have already started
+    if (hasGameStarted(game)) {
+      return res.status(400).json({ error: 'This game has already started. Booking is closed.' });
     }
 
     // Calculate total

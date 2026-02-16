@@ -159,14 +159,14 @@
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col min-w-0 bg-[#FAFAFA]">
       <!-- Header -->
-      <header class="h-16 border-b border-zinc-200 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-sm z-10 sticky top-0 px-4 md:px-6">
-        <div class="flex items-center gap-4">
+      <header class="h-16 border-b border-zinc-200 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-sm z-10 sticky top-0 px-3 md:px-5">
+        <div class="flex items-center gap-3">
           <!-- Mobile Menu Button -->
           <button class="lg:hidden text-zinc-500" onclick="toggleMobileMenu()">
             <span class="iconify text-2xl" data-icon="lucide:menu" data-width="1.5"></span>
           </button>
           <a href="index.html" class="flex items-center group">
-            <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+            <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-[50px] w-[50px] object-contain group-hover:scale-110 transition-transform">
           </a>
           </div>
 
@@ -254,14 +254,39 @@
               </div>
             </div>
 
-            <div class="max-w-7xl mx-auto px-4 md:px-6 mb-12">
-              <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-4 border-y border-zinc-200 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 mb-8">
+              <!-- Section Header: Title + Count + Live Chip -->
+              <div class="flex items-center gap-3 mb-4 pt-2" id="schedule">
+                <span class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display italic">
+                  LIVE & UPCOMING
+                </span>
+                <span id="games-count" class="text-lg font-bold text-zinc-500 font-display">
+                  (Loading...)
+                </span>
+                <span id="live-chip" class="hidden px-2 py-0.5 rounded text-[10px] font-black bg-blue-500 text-white uppercase tracking-wider transform -skew-x-12 animate-pulse">
+                  <!-- Updated dynamically: "2 LIVE NOW" -->
+                </span>
+              </div>
+              <!-- Status Filter Chips -->
+              <div class="flex items-center gap-2 py-2">
+                <div id="status-filter-buttons" class="flex items-center gap-1 flex-wrap">
+                  <button data-status="all" class="status-btn px-3 py-1 text-xs font-bold uppercase bg-zinc-900 text-white rounded-full transition-all">All</button>
+                  <button data-status="bookable" class="status-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-green-50 hover:text-green-700 rounded-full transition-all flex items-center gap-1">
+                    <span class="iconify" data-icon="lucide:ticket" data-width="12"></span>Bookable
+                  </button>
+                  <button data-status="live" class="status-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-blue-50 hover:text-blue-700 rounded-full transition-all flex items-center gap-1">
+                    <span class="iconify" data-icon="lucide:radio" data-width="12"></span>Live
+                  </button>
+                  <button data-status="full" class="status-btn px-3 py-1 text-xs font-bold uppercase text-zinc-500 hover:bg-amber-50 hover:text-amber-700 rounded-full transition-all flex items-center gap-1">
+                    <span class="iconify" data-icon="lucide:users" data-width="12"></span>Full
+                  </button>
+                </div>
+              </div>
+              <!-- Region Filters + Search Row -->
+              <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-3 border-y border-zinc-200 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
                 <div class="flex items-center gap-2">
-                  <span class="iconify text-green-600" data-icon="lucide:filter" data-width="20"></span>
-                  <span class="text-sm font-black uppercase tracking-wide text-zinc-400" data-i18n="filter.label">
-                    FILTERS:
-                  </span>
-                  <div id="filter-buttons" class="flex items-center gap-1 ml-2">
+                  <span class="iconify text-green-600" data-icon="lucide:map-pin" data-width="18"></span>
+                  <div id="filter-buttons" class="flex items-center gap-1">
                     <button data-region="all" class="filter-btn px-3 py-1 text-xs font-bold uppercase bg-zinc-900 text-white rounded transition-all" data-i18n="filter.all">
                       ALL
                     </button>
@@ -282,27 +307,15 @@
                 </div>
               </div>
             </div>
-            <!-- Sprint Header -->
-            <div class="flex items-center gap-3 mb-6 group cursor-pointer border-b-2 border-zinc-200 pb-2 border-dashed max-w-7xl mx-auto px-4 md:px-0" id="schedule">
-              <span class="text-3xl font-black text-zinc-900 uppercase tracking-tighter font-display italic" data-i18n="game.upcoming">
-                UPCOMING GAMES
-              </span>
-              <span id="games-count" class="text-lg font-bold text-zinc-500 font-display">
-                (Loading...)
-              </span>
-              <span class="px-2 py-0.5 rounded text-xs font-black bg-green-500 text-white uppercase tracking-wider transform -skew-x-12">
-                ACTIVE
-              </span>
-            </div>
 
             <!-- Loading State -->
-            <div id="games-loading" class="flex flex-col items-center justify-center py-16 max-w-7xl mx-auto">
+            <div id="games-loading" class="flex flex-col items-center justify-center py-16 max-w-7xl mx-auto px-4 md:px-6">
               <div class="w-12 h-12 border-4 border-zinc-200 border-t-green-500 rounded-full animate-spin mb-4"></div>
               <p class="text-zinc-500 font-medium" data-i18n="misc.loading">Loading games...</p>
             </div>
 
             <!-- Error State -->
-            <div id="games-error" class="hidden flex flex-col items-center justify-center py-16 max-w-7xl mx-auto">
+            <div id="games-error" class="hidden flex flex-col items-center justify-center py-16 max-w-7xl mx-auto px-4 md:px-6">
               <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
                 <span class="iconify text-red-500 text-3xl" data-icon="lucide:alert-circle"></span>
               </div>
@@ -311,7 +324,7 @@
             </div>
 
             <!-- Dynamic Games Container -->
-            <div id="games-container" class="hidden flex flex-col md:flex-row h-auto gap-6 w-full max-w-7xl mx-auto justify-center">
+            <div id="games-container" class="hidden flex flex-col md:flex-row h-auto gap-6 w-full max-w-7xl mx-auto px-4 md:px-6 justify-center">
               <!-- Games will be loaded dynamically -->
             </div>
             <div class="py-24 border-t border-zinc-200 mt-20">
@@ -729,61 +742,106 @@
         return date.toLocaleDateString('en-US', { weekday: 'short' });
       }
 
-      // Create game card HTML
+      // Create game card HTML — redesigned with time as primary, status badges
       function createGameCard(game, isHot = false) {
-        // Ensure spotsRemaining is bounded between 0 and capacity
         const capacity = game.capacity || 24;
         const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
+        const filled = capacity - spotsRemaining;
+        const fillPercent = Math.round((filled / capacity) * 100);
         const isFull = spotsRemaining === 0;
-        const spotsText = isFull ? 'FULL' : `${spotsRemaining} SPOTS`;
-        const spotsClass = isFull
-          ? 'text-amber-600 border-amber-200 bg-amber-50'
-          : 'text-green-600 border-green-200 bg-green-50';
-        
-        // Full games get amber border, hot games get green border, default is zinc
-        let borderClass = 'border border-zinc-200';
-        if (isFull) {
-          borderClass = 'border-2 border-amber-400';
-        } else if (isHot) {
-          borderClass = 'border-2 border-green-500 shadow-lg';
-        }
+        const liveStatus = getGameLiveStatus(game);
         
         const venueName = game.venue?.name?.replace(' Fields', '') || 'TBD';
 
-        // Show different CTA for full games
-        const ctaText = isFull ? 'Join Waitlist →' : 'View Details →';
-        const ctaClass = isFull ? 'text-amber-600' : 'text-green-600';
-
-        // Badge for full games vs hot games vs normal
-        let badgeHtml = '';
-        if (isFull) {
-          badgeHtml = '<span class="text-[10px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded uppercase tracking-wide flex items-center gap-1"><span class="iconify" data-icon="lucide:clock" data-width="10"></span>GAME FULL</span>';
-        } else if (isHot) {
-          badgeHtml = '<span class="text-[10px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded uppercase tracking-wide">HOT 🔥</span>';
-        } else {
-          badgeHtml = `<span class="text-[10px] font-bold ${spotsClass} border px-1.5 py-0.5 rounded uppercase tracking-wide">${spotsText}</span>`;
+        // Status-based styling
+        let borderClass, bgClass, badgeHtml, ctaText, ctaClass;
+        
+        switch (liveStatus) {
+          case 'in-progress':
+            borderClass = 'border-2 border-blue-400';
+            bgClass = 'bg-blue-50/30';
+            badgeHtml = '<span class="text-[10px] font-bold text-white bg-blue-500 px-1.5 py-0.5 rounded uppercase tracking-wide flex items-center gap-1 animate-pulse"><span class="iconify" data-icon="lucide:radio" data-width="10"></span>IN PROGRESS</span>';
+            ctaText = 'View Game →';
+            ctaClass = 'text-blue-600';
+            break;
+          case 'starting-soon':
+            borderClass = 'border-2 border-orange-400';
+            bgClass = '';
+            badgeHtml = '<span class="text-[10px] font-bold text-white bg-orange-500 px-1.5 py-0.5 rounded uppercase tracking-wide flex items-center gap-1"><span class="iconify" data-icon="lucide:clock" data-width="10"></span>STARTING SOON</span>';
+            ctaText = isFull ? 'Join Waitlist →' : 'Book Now →';
+            ctaClass = 'text-orange-600';
+            break;
+          default:
+            if (isFull) {
+              borderClass = 'border-2 border-amber-400';
+              bgClass = 'bg-amber-50/30';
+              badgeHtml = '<span class="text-[10px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded uppercase tracking-wide flex items-center gap-1"><span class="iconify" data-icon="lucide:clock" data-width="10"></span>GAME FULL</span>';
+              ctaText = 'Join Waitlist →';
+              ctaClass = 'text-amber-600';
+            } else if (isHot) {
+              borderClass = 'border-2 border-green-500 shadow-lg';
+              bgClass = '';
+              badgeHtml = '<span class="text-[10px] font-bold text-white bg-green-600 px-1.5 py-0.5 rounded uppercase tracking-wide">FILLING FAST 🔥</span>';
+              ctaText = 'Book Now →';
+              ctaClass = 'text-green-600';
+            } else {
+              borderClass = 'border border-zinc-200';
+              bgClass = '';
+              const spotsClass = 'text-green-600 border-green-200 bg-green-50';
+              badgeHtml = `<span class="text-[10px] font-bold ${spotsClass} border px-1.5 py-0.5 rounded uppercase tracking-wide">${spotsRemaining} SPOTS</span>`;
+              ctaText = 'Book Now →';
+              ctaClass = 'text-green-600';
+            }
         }
 
+        // Progress bar color
+        const progressColor = isFull ? 'bg-amber-500' : fillPercent >= 70 ? 'bg-orange-500' : 'bg-green-500';
+
         return `
-          <a href="game-details.html?gameId=${game.gameId}" class="block bg-white ${borderClass} hover:border-green-500 transition-all group cursor-pointer rounded-md p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 hover:shadow-lg transition-transform duration-200 overflow-hidden${isFull ? ' bg-amber-50/30' : ''}">
-            <div class="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
-            <div class="flex items-center justify-between mb-2">
+          <a href="game-details.html?gameId=${encodeURIComponent(game.gameId)}" class="block ${bgClass} bg-white ${borderClass} hover:border-green-500 transition-all group cursor-pointer rounded-lg p-4 relative shadow-sm hover:shadow-md flex flex-col game-card hover:-translate-y-0.5 duration-200 overflow-hidden">
+            <div class="absolute inset-0 opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
+            <div class="flex items-center justify-between mb-3">
               <span class="text-[10px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                ${game.gameId}
+                ${escapeHtml(game.gameId)}
               </span>
               ${badgeHtml}
             </div>
-            <h3 class="text-xl font-bold text-zinc-900 mb-0.5 leading-tight font-display uppercase tracking-tight">
-              ${game.title}
-            </h3>
-            <div class="text-xs text-zinc-500 font-mono mb-4 flex items-center gap-1">
-              <span class="iconify" data-icon="lucide:map-pin" data-width="1.2"></span>
-              ${venueName} • ${formatGameDay(game)} ${game.time}
+            
+            <!-- Time as primary element -->
+            <div class="flex items-baseline gap-2 mb-1">
+              <span class="text-2xl font-black text-zinc-900 font-display tracking-tight">${escapeHtml(game.time) || 'TBD'}</span>
             </div>
-            <div class="mt-auto flex items-center justify-between pt-3 border-t ${isFull ? 'border-amber-200' : 'border-zinc-100'} w-full">
-              <span class="text-xs font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">$${game.price.toFixed(2)}</span>
+            
+            <!-- Title -->
+            <h3 class="text-sm font-bold text-zinc-600 mb-2 leading-tight uppercase tracking-wide">
+              ${escapeHtml(game.title)}
+            </h3>
+            
+            <!-- Venue -->
+            <div class="text-xs text-zinc-500 font-medium mb-1 flex items-center gap-1">
+              <span class="iconify text-zinc-400" data-icon="lucide:map-pin" data-width="12"></span>
+              ${escapeHtml(venueName)}
+            </div>
+            
+            <!-- Status subline -->
+            ${(() => { const sub = getCardSubline(game); return sub ? `<p class="text-[11px] font-bold uppercase tracking-wide ${sub.className} mb-2">${escapeHtml(sub.text)}</p>` : '<div class="mb-2"></div>'; })()}
+            
+            <!-- Spots progress bar -->
+            <div class="mb-3">
+              <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide mb-1">
+                <span class="text-zinc-400">${filled}/${capacity} Filled</span>
+                <span class="${isFull ? 'text-amber-600' : 'text-green-600'}">${isFull ? 'FULL' : spotsRemaining + ' left'}</span>
+              </div>
+              <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                <div class="${progressColor} h-full rounded-full transition-all duration-500" style="width: ${fillPercent}%"></div>
+              </div>
+            </div>
+            
+            <!-- Footer: price + CTA -->
+            <div class="mt-auto flex items-center justify-between pt-2 border-t ${isFull ? 'border-amber-200' : 'border-zinc-100'}">
+              <span class="text-sm font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">$${game.price.toFixed(2)}</span>
               <span class="text-[10px] font-bold uppercase tracking-wide ${ctaClass} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                ${isFull ? '<span class="iconify" data-icon="lucide:bell" data-width="12"></span>' : ''}${ctaText}
+                ${ctaText}
               </span>
             </div>
           </a>
@@ -794,7 +852,23 @@
       let gamesData = [];
       let allGamesData = [];
       let currentFilter = 'all';
+      let currentStatusFilter = 'all';
       let currentSearch = '';
+      let selectedCardId = null; // Track selected card across re-renders
+
+      // Get a human-readable subline for a game card based on live status
+      function getCardSubline(game) {
+        const liveStatus = getGameLiveStatus(game);
+        if (liveStatus === 'in-progress') return { text: 'Live now — RSVP closed', className: 'text-blue-500' };
+        if (liveStatus === 'completed') return { text: 'Completed', className: 'text-zinc-400' };
+        if (liveStatus === 'starting-soon') {
+          const startTime = parseGameStartTime(game.date, game.time);
+          const minsLeft = Math.max(1, Math.round((startTime.getTime() - Date.now()) / 60000));
+          return { text: `Starts in ${minsLeft} min`, className: 'text-orange-500' };
+        }
+        if (game.spotsRemaining === 0) return { text: 'Full — waitlist open', className: 'text-amber-500' };
+        return null; // No subline for normal bookable games
+      }
 
       // Map venues to regions
       const venueRegions = {
@@ -874,6 +948,7 @@
           // Note: Count will be updated after filtering to upcoming games only
           
           if (games.length === 0) {
+            allGamesData = []; gamesData = []; selectedCardId = null;
             containerEl.innerHTML = `
               <div class="text-center py-12 w-full">
                 <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -883,20 +958,26 @@
                 <p class="text-zinc-400 text-sm mt-2">${typeof I18N !== 'undefined' ? I18N.t('game.checkBack', 'Check back soon for new games!') : 'Check back soon for new games!'}</p>
               </div>
             `;
+            const liveChip = document.getElementById('live-chip');
+            if (liveChip) liveChip.classList.add('hidden');
+            const mobileCta = document.getElementById('mobile-sticky-cta');
+            if (mobileCta) mobileCta.classList.add('translate-y-full');
             return;
           }
 
           // Sort games by date
           games.sort((a, b) => new Date(a.date) - new Date(b.date));
           
-          // Filter to upcoming games only.
-          // gameLocalDate() handles the UTC→local timezone shift so
-          // 2026-02-10T00:00:00Z is treated as Feb 10 in any US timezone.
-          const today = todayLocal();
-          const upcoming = games.filter(g => gameLocalDate(g.date) >= today);
+          // Keep games that are still active (open, full, starting-soon, in-progress).
+          // In-progress games stay visible with a status badge; completed/cancelled are hidden.
+          const upcoming = games.filter(g => {
+            const liveStatus = getGameLiveStatus(g);
+            return liveStatus !== 'completed' && liveStatus !== 'cancelled';
+          });
           
           // Handle no upcoming games
           if (upcoming.length === 0) {
+            allGamesData = []; gamesData = []; selectedCardId = null;
             containerEl.innerHTML = `
               <div class="text-center py-12 w-full">
                 <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -906,60 +987,27 @@
                 <p class="text-zinc-400 text-sm mt-2">${typeof I18N !== 'undefined' ? I18N.t('game.checkBack', 'Check back soon for new games!') : 'Check back soon for new games!'}</p>
               </div>
             `;
-            countEl.textContent = `(${games.length} Total, 0 Upcoming)`;
+            countEl.textContent = `(0 Upcoming)`;
+            // Hide live chip — no games to be live
+            const liveChip = document.getElementById('live-chip');
+            if (liveChip) liveChip.classList.add('hidden');
+            // Reset mobile CTA to neutral so it doesn't reference a stale game
+            const mobileCta = document.getElementById('mobile-sticky-cta');
+            if (mobileCta) mobileCta.classList.add('translate-y-full');
             return;
           }
-          
-          // Find the "hottest" game (most spots filled, still available)
-          const hotGame = upcoming.reduce((hot, game) => {
-            const capacity = game.capacity || 24;
-            const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
-            const fillRate = (capacity - spotsRemaining) / capacity;
-            const hotCapacity = hot ? (hot.capacity || 24) : 24;
-            const hotSpotsRemaining = hot ? Math.max(0, Math.min(hot.spotsRemaining, hotCapacity)) : 0;
-            const hotFillRate = hot ? (hotCapacity - hotSpotsRemaining) / hotCapacity : 0;
-            return fillRate > hotFillRate && spotsRemaining > 0 ? game : hot;
-          }, null);
 
           // Store all upcoming games for filtering
           allGamesData = upcoming;
           gamesData = upcoming;
 
-          // Update count with actual upcoming games
-          countEl.textContent = `(${upcoming.length} Games This Week)`;
-
-          // Build HTML
-          let html = `
-            <!-- UPCOMING GAMES COLUMN -->
-            <div class="flex flex-col gap-3 w-full md:w-2/3">
-              <div class="flex items-center justify-between text-sm font-black text-zinc-400 uppercase tracking-widest mb-1 font-display">
-                <span>Upcoming</span>
-                <span class="bg-zinc-200 text-zinc-600 px-1.5 rounded text-xs">${upcoming.length}</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          `;
+          // Render with group-by-day layout
+          renderFilteredGames();
           
-          upcoming.forEach(game => {
-            const isHot = hotGame && game.gameId === hotGame.gameId;
-            html += createGameCard(game, isHot);
-          });
-          
-          html += `
-              </div>
-            </div>
-          `;
-
-          containerEl.innerHTML = html;
-          
-          // Initialize filter functionality
-          initializeFilters();
-          
-          // Re-attach click handlers for sidebar
-          attachCardHandlers();
-          
-          // Update sidebar with first game
-          if (upcoming.length > 0) {
-            updateSidebar(upcoming[0]);
+          // Initialize filter functionality (only once — avoid duplicate listeners)
+          if (!initializeFilters._done) {
+            initializeFilters();
+            initializeFilters._done = true;
           }
 
         } catch (err) {
@@ -973,6 +1021,19 @@
       // Filter and search games
       function filterGames() {
         let filtered = allGamesData;
+
+        // Apply status filter
+        if (currentStatusFilter !== 'all') {
+          filtered = filtered.filter(game => {
+            const ls = getGameLiveStatus(game);
+            switch (currentStatusFilter) {
+              case 'bookable': return isGameBookable(game);
+              case 'live': return ls === 'in-progress' || ls === 'starting-soon';
+              case 'full': return game.spotsRemaining === 0 && ls !== 'completed' && ls !== 'cancelled';
+              default: return true;
+            }
+          });
+        }
 
         // Apply region filter
         if (currentFilter !== 'all') {
@@ -993,7 +1054,7 @@
         return filtered;
       }
 
-      // Render filtered games
+      // Render filtered games — grouped by day with date headers
       function renderFilteredGames() {
         const containerEl = document.getElementById('games-container');
         const countEl = document.getElementById('games-count');
@@ -1012,11 +1073,16 @@
             </div>
           `;
           countEl.textContent = `(0 of ${allGamesData.length} Games)`;
+          // Hide live chip when no results match
+          const liveChip = document.getElementById('live-chip');
+          if (liveChip) liveChip.classList.add('hidden');
           return;
         }
 
-        // Find the "hottest" game
+        // Find the "hottest" game (most filled, still bookable)
         const hotGame = filtered.reduce((hot, game) => {
+          const liveStatus = getGameLiveStatus(game);
+          if (liveStatus === 'in-progress') return hot; // Skip in-progress for "hot"
           const capacity = game.capacity || 24;
           const spotsRemaining = Math.max(0, Math.min(game.spotsRemaining, capacity));
           const fillRate = (capacity - spotsRemaining) / capacity;
@@ -1026,60 +1092,148 @@
           return fillRate > hotFillRate && spotsRemaining > 0 ? game : hot;
         }, null);
 
-        // Build HTML
-        let html = `
-          <!-- UPCOMING GAMES COLUMN -->
-          <div class="flex flex-col gap-3 w-full md:w-2/3">
-            <div class="flex items-center justify-between text-sm font-black text-zinc-400 uppercase tracking-widest mb-1 font-display">
-              <span>Upcoming</span>
-              <span class="bg-zinc-200 text-zinc-600 px-1.5 rounded text-xs">${filtered.length}</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        `;
+        // Group games by date
+        const today = todayLocal();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
         
+        const groupedByDate = {};
         filtered.forEach(game => {
-          const isHot = hotGame && game.gameId === hotGame.gameId;
-          html += createGameCard(game, isHot);
+          const dateKey = gameLocalDate(game.date).toISOString().split('T')[0];
+          if (!groupedByDate[dateKey]) groupedByDate[dateKey] = [];
+          groupedByDate[dateKey].push(game);
+        });
+
+        // Sort date keys chronologically
+        const sortedDateKeys = Object.keys(groupedByDate).sort();
+        
+        let html = '<div class="flex flex-col gap-6 w-full">';
+        
+        sortedDateKeys.forEach(dateKey => {
+          const games = groupedByDate[dateKey];
+          const dateObj = new Date(dateKey + 'T12:00:00'); // noon to avoid timezone issues
+          
+          // Date label: TODAY, TOMORROW, or "SUNDAY, FEB 15"
+          let dateLabel;
+          let dateSublabel = '';
+          const gameDate = new Date(dateObj);
+          gameDate.setHours(0, 0, 0, 0);
+          
+          if (gameDate.getTime() === today.getTime()) {
+            dateLabel = 'TODAY';
+            dateSublabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+          } else if (gameDate.getTime() === tomorrow.getTime()) {
+            dateLabel = 'TOMORROW';
+            dateSublabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+          } else {
+            dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase();
+          }
+          
+          // Section styling: "TODAY" gets a green accent, only show Live badge if games are actually in-progress
+          const isToday = gameDate.getTime() === today.getTime();
+          const hasLiveGames = isToday && games.some(g => getGameLiveStatus(g) === 'in-progress');
+          const headerBorder = isToday ? 'border-l-4 border-green-500 pl-3' : '';
+          const todayBadge = hasLiveGames ? '<span class="ml-2 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded uppercase tracking-wider animate-pulse">Live</span>' : '';
+          
+          html += `
+            <div class="game-day-group">
+              <div class="flex items-center gap-3 mb-3 ${headerBorder}">
+                <h3 class="text-sm font-black text-zinc-900 uppercase tracking-widest font-display">${dateLabel}${todayBadge}</h3>
+                ${dateSublabel ? `<span class="text-xs text-zinc-400 font-medium">${dateSublabel}</span>` : ''}
+                <span class="text-[10px] font-bold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">${games.length} ${games.length === 1 ? 'game' : 'games'}</span>
+                <div class="flex-1 h-px bg-zinc-200"></div>
+              </div>
+              <!-- Tailwind safelist: grid-cols-1 grid-cols-2 grid-cols-3 sm:grid-cols-2 -->
+              <div class="${games.length === 1 ? 'max-w-sm mx-auto' : 'grid grid-cols-1 sm:grid-cols-2 gap-3'}">
+          `;
+          
+          games.forEach(game => {
+            const isHot = hotGame && game.gameId === hotGame.gameId;
+            html += createGameCard(game, isHot);
+          });
+          
+          html += `
+              </div>
+            </div>
+          `;
         });
         
-        html += `
-            </div>
-          </div>
-        `;
+        html += '</div>';
 
         containerEl.innerHTML = html;
-        countEl.textContent = currentFilter === 'all' && !currentSearch 
-          ? `(${filtered.length} Games This Week)` 
+        containerEl.classList.remove('hidden');
+        
+        // Track rendered status for auto-refresh diffing
+        filtered.forEach(g => { g._lastRenderedStatus = getGameLiveStatus(g); });
+        
+        countEl.textContent = currentFilter === 'all' && currentStatusFilter === 'all' && !currentSearch 
+          ? `(${filtered.length} Games)` 
           : `(${filtered.length} of ${allGamesData.length} Games)`;
+
+        // Update live chip
+        const liveCount = filtered.filter(g => getGameLiveStatus(g) === 'in-progress').length;
+        const liveChip = document.getElementById('live-chip');
+        if (liveChip) {
+          if (liveCount > 0) {
+            liveChip.textContent = `${liveCount} LIVE NOW`;
+            liveChip.classList.remove('hidden');
+          } else {
+            liveChip.classList.add('hidden');
+          }
+        }
 
         // Re-attach click handlers for sidebar
         attachCardHandlers();
 
-        // Update sidebar with first game
+        // Restore selected card or default to first
         if (filtered.length > 0) {
-          updateSidebar(filtered[0]);
+          const selectedGame = selectedCardId && filtered.find(g => g.gameId === selectedCardId);
+          updateSidebar(selectedGame || filtered[0]);
+          // Re-highlight selected card
+          if (selectedGame) {
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(c => {
+              const href = c.getAttribute('href');
+              const cId = new URLSearchParams(href.split('?')[1]).get('gameId');
+              if (cId === selectedCardId) c.classList.add('ring-4', 'ring-green-500/30');
+            });
+          }
         }
       }
 
       // Initialize filter buttons
       function initializeFilters() {
         const filterBtns = document.querySelectorAll('.filter-btn');
+        const statusBtns = document.querySelectorAll('.status-btn');
         const searchInput = document.getElementById('game-search');
 
-        // Filter button click handlers
+        // Status filter chip handlers
+        statusBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            statusBtns.forEach(b => {
+              b.classList.remove('bg-zinc-900', 'text-white');
+              b.classList.add('text-zinc-500');
+            });
+            btn.classList.remove('text-zinc-500');
+            btn.classList.add('bg-zinc-900', 'text-white');
+            currentStatusFilter = btn.dataset.status;
+            renderFilteredGames();
+            syncFiltersToURL();
+          });
+        });
+
+        // Region filter button click handlers
         filterBtns.forEach(btn => {
           btn.addEventListener('click', () => {
-            // Update active state
             filterBtns.forEach(b => {
               b.classList.remove('bg-zinc-900', 'text-white');
               b.classList.add('text-zinc-500', 'hover:bg-zinc-200');
             });
             btn.classList.remove('text-zinc-500', 'hover:bg-zinc-200');
             btn.classList.add('bg-zinc-900', 'text-white');
-
-            // Apply filter
             currentFilter = btn.dataset.region;
             renderFilteredGames();
+            syncFiltersToURL();
           });
         });
 
@@ -1090,7 +1244,8 @@
           searchTimeout = setTimeout(() => {
             currentSearch = e.target.value;
             renderFilteredGames();
-          }, 300); // 300ms debounce
+            syncFiltersToURL();
+          }, 300);
         });
 
         // Clear search on Escape
@@ -1099,6 +1254,7 @@
             searchInput.value = '';
             currentSearch = '';
             renderFilteredGames();
+            syncFiltersToURL();
           }
         });
       }
@@ -1114,6 +1270,8 @@
         const sbProgress = document.getElementById('sidebar-progress');
         const rsvpBtn = document.getElementById('sidebar-rsvp-btn');
         const detailsLink = document.getElementById('sidebar-details-link');
+        const liveStatus = getGameLiveStatus(game);
+        const bookable = isGameBookable(game);
 
         if (sbTitle) sbTitle.innerText = game.title;
         if (sbDate) {
@@ -1129,7 +1287,7 @@
         if (sbVenue && game.venue) {
           const addressParts = game.venue.address.split(',');
           if (addressParts.length >= 2) {
-            sbVenue.innerHTML = `${addressParts[0]},<br>${addressParts.slice(1).join(',').trim()}`;
+            sbVenue.innerHTML = `${escapeHtml(addressParts[0])},<br>${escapeHtml(addressParts.slice(1).join(',').trim())}`;
           } else {
             sbVenue.textContent = game.venue.address;
           }
@@ -1159,14 +1317,52 @@
 
         // Update links
         const gameUrl = `game-details.html?gameId=${game.gameId}`;
-        if (rsvpBtn) rsvpBtn.href = gameUrl;
+        if (rsvpBtn) {
+          rsvpBtn.href = gameUrl;
+          // Update CTA based on live status
+          if (liveStatus === 'in-progress') {
+            rsvpBtn.innerHTML = '<span class="iconify inline-block mr-2" data-icon="lucide:radio" data-width="1.2"></span>Game In Progress';
+            rsvpBtn.className = 'block w-full py-3 bg-blue-500 text-white font-bold uppercase tracking-wide rounded shadow-sm text-sm text-center cursor-default';
+          } else if (liveStatus === 'completed') {
+            rsvpBtn.innerHTML = '<span class="iconify inline-block mr-2" data-icon="lucide:check-circle-2" data-width="1.2"></span>Game Completed';
+            rsvpBtn.className = 'block w-full py-3 bg-zinc-400 text-white font-bold uppercase tracking-wide rounded shadow-sm text-sm text-center cursor-default';
+          } else if (game.spotsRemaining === 0) {
+            rsvpBtn.innerHTML = '<span class="iconify inline-block mr-2" data-icon="lucide:clock" data-width="1.2"></span>Join Waitlist';
+            rsvpBtn.className = 'block w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold uppercase tracking-wide rounded shadow-sm transition-all text-sm text-center';
+          } else {
+            rsvpBtn.innerHTML = '<span class="iconify inline-block mr-2" data-icon="lucide:ticket" data-width="1.2"></span>Book This Game';
+            rsvpBtn.className = 'block w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-wide rounded shadow-sm transition-all text-sm text-center';
+          }
+        }
         if (detailsLink) detailsLink.href = gameUrl;
         
         // Also update mobile sticky CTA
         const mobileCTAGame = document.getElementById('mobile-cta-game');
         const mobileCTABtn = document.getElementById('mobile-cta-btn');
-        if (mobileCTAGame) mobileCTAGame.textContent = game.title;
-        if (mobileCTABtn) mobileCTABtn.href = gameUrl;
+        if (mobileCTAGame) {
+          mobileCTAGame.textContent = game.title;
+        }
+        // Update mobile subtitle
+        const mobileCTASub = document.getElementById('mobile-cta-subtitle');
+        if (mobileCTASub) {
+          if (liveStatus === 'in-progress') mobileCTASub.textContent = 'Game is live now';
+          else if (liveStatus === 'completed') mobileCTASub.textContent = 'Game has ended';
+          else if (game.spotsRemaining === 0) mobileCTASub.textContent = 'Game is full — join waitlist';
+          else mobileCTASub.textContent = 'Tap to book your spot';
+        }
+        if (mobileCTABtn) {
+          mobileCTABtn.href = gameUrl;
+          if (liveStatus === 'in-progress') {
+            mobileCTABtn.innerHTML = '<span class="iconify" data-icon="lucide:radio" data-width="16"></span>View Live';
+            mobileCTABtn.className = 'px-6 py-3 bg-blue-500 text-white font-bold text-sm uppercase rounded-md shadow-sm flex items-center gap-2 flex-shrink-0';
+          } else if (!bookable) {
+            mobileCTABtn.innerHTML = '<span class="iconify" data-icon="lucide:eye" data-width="16"></span>View';
+            mobileCTABtn.className = 'px-6 py-3 bg-zinc-400 text-white font-bold text-sm uppercase rounded-md shadow-sm flex items-center gap-2 flex-shrink-0';
+          } else {
+            mobileCTABtn.innerHTML = '<span class="iconify" data-icon="lucide:ticket" data-width="16"></span>Book Now';
+            mobileCTABtn.className = 'px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-sm uppercase rounded-md shadow-sm transition-all flex items-center gap-2 flex-shrink-0';
+          }
+        }
       }
 
       // Attach click handlers to game cards
@@ -1186,6 +1382,7 @@
               const game = gamesData.find(g => g.gameId === gameId);
               
               if (game) {
+                selectedCardId = game.gameId;
                 updateSidebar(game);
               }
             }
@@ -1193,11 +1390,90 @@
         });
       }
 
+      // --- Phase 4: URL param sync / restore ---
+
+      /** Push current filter state to URL without page reload */
+      function syncFiltersToURL() {
+        const params = new URLSearchParams();
+        if (currentFilter !== 'all') params.set('region', currentFilter);
+        if (currentStatusFilter !== 'all') params.set('status', currentStatusFilter);
+        if (currentSearch.trim()) params.set('q', currentSearch.trim());
+        const qs = params.toString();
+        const url = qs ? `${window.location.pathname}?${qs}${window.location.hash}` : `${window.location.pathname}${window.location.hash}`;
+        history.pushState({ region: currentFilter, status: currentStatusFilter, q: currentSearch }, '', url);
+      }
+
+      /** Read URL params and apply filter state (called on load and popstate) */
+      function restoreFiltersFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        currentFilter = params.get('region') || 'all';
+        currentStatusFilter = params.get('status') || 'all';
+        currentSearch = params.get('q') || '';
+
+        // Sync UI chips
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-zinc-900', 'text-white');
+          b.classList.add('text-zinc-500', 'hover:bg-zinc-200');
+          if (b.dataset.region === currentFilter) {
+            b.classList.remove('text-zinc-500', 'hover:bg-zinc-200');
+            b.classList.add('bg-zinc-900', 'text-white');
+          }
+        });
+        document.querySelectorAll('.status-btn').forEach(b => {
+          b.classList.remove('bg-zinc-900', 'text-white');
+          b.classList.add('text-zinc-500');
+          if (b.dataset.status === currentStatusFilter) {
+            b.classList.remove('text-zinc-500');
+            b.classList.add('bg-zinc-900', 'text-white');
+          }
+        });
+        const searchInput = document.getElementById('game-search');
+        if (searchInput) searchInput.value = currentSearch;
+      }
+
+      // Handle browser back/forward
+      window.addEventListener('popstate', () => {
+        restoreFiltersFromURL();
+        if (allGamesData.length > 0) renderFilteredGames();
+      });
+
       // Load games on page load
       document.addEventListener('DOMContentLoaded', function() {
+        // Restore filter state from URL params before loading games
+        restoreFiltersFromURL();
+
         loadGames().catch(err => {
           // Error handled in loadGames
         });
+        
+        // Auto-refresh: re-render every 60s so status transitions appear live.
+        // Only re-fetches from API every 5 minutes; intermediate refreshes just re-render
+        // cached data with updated getGameLiveStatus() calculations.
+        let _lastApiFetch = Date.now();
+        const REFRESH_INTERVAL = 60 * 1000;      // re-render every 60s
+        const API_REFRESH_INTERVAL = 5 * 60 * 1000; // re-fetch from API every 5min
+        
+        setInterval(async () => {
+          if (!allGamesData || allGamesData.length === 0) return;
+          
+          // Always check if any game's computed status changed since last render.
+          // This catches every transition (starting-soon → in-progress → completed)
+          // even when no games are currently live.
+          const needsRerender = allGamesData.some(g => {
+            return getGameLiveStatus(g) !== g._lastRenderedStatus;
+          });
+          
+          if (needsRerender || Date.now() - _lastApiFetch > API_REFRESH_INTERVAL) {
+            if (Date.now() - _lastApiFetch > API_REFRESH_INTERVAL) {
+              // Full refresh from API
+              _lastApiFetch = Date.now();
+              await loadGames();
+            } else {
+              // Just re-render with updated status calculations
+              renderFilteredGames();
+            }
+          }
+        }, REFRESH_INTERVAL);
         
         // Load platform stats for user count badge
         loadPlatformStats();
@@ -1226,7 +1502,7 @@
       <div class="flex items-center justify-between gap-4 max-w-lg mx-auto">
         <div class="flex-1 min-w-0">
           <p id="mobile-cta-game" class="text-sm font-bold text-zinc-900 truncate">Sunday Pickup</p>
-          <p class="text-xs text-zinc-500">Tap to book your spot</p>
+          <p id="mobile-cta-subtitle" class="text-xs text-zinc-500">Tap to book your spot</p>
         </div>
         <a id="mobile-cta-btn" href="game-details.html?gameId=LP-001" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold text-sm uppercase rounded-md shadow-sm transition-all flex items-center gap-2 flex-shrink-0">
           <span class="iconify" data-icon="lucide:ticket" data-width="16"></span>
@@ -1236,12 +1512,12 @@
     </div>
     
     <script>
-      // Show mobile CTA when user scrolls past hero
+      // Show mobile CTA when user scrolls past hero — only if games are available
       const mobileCta = document.getElementById('mobile-sticky-cta');
       const mainContainer = document.getElementById('main-scroll-container');
       if (mobileCta && mainContainer) {
         mainContainer.addEventListener('scroll', () => {
-          if (mainContainer.scrollTop > 400) {
+          if (allGamesData && allGamesData.length > 0 && mainContainer.scrollTop > 400) {
             mobileCta.classList.remove('translate-y-full');
           } else {
             mobileCta.classList.add('translate-y-full');

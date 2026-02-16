@@ -59,14 +59,14 @@
     </aside>
 
     <!-- Navbar (Standalone) -->
-    <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-4 md:px-6 flex items-center justify-between">
-      <div class="flex items-center gap-3">
+    <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-3 md:px-5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
         <!-- Mobile Menu Button -->
         <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()">
           <span class="iconify text-2xl" data-icon="lucide:menu"></span>
         </button>
         <a href="index.html" class="flex items-center group">
-          <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-10 w-10 object-contain group-hover:scale-110 transition-transform">
+          <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-[50px] w-[50px] object-contain group-hover:scale-110 transition-transform">
         </a>
       </div>
 
@@ -363,6 +363,37 @@
                 <span id="waitlist-count">0</span> people on waitlist
               </p>
             </form>
+          </div>
+        </div>
+
+        <!-- Next Available Game Module (shown when current game is non-bookable) -->
+        <div id="next-game-module" class="hidden bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl overflow-hidden mb-6">
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="iconify text-green-600" data-icon="lucide:arrow-right-circle" data-width="20"></span>
+              <h3 class="text-sm font-black text-green-800 uppercase tracking-tight font-display">Next Available Game</h3>
+            </div>
+            <a id="next-game-card" href="#" class="block bg-white border border-green-200 rounded-lg p-4 hover:border-green-400 hover:shadow-md transition-all group">
+              <div class="flex items-center justify-between mb-2">
+                <span id="next-game-badge" class="text-[10px] font-bold text-green-600 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded uppercase tracking-wide">LP-000</span>
+                <span id="next-game-spots" class="text-[10px] font-bold text-green-600">0 spots</span>
+              </div>
+              <p id="next-game-time" class="text-xl font-black text-zinc-900 font-display tracking-tight mb-1">7:00 PM</p>
+              <p id="next-game-title" class="text-sm font-bold text-zinc-600 uppercase tracking-wide mb-1">Sunday Pickup</p>
+              <div class="flex items-center gap-1 text-xs text-zinc-500 font-medium mb-3">
+                <span class="iconify text-zinc-400" data-icon="lucide:calendar" data-width="12"></span>
+                <span id="next-game-date">Feb 22, 2026</span>
+                <span class="mx-1">·</span>
+                <span class="iconify text-zinc-400" data-icon="lucide:map-pin" data-width="12"></span>
+                <span id="next-game-venue">Venue</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span id="next-game-price" class="text-sm font-black text-green-600">$5.99</span>
+                <span id="next-game-cta" class="text-[10px] font-bold uppercase tracking-wide text-green-600 group-hover:underline flex items-center gap-1">
+                  Book Now →
+                </span>
+              </div>
+            </a>
           </div>
         </div>
 
@@ -765,7 +796,7 @@
           // Update time
           const timeDiv = document.querySelector('.font-mono.text-sm');
           if (timeDiv && gameData.time) {
-            timeDiv.innerHTML = `<span class="iconify" data-icon="lucide:clock" data-width="1.2em"></span> ${gameData.time}`;
+            timeDiv.innerHTML = `<span class="iconify" data-icon="lucide:clock" data-width="1.2em"></span> ${escapeHtml(gameData.time)}`;
           }
           
           // Update price display
@@ -783,6 +814,11 @@
             showWaitlistSection();
           }
 
+          // Check if game has started/completed/cancelled — show status banner
+          if (!isGameActive(gameData)) {
+            showGameStartedBanner(getGameLiveStatus(gameData));
+          }
+
           // Load who's playing list
           loadPlayers();
 
@@ -794,6 +830,22 @@
 
         } catch (err) {
           console.error('Failed to load game:', err);
+          // Show user-facing error fallback
+          const contentEl = document.getElementById('game-content');
+          if (contentEl) {
+            contentEl.innerHTML = `
+              <div class="text-center py-16 px-4">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="iconify text-red-400 text-3xl" data-icon="lucide:wifi-off"></span>
+                </div>
+                <h2 class="text-lg font-bold text-zinc-900 mb-2">Unable to Load Game</h2>
+                <p class="text-zinc-500 text-sm mb-6">There was a problem connecting to the server. Please check your connection and try again.</p>
+                <button onclick="location.reload()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold text-sm uppercase rounded-md shadow-sm transition-all">
+                  Try Again
+                </button>
+              </div>
+            `;
+          }
         }
       }
 
@@ -879,13 +931,25 @@
         // Use game.expectations if defined in database, otherwise use venue-specific or defaults
         let expectations = gameData.expectations || venueExpectations[gameData.venue?.name] || defaultExpectations;
         
-        // Build the HTML
-        expectationsList.innerHTML = expectations.map(exp => `
-          <li class="flex items-start gap-3">
-            <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
-            <span class="text-sm font-medium text-zinc-700">${exp}</span>
-          </li>
-        `).join('');
+        // Build list safely via DOM — expectations may come from DB/admin input
+        expectationsList.innerHTML = '';
+        expectations.forEach(exp => {
+          const li = document.createElement('li');
+          li.className = 'flex items-start gap-3';
+
+          const icon = document.createElement('span');
+          icon.className = 'iconify text-green-500 mt-1';
+          icon.setAttribute('data-icon', 'lucide:check-circle-2');
+          icon.setAttribute('data-width', '1.2em');
+
+          const text = document.createElement('span');
+          text.className = 'text-sm font-medium text-zinc-700';
+          text.textContent = exp; // textContent — safe, no HTML injection
+
+          li.appendChild(icon);
+          li.appendChild(text);
+          expectationsList.appendChild(li);
+        });
       }
 
       // Update availability display
@@ -1088,6 +1152,23 @@
 
       // Load game data on page load
       const gameDataReady = loadGameData();
+
+      // Auto-refresh: re-check game status every 60s so live transitions
+      // (starting-soon → in-progress → completed) appear without manual reload.
+      let _gameLastStatus = null;
+      setInterval(() => {
+        if (!gameData) return;
+        const currentStatus = getGameLiveStatus(gameData);
+        if (currentStatus !== _gameLastStatus) {
+          _gameLastStatus = currentStatus;
+          // Status changed — update the banner / booking UI
+          if (!isGameActive(gameData)) {
+            showGameStartedBanner(currentStatus);
+          }
+          // Update availability display in case spots changed
+          if (typeof updateAvailabilityDisplay === 'function') updateAvailabilityDisplay();
+        }
+      }, 60 * 1000);
       
       // Auto-fill forms for logged-in users
       function autoFillFormsIfLoggedIn() {
@@ -1169,6 +1250,8 @@
       // Show Quick Book section
       function showQuickBookSection(card) {
         if (!gameData || gameData.spotsRemaining === 0) return;
+        // Block Quick Book if game is no longer bookable
+        if (!isGameBookable(gameData)) return;
         
         const section = document.getElementById('quick-book-section');
         const brandEl = document.getElementById('quick-card-brand');
@@ -1550,6 +1633,124 @@
         document.getElementById('rsvp-form-container').classList.add('hidden');
         document.getElementById('form-section-title').textContent = 'Game Full';
         loadWaitlistCount();
+        loadNextGame(); // Show next available game as alternative
+      }
+
+      // Show banner when game is not bookable — block all booking UI
+      function showGameStartedBanner(status) {
+        const isCompleted = status === 'completed';
+        const isCancelled = status === 'cancelled';
+        
+        let label, icon, bgClass, textColor, iconColor, msg;
+        
+        if (isCancelled) {
+          label = 'Game Cancelled';
+          icon = 'lucide:x-circle';
+          bgClass = 'from-red-50 to-red-50/50 border-red-300';
+          textColor = 'text-red-700';
+          iconColor = 'text-red-400';
+          msg = 'This game has been cancelled.';
+        } else if (isCompleted) {
+          label = 'Game Completed';
+          icon = 'lucide:check-circle-2';
+          bgClass = 'from-zinc-100 to-zinc-50 border-zinc-300';
+          textColor = 'text-zinc-600';
+          iconColor = 'text-zinc-400';
+          msg = 'This game has ended. Check out upcoming games below.';
+        } else {
+          label = 'Game In Progress';
+          icon = 'lucide:timer';
+          bgClass = 'from-blue-50 to-indigo-50 border-blue-300';
+          textColor = 'text-blue-700';
+          iconColor = 'text-blue-500';
+          msg = 'This game has already started. RSVPs are closed.';
+        }
+
+        // Hide Quick Book and RSVP form
+        const quickBookSection = document.getElementById('quick-book-section');
+        if (quickBookSection) quickBookSection.classList.add('hidden');
+        const rsvpForm = document.getElementById('rsvp-form-container');
+        if (rsvpForm) rsvpForm.classList.add('hidden');
+        const waitlistSection = document.getElementById('waitlist-section');
+        if (waitlistSection) waitlistSection.classList.add('hidden');
+
+        // Update the form section title
+        const formTitle = document.getElementById('form-section-title');
+        if (formTitle) formTitle.textContent = label;
+
+        // Reuse existing banner if present (idempotent across polling cycles)
+        let banner = document.getElementById('game-status-banner');
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'game-status-banner';
+          const formCol = rsvpForm ? rsvpForm.parentElement : document.querySelector('.lg\\:col-span-1');
+          if (formCol) formCol.appendChild(banner);
+        }
+        banner.className = `bg-gradient-to-br ${bgClass} border-2 rounded-xl p-6 text-center`;
+        banner.innerHTML = `
+          <span class="iconify ${iconColor} text-4xl mx-auto mb-3" data-icon="${icon}" data-width="2.5em"></span>
+          <h3 class="text-lg font-bold ${textColor} mb-1">${label}</h3>
+          <p class="text-sm ${textColor} opacity-75">${msg}</p>
+          <a href="/" class="inline-block mt-4 text-sm font-semibold text-green-600 hover:text-green-700 underline underline-offset-2">← Browse Upcoming Games</a>
+        `;
+
+        loadNextGame(); // Show next available game as alternative
+      }
+
+      /**
+       * Fetch all games and show the best "next available" option.
+       * Priority: same venue first, then nearest upcoming with spots.
+       */
+      async function loadNextGame() {
+        try {
+          const res = await fetch(`${API_URL}/api/games`);
+          if (!res.ok) return;
+          const allGames = await res.json();
+
+          // Filter to bookable upcoming games (exclude current game)
+          const candidates = allGames.filter(g => {
+            if (g.gameId === gameId) return false;
+            const ls = getGameLiveStatus(g);
+            return (ls === 'open' || ls === 'scheduled' || ls === 'starting-soon') && g.spotsRemaining > 0;
+          }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+          if (candidates.length === 0) return;
+
+          // Prefer same venue, then nearest date
+          const currentVenue = gameData?.venue?.name || '';
+          const sameVenue = candidates.find(g => g.venue?.name === currentVenue);
+          const nextGame = sameVenue || candidates[0];
+
+          // Populate the module
+          const mod = document.getElementById('next-game-module');
+          if (!mod) return;
+
+          const gDate = gameLocalDate(nextGame.date);
+          const dateStr = gDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          const venue = nextGame.venue?.name?.replace(' Fields', '') || 'TBD';
+          const spots = Math.max(0, Math.min(nextGame.spotsRemaining, nextGame.capacity || 24));
+
+          document.getElementById('next-game-card').href = `game-details.html?gameId=${encodeURIComponent(nextGame.gameId)}`;
+          document.getElementById('next-game-badge').textContent = nextGame.gameId;
+          document.getElementById('next-game-spots').textContent = `${spots} spots`;
+          document.getElementById('next-game-time').textContent = nextGame.time || 'TBD';
+          document.getElementById('next-game-title').textContent = nextGame.title;
+          document.getElementById('next-game-date').textContent = dateStr;
+          document.getElementById('next-game-venue').textContent = venue;
+          document.getElementById('next-game-price').textContent = `$${nextGame.price.toFixed(2)}`;
+
+          // CTA label
+          const ctaEl = document.getElementById('next-game-cta');
+          if (ctaEl) ctaEl.textContent = 'Book Now →';
+
+          // Show the module with label context
+          const heading = mod.querySelector('h3');
+          if (heading) heading.textContent = sameVenue ? 'Next Game at This Venue' : 'Next Available Game';
+
+          mod.classList.remove('hidden');
+        } catch (err) {
+          console.error('Failed to load next game:', err);
+        }
       }
       
       // Load waitlist count
@@ -1692,7 +1893,7 @@
               // Link indicator showing who registered them
               const linkSpan = document.createElement('span');
               linkSpan.className = 'text-[10px] text-zinc-400 flex items-center gap-0.5';
-              linkSpan.innerHTML = `<span class="iconify" data-icon="lucide:link" data-width="10"></span> ${firstName}`;
+              linkSpan.innerHTML = `<span class="iconify" data-icon="lucide:link" data-width="10"></span> ${escapeHtml(firstName)}`;
               guestChip.appendChild(linkSpan);
               
               listEl.appendChild(guestChip);
