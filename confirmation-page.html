@@ -417,6 +417,9 @@
             if (rsvp.paymentMethod === 'online' && rsvp.paymentStatus === 'paid') {
               statusEl.textContent = 'Paid via Card';
               statusEl.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
+            } else if (rsvp.paymentMethod === 'free') {
+              statusEl.textContent = 'Free Game';
+              statusEl.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
             } else if (rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash') {
               statusEl.textContent = 'Pay via CashApp';
               statusEl.classList.remove('bg-green-50', 'text-green-700', 'border-green-200');

@@ -478,7 +478,7 @@
 
                 <!-- Payment & Waiver -->
                 <div class="space-y-4">
-                  <div class="space-y-2">
+                  <div class="space-y-2" id="payment-method-section">
                     <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.paymentMethod">
                       Payment Method
                     </label>
@@ -801,7 +801,21 @@
           
           // Update price display
           const priceEl = document.querySelector('.text-3xl.font-black.text-green-600');
-          if (priceEl) priceEl.textContent = `$${gameData.price.toFixed(2)}`;
+          if (priceEl) {
+            if (gameData.price === 0) {
+              priceEl.textContent = 'FREE';
+            } else {
+              priceEl.textContent = `$${gameData.price.toFixed(2)}`;
+            }
+          }
+
+          // Free game: hide payment toggle, show free badge, update button
+          const paymentSection = document.getElementById('payment-method-section');
+          const submitBtn = document.getElementById('rsvp-submit-btn');
+          if (gameData.price === 0) {
+            if (paymentSection) paymentSection.classList.add('hidden');
+            if (submitBtn) submitBtn.textContent = 'Reserve Free Spot';
+          }
           
           // Update venue information
           updateVenueDisplay();
@@ -1252,6 +1266,8 @@
         if (!gameData || gameData.spotsRemaining === 0) return;
         // Block Quick Book if game is no longer bookable
         if (!isGameBookable(gameData)) return;
+        // Free games don't need Quick Book — the normal form handles it
+        if (gameData.price === 0) return;
         
         const section = document.getElementById('quick-book-section');
         const brandEl = document.getElementById('quick-card-brand');
@@ -1343,7 +1359,7 @@
         document.getElementById('modal-card-last4').textContent = quickBookCard.last4;
         
         // Set price
-        const price = gameData.price || PRICE_PER_PERSON;
+        const price = gameData.price ?? PRICE_PER_PERSON;
         document.getElementById('modal-price-self').textContent = price.toFixed(2);
         
         // Reset guests
@@ -1415,7 +1431,7 @@
         
         // Update summary
         const summaryContainer = document.getElementById('modal-guests-summary');
-        const price = gameData?.price || PRICE_PER_PERSON;
+        const price = gameData?.price ?? PRICE_PER_PERSON;
         summaryContainer.innerHTML = modalGuests.map((guest, i) => `
           <div class="flex justify-between text-sm text-zinc-600">
             <span>Guest ${i + 1}${guest.name ? ` (${guest.name})` : ''}</span>
@@ -1425,7 +1441,7 @@
       }
       
       function updateModalTotal() {
-        const price = gameData?.price || PRICE_PER_PERSON;
+        const price = gameData?.price ?? PRICE_PER_PERSON;
         const total = price * (1 + modalGuests.length);
         document.getElementById('modal-total').textContent = total.toFixed(2);
       }
@@ -1528,7 +1544,8 @@
             cashAppHelper.classList.remove('hidden');
             // Update the CashApp total display
             if (cashAppTotal) {
-              const total = PRICE_PER_PERSON * (1 + guests.length);
+              const price = gameData ? gameData.price : PRICE_PER_PERSON;
+              const total = price * (1 + guests.length);
               cashAppTotal.textContent = '$' + total.toFixed(2);
             }
           }
@@ -1581,10 +1598,27 @@
           lang: typeof I18N !== 'undefined' ? I18N.getLanguage() : 'en'
         };
         
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-        
+        const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || 'online';
+        const isFreeGame = gameData && gameData.price === 0;
+
         try {
-          if (paymentMethod === 'cashapp') {
+          if (isFreeGame) {
+            // Free game — reserve spot directly, no payment needed
+            const response = await fetch(`${API_URL}/api/rsvp`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...formData, paymentMethod: 'free' })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.error || 'Failed to create RSVP');
+            }
+
+            window.location.href = `confirmation-page.html?code=${data.confirmationCode}`;
+
+          } else if (paymentMethod === 'cashapp') {
             // CashApp payment - reserve spot immediately
             const response = await fetch(`${API_URL}/api/rsvp`, {
               method: 'POST',
@@ -1623,7 +1657,7 @@
           errorDiv.textContent = err.message || 'Something went wrong. Please try again.';
           errorDiv.classList.remove('hidden');
           btn.disabled = false;
-          btn.textContent = paymentMethod === 'cashapp' ? 'Reserve Spot & Pay via CashApp' : 'Pay Now & Confirm';
+          btn.textContent = isFreeGame ? 'Reserve Free Spot' : paymentMethod === 'cashapp' ? 'Reserve Spot & Pay via CashApp' : 'Pay Now & Confirm';
         }
       });
       

@@ -531,6 +531,8 @@ async function sendConfirmationEmail(rsvp, game, lang = 'en') {
 
     const paymentStatus = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
       ? txt.payViaCashApp
+      : rsvp.paymentMethod === 'free'
+      ? 'Free Game'
       : txt.paidViaCard;
     const paymentStatusColor = rsvp.paymentMethod === 'cashapp' || rsvp.paymentMethod === 'cash'
       ? '#dc2626'
@@ -851,8 +853,8 @@ app.post('/api/rsvp', rsvpLimiter, async (req, res) => {
       })),
       totalPlayers,
       totalAmount: totalPlayers * game.price,
-      paymentMethod: paymentMethod === 'cashapp' ? 'cashapp' : 'cashapp', // Default to CashApp
-      paymentStatus: 'pending',
+      paymentMethod: ['cashapp', 'free'].includes(paymentMethod) ? paymentMethod : 'cashapp',
+      paymentStatus: paymentMethod === 'free' ? 'paid' : 'pending',
       waiverAccepted,
       // 🔒 Legal: capture waiver acceptance metadata
       waiverAcceptedAt: new Date(),
@@ -1628,7 +1630,7 @@ app.get('/api/admin/games/:gameId/rsvps', adminLimiter, adminSessionAuth, async 
 // Admin - Update game
 app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, res) => {
   try {
-    const { title, time, date, capacity, status, venue } = req.body;
+    const { title, time, date, capacity, status, venue, price } = req.body;
 
     const updateData = {};
     if (title) updateData.title = title;
@@ -1637,6 +1639,7 @@ app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, 
     if (capacity) updateData.capacity = parseInt(capacity);
     if (status) updateData.status = status;
     if (venue) updateData.venue = venue;
+    if (price != null && price !== '') updateData.price = parseFloat(price);
 
     const game = await Game.findOneAndUpdate(
       { gameId: req.params.gameId },
@@ -1691,7 +1694,7 @@ app.post('/api/admin/games', adminLimiter, adminSessionAuth, async (req, res) =>
       },
       capacity: capacity || 24,
       spotsRemaining: capacity || 24,
-      price: price || 5.99,
+      price: (price != null && price !== '') ? parseFloat(price) : 5.99,
       status: 'open'
     });
 
