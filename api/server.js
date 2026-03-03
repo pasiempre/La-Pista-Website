@@ -1235,17 +1235,17 @@ app.post('/api/rsvp/:code/cancel', codeLookupLimiter, async (req, res) => {
     // Find the game
     const game = await Game.findOne({ gameId: rsvp.gameId });
     
-    // Check if game is in the past
-    if (game && new Date(game.date) < new Date()) {
+    // Check if game has already started (uses proper date+time+timezone logic)
+    if (game && hasGameStarted(game)) {
       return res.status(400).json({ error: 'Cannot cancel past games' });
     }
 
     // Calculate if eligible for refund (cancelled 24+ hours before game)
     let refundEligible = false;
     if (game && rsvp.paymentMethod === 'online') {
-      const gameDate = new Date(game.date);
+      const gameStart = parseGameStartTimeServer(game);
       const now = new Date();
-      const hoursUntilGame = (gameDate - now) / (1000 * 60 * 60);
+      const hoursUntilGame = (gameStart - now) / (1000 * 60 * 60);
       refundEligible = hoursUntilGame >= 24;
     }
 

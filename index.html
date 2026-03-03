@@ -839,7 +839,7 @@
             
             <!-- Footer: price + CTA -->
             <div class="mt-auto flex items-center justify-between pt-2 border-t ${isFull ? 'border-amber-200' : 'border-zinc-100'}">
-              <span class="text-sm font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">$${game.price.toFixed(2)}</span>
+              <span class="text-sm font-black ${isFull ? 'text-amber-600' : 'text-green-600'}">${game.price === 0 ? 'FREE' : '$' + game.price.toFixed(2)}</span>
               <span class="text-[10px] font-bold uppercase tracking-wide ${ctaClass} opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 ${ctaText}
               </span>
@@ -1301,7 +1301,7 @@
         // Update price
         const sbPrice = document.getElementById('sidebar-price');
         if (sbPrice && game.price != null) {
-          sbPrice.textContent = `$${game.price.toFixed(2)}`;
+          sbPrice.textContent = game.price === 0 ? 'FREE' : `$${game.price.toFixed(2)}`;
         }
         
         // Update spots (with safeguards to prevent negative values)

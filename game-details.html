@@ -1771,7 +1771,7 @@
           document.getElementById('next-game-title').textContent = nextGame.title;
           document.getElementById('next-game-date').textContent = dateStr;
           document.getElementById('next-game-venue').textContent = venue;
-          document.getElementById('next-game-price').textContent = `$${nextGame.price.toFixed(2)}`;
+          document.getElementById('next-game-price').textContent = nextGame.price === 0 ? 'FREE' : `$${nextGame.price.toFixed(2)}`;
 
           // CTA label
           const ctaEl = document.getElementById('next-game-cta');
