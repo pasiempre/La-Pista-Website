@@ -83,10 +83,10 @@ const rsvpSchema = new mongoose.Schema({
     type: Number, 
     required: true 
   },
-  paymentMethod: { 
-    type: String, 
-    enum: ['online', 'cash', 'cashapp'],
-    required: true 
+  paymentMethod: {
+    type: String,
+    enum: ['online', 'cash', 'cashapp', 'free'],
+    required: true
   },
   paymentStatus: { 
     type: String, 
