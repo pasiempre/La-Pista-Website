@@ -236,6 +236,19 @@
           </div>
         </div>
 
+        <div id="status-field" class="hidden">
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Status</label>
+          <select id="game-status"
+                  class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+            <option value="open">Open</option>
+            <option value="full">Full</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
         <div id="modal-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm"></div>
 
         <div class="flex gap-3 pt-4">
@@ -575,6 +588,7 @@
       document.getElementById('game-capacity').value = '24';
       document.getElementById('game-price').value = '5.99';
       document.getElementById('modal-error').classList.add('hidden');
+      document.getElementById('status-field').classList.add('hidden');
       document.getElementById('game-modal').classList.remove('hidden');
     }
 
@@ -594,6 +608,8 @@
       document.getElementById('game-venue-address').value = game.venue?.address || '';
       document.getElementById('game-capacity').value = game.capacity;
       document.getElementById('game-price').value = game.price;
+      document.getElementById('game-status').value = game.status || 'open';
+      document.getElementById('status-field').classList.remove('hidden');
       document.getElementById('modal-error').classList.add('hidden');
       document.getElementById('game-modal').classList.remove('hidden');
     }
@@ -623,6 +639,11 @@
         capacity: parseInt(document.getElementById('game-capacity').value),
         price: parseFloat(document.getElementById('game-price').value)
       };
+
+      // Include status when editing
+      if (isEdit) {
+        gameData.status = document.getElementById('game-status').value;
+      }
 
       btn.disabled = true;
       btn.textContent = isEdit ? 'Saving...' : 'Creating...';

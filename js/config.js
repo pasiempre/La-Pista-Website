@@ -74,13 +74,21 @@ function parseGameStartTime(dateStr, timeStr) {
   
   let hours = 0, minutes = 0;
   if (timeStr) {
-    const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if (match) {
-      hours = parseInt(match[1], 10);
-      minutes = parseInt(match[2], 10);
-      const period = match[3].toUpperCase();
+    // Try 12-hour format first: "8:00 PM", "8:00PM"
+    const match12 = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match12) {
+      hours = parseInt(match12[1], 10);
+      minutes = parseInt(match12[2], 10);
+      const period = match12[3].toUpperCase();
       if (period === 'PM' && hours !== 12) hours += 12;
       if (period === 'AM' && hours === 12) hours = 0;
+    } else {
+      // Try 24-hour format: "20:00", "08:00"
+      const match24 = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+      if (match24) {
+        hours = parseInt(match24[1], 10);
+        minutes = parseInt(match24[2], 10);
+      }
     }
   }
   
