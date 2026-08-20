@@ -1644,10 +1644,28 @@ app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, 
     if (title) updateData.title = title;
     if (time) updateData.time = time;
     if (date) updateData.date = new Date(date);
-    if (capacity) updateData.capacity = parseInt(capacity);
     if (status) updateData.status = status;
     if (venue) updateData.venue = venue;
     if (price != null && price !== '') updateData.price = parseFloat(price);
+
+    // When capacity changes, resync spotsRemaining from actual bookings so the
+    // counter can never drift above capacity (or go stale after edits).
+    if (capacity) {
+      const newCapacity = parseInt(capacity);
+      updateData.capacity = newCapacity;
+
+      const activeRsvps = await RSVP.find({
+        gameId: req.params.gameId,
+        status: { $ne: 'cancelled' }
+      }).select('totalPlayers');
+      const bookedPlayers = activeRsvps.reduce((sum, r) => sum + (r.totalPlayers || 1), 0);
+
+      updateData.spotsRemaining = Math.max(0, newCapacity - bookedPlayers);
+      // Keep status consistent with availability (don't override an explicit cancel)
+      if (status !== 'cancelled') {
+        updateData.status = updateData.spotsRemaining <= 0 ? 'full' : (status || 'open');
+      }
+    }
 
     const game = await Game.findOneAndUpdate(
       { gameId: req.params.gameId },
@@ -1700,8 +1718,8 @@ app.post('/api/admin/games', adminLimiter, adminSessionAuth, async (req, res) =>
         address: venue.address,
         mapsUrl: venue.mapsUrl || `https://maps.google.com/?q=${encodeURIComponent(venue.address)}`
       },
-      capacity: capacity || 24,
-      spotsRemaining: capacity || 24,
+      capacity: parseInt(capacity) || 24,
+      spotsRemaining: parseInt(capacity) || 24,
       price: (price != null && price !== '') ? parseFloat(price) : 5.99,
       status: 'open'
     });
