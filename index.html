@@ -607,12 +607,15 @@
               <div class="text-zinc-400 font-bold uppercase text-xs tracking-wide pt-1">
                 PAYMENT
               </div>
-              <div class="flex gap-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded border border-green-500 text-green-600 bg-white text-[10px] font-black uppercase tracking-wide">
+              <div class="flex gap-2" id="sidebar-payment-cell">
+                <span id="sidebar-pay-online" class="inline-flex items-center px-2 py-0.5 rounded border border-green-500 text-green-600 bg-white text-[10px] font-black uppercase tracking-wide">
                   PAY ONLINE
                 </span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded border border-zinc-300 text-zinc-500 bg-white text-[10px] font-black uppercase tracking-wide">
+                <span id="sidebar-pay-atgame" class="inline-flex items-center px-2 py-0.5 rounded border border-zinc-300 text-zinc-500 bg-white text-[10px] font-black uppercase tracking-wide">
                   PAY AT GAME
+                </span>
+                <span id="sidebar-pay-free" class="hidden items-center gap-1 px-2 py-0.5 rounded border border-green-500 text-green-700 bg-green-50 text-[10px] font-black uppercase tracking-wide">
+                  <span class="iconify" data-icon="lucide:gift" data-width="12"></span> FREE GAME
                 </span>
               </div>
             </div>
@@ -1290,6 +1293,18 @@
         const sbPrice = document.getElementById('sidebar-price');
         if (sbPrice && game.price != null) {
           sbPrice.textContent = game.price === 0 ? 'FREE' : `$${game.price.toFixed(2)}`;
+        }
+
+        // Payment badges: show "FREE GAME" for $0 games, paid options otherwise
+        const isFreeGame = game.price === 0;
+        const payOnline = document.getElementById('sidebar-pay-online');
+        const payAtGame = document.getElementById('sidebar-pay-atgame');
+        const payFree = document.getElementById('sidebar-pay-free');
+        if (payOnline) payOnline.classList.toggle('hidden', isFreeGame);
+        if (payAtGame) payAtGame.classList.toggle('hidden', isFreeGame);
+        if (payFree) {
+          payFree.classList.toggle('hidden', !isFreeGame);
+          payFree.classList.toggle('inline-flex', isFreeGame);
         }
         
         // Update spots (with safeguards to prevent negative values)
