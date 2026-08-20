@@ -479,27 +479,36 @@
                 <!-- Payment & Waiver -->
                 <div class="space-y-4">
                   <div class="space-y-2" id="payment-method-section">
-                    <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.paymentMethod">
-                      Payment Method
-                    </label>
-                    <div class="grid grid-cols-2 gap-3">
-                      <label class="cursor-pointer" onclick="document.getElementById('payOnline').checked = true; updatePaymentUI('online');">
-                        <input type="radio" name="payment" id="payOnline" value="online" class="peer sr-only" checked="">
-                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300" data-i18n="form.payNow">
-                          Pay Now
-                        </div>
+                    <div id="payment-options" class="space-y-2">
+                      <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide" data-i18n="form.paymentMethod">
+                        Payment Method
                       </label>
-                      <label class="cursor-pointer" onclick="document.getElementById('payCashApp').checked = true; updatePaymentUI('cashapp');">
-                        <input type="radio" name="payment" id="payCashApp" value="cashapp" class="peer sr-only">
-                        <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300 flex items-center justify-center gap-1">
-                          <span class="iconify" data-icon="simple-icons:cashapp" data-width="14"></span>
-                          CashApp
-                        </div>
-                      </label>
+                      <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer" onclick="document.getElementById('payOnline').checked = true; updatePaymentUI('online');">
+                          <input type="radio" name="payment" id="payOnline" value="online" class="peer sr-only" checked="">
+                          <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300" data-i18n="form.payNow">
+                            Pay Now
+                          </div>
+                        </label>
+                        <label class="cursor-pointer" onclick="document.getElementById('payCashApp').checked = true; updatePaymentUI('cashapp');">
+                          <input type="radio" name="payment" id="payCashApp" value="cashapp" class="peer sr-only">
+                          <div class="text-center px-4 py-3 rounded border border-zinc-200 bg-white text-zinc-500 text-xs font-bold uppercase transition-all peer-checked:border-green-500 peer-checked:text-green-600 peer-checked:bg-green-50 hover:border-green-300 flex items-center justify-center gap-1">
+                            <span class="iconify" data-icon="simple-icons:cashapp" data-width="14"></span>
+                            CashApp
+                          </div>
+                        </label>
+                      </div>
+                      <p id="cashapp-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
+                        <span class="font-bold">⚠️ Payment Required:</span> You must pay <span class="cashapp-total font-bold">$5.99</span> via CashApp to <span class="font-bold">$bhrizzo</span> before the game. No payment = no play.
+                      </p>
                     </div>
-                    <p id="cashapp-helper" class="hidden text-xs text-amber-600 font-medium mt-2">
-                      <span class="font-bold">⚠️ Payment Required:</span> You must pay <span class="cashapp-total font-bold">$5.99</span> via CashApp to <span class="font-bold">$bhrizzo</span> before the game. No payment = no play.
-                    </p>
+                    <div id="free-game-notice" class="hidden flex items-center gap-3 px-4 py-3 rounded border border-green-200 bg-green-50">
+                      <span class="iconify text-green-600 shrink-0" data-icon="lucide:gift" data-width="22"></span>
+                      <div>
+                        <div class="text-xs font-black uppercase tracking-wide text-green-700" id="free-game-title" data-i18n="form.freeGame">Free Game</div>
+                        <div class="text-xs text-green-600 font-medium" id="free-game-sub" data-i18n="form.freeGameDesc">No payment required — just reserve your spot.</div>
+                      </div>
+                    </div>
                   </div>
 
                   <div class="flex items-start gap-3 pt-2">
@@ -809,13 +818,21 @@
             }
           }
 
-          // Free game: hide payment toggle, show free badge, update button
-          const paymentSection = document.getElementById('payment-method-section');
+          // Free game: swap the payment toggle for a "Free Game" notice and
+          // relabel the submit button. Uses data-i18n so it stays correct when
+          // the user switches languages.
+          const isFreeGame = gameData.price === 0;
+          const paymentOptions = document.getElementById('payment-options');
+          const freeNotice = document.getElementById('free-game-notice');
           const submitBtn = document.getElementById('rsvp-submit-btn');
-          if (gameData.price === 0) {
-            if (paymentSection) paymentSection.classList.add('hidden');
-            if (submitBtn) submitBtn.textContent = 'Reserve Free Spot';
+
+          if (paymentOptions) paymentOptions.classList.toggle('hidden', isFreeGame);
+          if (freeNotice) freeNotice.classList.toggle('hidden', !isFreeGame);
+
+          if (submitBtn) {
+            submitBtn.setAttribute('data-i18n', isFreeGame ? 'form.reserveFreeSpot' : 'form.payAndConfirm');
           }
+          if (typeof I18N !== 'undefined') I18N.applyTranslations();
           
           // Update venue information
           updateVenueDisplay();
