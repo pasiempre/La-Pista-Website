@@ -241,21 +241,13 @@
         </div>
       </div>
 
-      <!-- 4. What to Expect (Dynamic per game) -->
-      <div class="mb-12">
+      <!-- 4. What to Expect (admin-selected amenity/info tags only) -->
+      <div id="what-to-expect-section" class="mb-12 hidden">
         <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4" data-i18n="gameDetails.whatToExpect">
           What to Expect
         </h3>
         <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6">
-          <ul id="expectations-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Will be populated by JavaScript based on game data -->
-            <!-- Default expectations shown until game loads -->
-            <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em" aria-hidden="true"></span>
-              <span class="text-sm font-medium text-zinc-700">Loading...</span>
-            </li>
-          </ul>
-          <div id="amenities-tags" class="hidden flex-wrap gap-2 mt-5 pt-5 border-t border-zinc-200"></div>
+          <div id="amenities-tags" class="flex flex-wrap gap-3"></div>
         </div>
       </div>
 
@@ -950,68 +942,6 @@
           const embedUrl = `https://www.google.com/maps?q=${encodedAddress}&output=embed`;
           mapIframe.src = embedUrl;
         }
-        
-        // Update "What to Expect" section based on game/venue
-        updateExpectations();
-      }
-
-      // Update "What to Expect" section dynamically
-      function updateExpectations() {
-        const expectationsList = document.getElementById('expectations-list');
-        if (!expectationsList || !gameData) return;
-        
-        // Default expectations that apply to all games
-        const defaultExpectations = [
-          'Arrive 10 minutes before kickoff',
-          'All skill levels welcome - no ego',
-          'Turf shoes or firm ground cleats',
-          'Bibs provided by host'
-        ];
-        
-        // Venue-specific expectations
-        const venueExpectations = {
-          'Shady Lane Fields': [
-            'Turf field with lights',
-            'Free parking available',
-            'Water available on site',
-            'Curated music for high paced games'
-          ],
-          'Prairie Lane Fields': [
-            'Turf field',
-            'Parking available on premises',
-            'Restrooms available',
-            'Ages 16+'
-          ],
-          'Cesar Chavez Fields': [
-            'Downtown location',
-            'Limited street parking',
-            'Water fountains nearby',
-            'Great city views'
-          ]
-        };
-        
-        // Use game.expectations if defined in database, otherwise use venue-specific or defaults
-        let expectations = gameData.expectations || venueExpectations[gameData.venue?.name] || defaultExpectations;
-        
-        // Build list safely via DOM — expectations may come from DB/admin input
-        expectationsList.innerHTML = '';
-        expectations.forEach(exp => {
-          const li = document.createElement('li');
-          li.className = 'flex items-start gap-3';
-
-          const icon = document.createElement('span');
-          icon.className = 'iconify text-green-500 mt-1';
-          icon.setAttribute('data-icon', 'lucide:check-circle-2');
-          icon.setAttribute('data-width', '1.2em');
-
-          const text = document.createElement('span');
-          text.className = 'text-sm font-medium text-zinc-700';
-          text.textContent = exp; // textContent — safe, no HTML injection
-
-          li.appendChild(icon);
-          li.appendChild(text);
-          expectationsList.appendChild(li);
-        });
       }
 
       // ============================================
@@ -1036,10 +966,11 @@
           formatEl.classList.remove('hidden');
         }
 
-        // --- Amenity / info tags ---
+        // --- Amenity / info tags (the only content of "What to Expect") ---
         const tagsEl = document.getElementById('amenities-tags');
+        const wteSection = document.getElementById('what-to-expect-section');
         const tags = Array.isArray(gameData.tags) ? gameData.tags : [];
-        if (tagsEl && tags.length) {
+        if (tagsEl) {
           tagsEl.innerHTML = '';
           tags.forEach(id => {
             const def = (typeof getTagDef === 'function') ? getTagDef(id) : { label: id, icon: 'lucide:tag' };
@@ -1058,12 +989,8 @@
             pill.appendChild(label);
             tagsEl.appendChild(pill);
           });
-          tagsEl.classList.remove('hidden');
-          tagsEl.classList.add('flex');
-        } else if (tagsEl) {
-          tagsEl.classList.add('hidden');
-          tagsEl.classList.remove('flex');
         }
+        if (wteSection) wteSection.classList.toggle('hidden', tags.length === 0);
 
         // --- Description + photo carousel (About This Game) ---
         const aboutSection = document.getElementById('about-game-section');
@@ -1079,6 +1006,7 @@
         }
 
         const photos = (Array.isArray(gameData.photos) ? gameData.photos : [])
+          .map(u => typeof normalizePhotoUrl === 'function' ? normalizePhotoUrl(u) : u)
           .filter(u => typeof isValidPhotoUrl === 'function' ? isValidPhotoUrl(u) : /^https?:\/\//i.test(u));
         const hasPhotos = photos.length > 0;
         renderCarousel(photos);
@@ -1116,7 +1044,12 @@
           img.alt = `${gameData.venue?.name || 'Game'} photo ${i + 1}`;
           img.loading = 'lazy';
           img.className = 'w-full h-64 sm:h-80 object-cover';
-          img.onerror = () => { slide.remove(); };
+          // Keep slide/dot counts in sync: on failure show a placeholder in place
+          img.onerror = () => {
+            img.remove();
+            slide.className = 'w-full shrink-0 h-64 sm:h-80 flex flex-col items-center justify-center gap-2 text-zinc-400 bg-zinc-100';
+            slide.innerHTML = '<span class="iconify text-3xl" data-icon="lucide:image-off" aria-hidden="true"></span><span class="text-xs font-medium">Image unavailable</span>';
+          };
           slide.appendChild(img);
           track.appendChild(slide);
 

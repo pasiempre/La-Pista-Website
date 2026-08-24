@@ -1674,11 +1674,24 @@ function sanitizeGameDetailFields(body) {
   if (body.photos !== undefined) {
     const arr = Array.isArray(body.photos) ? body.photos : [];
     out.photos = arr
-      .map(u => String(u || '').trim())
+      .map(u => normalizePhotoUrl(u))
       .filter(u => /^https?:\/\/.+/i.test(u))
       .slice(0, MAX_PHOTOS);
   }
   return out;
+}
+
+/**
+ * Server-side mirror of the frontend photo URL normalizer: converts GitHub
+ * "blob" webpage links into raw.githubusercontent.com image links.
+ */
+function normalizePhotoUrl(url) {
+  let u = String(url || '').trim();
+  const blob = u.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);
+  if (blob) {
+    u = `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3]}`;
+  }
+  return u.replace(/\?raw=true$/i, '');
 }
 
 app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, res) => {

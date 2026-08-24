@@ -76,6 +76,25 @@ function getTagDef(id) {
 }
 
 /**
+ * Normalize a pasted photo URL so it points at actual image bytes.
+ * Converts GitHub "blob" webpage URLs into raw.githubusercontent.com URLs,
+ * e.g. https://github.com/owner/repo/blob/REF/path.jpg
+ *   ->  https://raw.githubusercontent.com/owner/repo/REF/path.jpg
+ * Also unwraps ...?raw=true style GitHub links. Other URLs are returned as-is.
+ */
+function normalizePhotoUrl(url) {
+  if (typeof url !== 'string') return '';
+  let u = url.trim();
+  const blob = u.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);
+  if (blob) {
+    u = `https://raw.githubusercontent.com/${blob[1]}/${blob[2]}/${blob[3]}`;
+  }
+  // Drop a trailing ?raw=true (raw host serves bytes directly)
+  u = u.replace(/\?raw=true$/i, '');
+  return u;
+}
+
+/**
  * Basic sanity check for photo URLs pasted into the admin dashboard.
  * Only http(s) URLs are accepted to avoid javascript:/data: injection.
  */

@@ -832,7 +832,7 @@
 
     function getPhotoUrls() {
       return Array.from(document.querySelectorAll('.game-photo-url'))
-        .map(i => i.value.trim())
+        .map(i => normalizePhotoUrl(i.value))
         .filter(u => isValidPhotoUrl(u));
     }
 
@@ -955,7 +955,7 @@
 
     function getTemplatePhotoUrls() {
       return Array.from(document.querySelectorAll('.tpl-photo-url'))
-        .map(i => i.value.trim())
+        .map(i => normalizePhotoUrl(i.value))
         .filter(u => isValidPhotoUrl(u));
     }
 
