@@ -1,5 +1,5 @@
-// LaPista Service Worker v4.3 - Fixed response cloning
-const CACHE_NAME = 'lapista-v4.3';
+// LaPista Service Worker v4.4 - Bust cache for game details/admin updates
+const CACHE_NAME = 'lapista-v4.4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
