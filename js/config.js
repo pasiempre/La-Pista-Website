@@ -40,6 +40,53 @@ const LAPISTA_CONFIG = {
 Object.freeze(LAPISTA_CONFIG);
 
 /**
+ * Canonical catalog of game amenity/info tags.
+ * `id` is the stable value stored in the database; `label` is the display text;
+ * `icon` is an Iconify id. Shared by the admin dashboard and the game details page.
+ */
+const GAME_TAGS = [
+  { id: 'lights', label: 'Lights at field', icon: 'lucide:lightbulb' },
+  { id: 'parking', label: 'Parking available', icon: 'lucide:circle-parking' },
+  { id: 'restrooms', label: 'Restrooms on-site', icon: 'lucide:door-open' },
+  { id: 'water', label: 'Bring water', icon: 'lucide:droplet' },
+  { id: 'turf-shoes', label: 'Turf shoes recommended', icon: 'lucide:footprints' },
+  { id: 'no-metal-studs', label: 'No metal studs', icon: 'lucide:ban' },
+  { id: 'bibs', label: 'Bibs provided', icon: 'lucide:shirt' },
+  { id: 'indoor', label: 'Covered / indoor', icon: 'lucide:warehouse' },
+  { id: 'goalkeeper', label: 'Goalkeepers welcome', icon: 'lucide:hand' },
+  { id: 'age-16', label: '16+ only', icon: 'lucide:user-check' }
+];
+
+const SKILL_LEVELS = [
+  { id: 'all', label: 'All levels' },
+  { id: 'beginner', label: 'Beginner' },
+  { id: 'intermediate', label: 'Intermediate' },
+  { id: 'advanced', label: 'Advanced' }
+];
+
+Object.freeze(GAME_TAGS);
+Object.freeze(SKILL_LEVELS);
+
+/**
+ * Look up a tag definition by its stored id. Returns a fallback object
+ * (label derived from the id) if the id is not in the catalog.
+ */
+function getTagDef(id) {
+  return GAME_TAGS.find(t => t.id === id) || { id, label: String(id), icon: 'lucide:tag' };
+}
+
+/**
+ * Basic sanity check for photo URLs pasted into the admin dashboard.
+ * Only http(s) URLs are accepted to avoid javascript:/data: injection.
+ */
+function isValidPhotoUrl(url) {
+  if (typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  return /^https?:\/\/.+/i.test(trimmed);
+}
+
+/**
  * Convert a UTC midnight date string to a local Date with the correct calendar date.
  * Game dates are stored as midnight UTC (e.g. 2026-02-10T00:00:00Z).
  * In US timezones this shifts to the previous evening (Feb 9 6pm CST),

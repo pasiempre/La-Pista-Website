@@ -92,6 +92,9 @@
         <button onclick="showTab('rsvps')" id="tab-rsvps" class="tab-btn px-4 py-3 text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-zinc-600">
           RSVPs
         </button>
+        <button onclick="showTab('templates')" id="tab-templates" class="tab-btn px-4 py-3 text-sm font-bold uppercase tracking-wide text-zinc-400 hover:text-zinc-600">
+          Templates
+        </button>
       </div>
 
       <!-- Games Tab -->
@@ -100,19 +103,11 @@
         <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4">
           <div class="flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center gap-2">
-              <span class="iconify text-green-600" data-icon="lucide:zap"></span>
+              <span class="iconify text-green-600" data-icon="lucide:zap" aria-hidden="true"></span>
               <span class="text-sm font-bold text-green-800">Quick Create:</span>
             </div>
-            <div class="flex flex-wrap gap-2">
-              <button onclick="createFromTemplate('tuesday')" class="text-xs font-bold text-green-700 bg-white hover:bg-green-100 px-3 py-1.5 rounded border border-green-300 transition-colors">
-                🎮 Tuesday Game
-              </button>
-              <button onclick="createFromTemplate('thursday')" class="text-xs font-bold text-green-700 bg-white hover:bg-green-100 px-3 py-1.5 rounded border border-green-300 transition-colors">
-                🎮 Thursday Game
-              </button>
-              <button onclick="createFromTemplate('sunday')" class="text-xs font-bold text-green-700 bg-white hover:bg-green-100 px-3 py-1.5 rounded border border-green-300 transition-colors">
-                🎮 Sunday Game
-              </button>
+            <div id="quick-create-pills" class="flex flex-wrap gap-2">
+              <span class="text-xs text-green-700/70">Loading templates…</span>
             </div>
           </div>
         </div>
@@ -155,6 +150,25 @@
           </div>
           <div id="rsvps-list" class="divide-y divide-zinc-100">
             <div class="p-8 text-center text-zinc-500">Select a game to view RSVPs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Templates Tab -->
+      <div id="content-templates" class="hidden">
+        <div class="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+          <div class="p-4 border-b border-zinc-200 flex justify-between items-center gap-3">
+            <div>
+              <h2 class="font-bold text-zinc-900">Quick Create Templates</h2>
+              <p class="text-sm text-zinc-500">Presets for your recurring games. <span id="template-count">0</span>/10 used.</p>
+            </div>
+            <button id="new-template-btn" onclick="showCreateTemplateModal()" class="text-sm text-white bg-green-600 hover:bg-green-700 flex items-center gap-1 px-3 py-1.5 rounded-md font-bold">
+              <span class="iconify" data-icon="lucide:plus" aria-hidden="true"></span>
+              New Template
+            </button>
+          </div>
+          <div id="templates-list" class="divide-y divide-zinc-100">
+            <div class="p-8 text-center text-zinc-500">Loading templates...</div>
           </div>
         </div>
       </div>
@@ -236,6 +250,50 @@
           </div>
         </div>
 
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Skill Level</label>
+            <select id="game-skill" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+              <option value="all">All levels</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Format</label>
+            <input type="text" id="game-format" maxlength="20"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                   placeholder="7v7">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Amenities / Info Tags</label>
+          <div id="game-tags-container" class="grid grid-cols-2 gap-2 mt-1"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">
+            Description <span class="text-zinc-400 normal-case font-medium">(shown low on the game page)</span>
+          </label>
+          <textarea id="game-description" rows="3" maxlength="1000"
+                    class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none"
+                    placeholder="A short blurb about this game — vibe, level, anything good to know."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">
+            Photo URLs <span class="text-zinc-400 normal-case font-medium">(host on GitHub, paste raw links)</span>
+          </label>
+          <div id="game-photos-list" class="space-y-2"></div>
+          <button type="button" onclick="addPhotoRow()"
+                  class="mt-2 text-xs font-bold text-green-700 hover:text-green-800 flex items-center gap-1">
+            <span class="iconify" data-icon="lucide:plus" aria-hidden="true"></span>
+            Add photo URL
+          </button>
+        </div>
+
         <div id="status-field" class="hidden">
           <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Status</label>
           <select id="game-status"
@@ -263,49 +321,135 @@
     </div>
   </div>
 
+  <!-- Create/Edit Template Modal -->
+  <div id="template-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-zinc-200 flex justify-between items-center">
+        <h3 id="template-modal-title" class="font-bold text-xl text-zinc-900">New Template</h3>
+        <button onclick="closeTemplateModal()" class="text-zinc-400 hover:text-zinc-600" aria-label="Close">
+          <span class="iconify text-2xl" data-icon="lucide:x" aria-hidden="true"></span>
+        </button>
+      </div>
+      <form id="template-form" class="p-6 space-y-4">
+        <input type="hidden" id="edit-template-id">
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Template Name</label>
+          <input type="text" id="tpl-name" required maxlength="80"
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none"
+                 placeholder="Tuesday Night Pickup">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Day of Week</label>
+            <select id="tpl-day" required class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+              <option value="Sunday">Sunday</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Time</label>
+            <input type="text" id="tpl-time" required maxlength="20"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                   placeholder="8:00 PM">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Venue Name</label>
+          <input type="text" id="tpl-venue-name" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                 placeholder="Shady Lane Fields">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Venue Address</label>
+          <input type="text" id="tpl-venue-address" required
+                 class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm"
+                 placeholder="757 Shady Ln, Austin, TX 78702">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Capacity</label>
+            <input type="number" id="tpl-capacity" min="1" max="100"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm" value="24">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Price ($)</label>
+            <input type="number" id="tpl-price" step="0.01" min="0"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm" value="5.99">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Skill Level</label>
+            <select id="tpl-skill" class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm">
+              <option value="all">All levels</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Format</label>
+            <input type="text" id="tpl-format" maxlength="20"
+                   class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm" placeholder="7v7">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Amenities / Info Tags</label>
+          <div id="tpl-tags-container" class="grid grid-cols-2 gap-2 mt-1"></div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Description</label>
+          <textarea id="tpl-description" rows="3" maxlength="1000"
+                    class="w-full bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none"
+                    placeholder="Default blurb carried onto games created from this template."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">
+            Photo URLs <span class="text-zinc-400 normal-case font-medium">(venue photos, reused for each game)</span>
+          </label>
+          <div id="tpl-photos-list" class="space-y-2"></div>
+          <button type="button" onclick="addTemplatePhotoRow()"
+                  class="mt-2 text-xs font-bold text-green-700 hover:text-green-800 flex items-center gap-1">
+            <span class="iconify" data-icon="lucide:plus" aria-hidden="true"></span>
+            Add photo URL
+          </button>
+        </div>
+
+        <div id="template-modal-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm"></div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeTemplateModal()" class="flex-1 px-4 py-2 border border-zinc-200 rounded-md text-sm font-bold text-zinc-600 hover:bg-zinc-50">
+            Cancel
+          </button>
+          <button type="submit" id="template-submit-btn" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-sm font-bold text-white">
+            Create Template
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="/js/config.js"></script>
   <script>
     // Use centralized config for API URL
     const API_URL = LAPISTA_CONFIG.API_URL;
 
-    // ============================================
-    // GAME TEMPLATES - Your recurring games
-    // ============================================
-    const GAME_TEMPLATES = {
-      tuesday: {
-        title: 'Tuesday Night Pickup',
-        dayOfWeek: 'Tuesday',
-        time: '8:00 PM',
-        venue: {
-          name: 'Shady Lane Fields',
-          address: '757 Shady Ln, Austin, TX 78702'
-        },
-        capacity: 24,
-        price: 5.99
-      },
-      thursday: {
-        title: 'Thursday Night Pickup',
-        dayOfWeek: 'Thursday',
-        time: '8:00 PM',
-        venue: {
-          name: 'Shady Lane Fields',
-          address: '757 Shady Ln, Austin, TX 78702'
-        },
-        capacity: 24,
-        price: 5.99
-      },
-      sunday: {
-        title: 'Sunday Pickup',
-        dayOfWeek: 'Sunday',
-        time: '6:00 PM',
-        venue: {
-          name: 'Shady Lane Fields',
-          address: '757 Shady Ln, Austin, TX 78702'
-        },
-        capacity: 24,
-        price: 5.99
-      }
-    };
+    // Templates are stored in the database and loaded via loadTemplates()
+    let templatesData = [];
 
     // Get next occurrence of a specific day of week
     function getNextDayOfWeek(dayName) {
@@ -330,9 +474,9 @@
       return nextDate;
     }
 
-    // Create game from template
-    function createFromTemplate(templateKey) {
-      const template = GAME_TEMPLATES[templateKey];
+    // Create game from a stored template (pre-fills the game form)
+    function createFromTemplate(templateId) {
+      const template = templatesData.find(t => t._id === templateId);
       if (!template) return;
 
       const nextDate = getNextDayOfWeek(template.dayOfWeek);
@@ -340,14 +484,20 @@
       document.getElementById('modal-title').textContent = 'Create from Template';
       document.getElementById('modal-submit-btn').textContent = 'Create Game';
       document.getElementById('edit-game-id').value = '';
-      document.getElementById('game-title').value = template.title;
+      document.getElementById('game-title').value = template.name;
       document.getElementById('game-day').value = template.dayOfWeek;
       document.getElementById('game-time').value = template.time;
       document.getElementById('game-date').value = nextDate.toISOString().split('T')[0];
-      document.getElementById('game-venue-name').value = template.venue.name;
-      document.getElementById('game-venue-address').value = template.venue.address;
-      document.getElementById('game-capacity').value = template.capacity;
-      document.getElementById('game-price').value = template.price;
+      document.getElementById('game-venue-name').value = template.venue?.name || '';
+      document.getElementById('game-venue-address').value = template.venue?.address || '';
+      document.getElementById('game-capacity').value = template.capacity ?? 24;
+      document.getElementById('game-price').value = template.price ?? 5.99;
+      document.getElementById('game-skill').value = template.skillLevel || 'all';
+      document.getElementById('game-format').value = template.format || '';
+      document.getElementById('game-description').value = template.description || '';
+      renderTagCheckboxes(template.tags || []);
+      setPhotoRows(template.photos || []);
+      document.getElementById('status-field').classList.add('hidden');
       document.getElementById('modal-error').classList.add('hidden');
       document.getElementById('game-modal').classList.remove('hidden');
     }
@@ -435,6 +585,7 @@
       sessionExpired = false;
       loadStats();
       loadGames();
+      loadTemplates();
     }
 
     function showTab(tab) {
@@ -447,10 +598,13 @@
 
       document.getElementById('content-games').classList.add('hidden');
       document.getElementById('content-rsvps').classList.add('hidden');
+      document.getElementById('content-templates').classList.add('hidden');
       document.getElementById(`content-${tab}`).classList.remove('hidden');
 
       if (tab === 'rsvps') {
         populateGameSelect();
+      } else if (tab === 'templates') {
+        loadTemplates();
       }
     }
 
@@ -587,6 +741,11 @@
       document.getElementById('game-form').reset();
       document.getElementById('game-capacity').value = '24';
       document.getElementById('game-price').value = '5.99';
+      document.getElementById('game-skill').value = 'all';
+      document.getElementById('game-format').value = '';
+      document.getElementById('game-description').value = '';
+      renderTagCheckboxes([]);
+      setPhotoRows([]);
       document.getElementById('modal-error').classList.add('hidden');
       document.getElementById('status-field').classList.add('hidden');
       document.getElementById('game-modal').classList.remove('hidden');
@@ -608,6 +767,11 @@
       document.getElementById('game-venue-address').value = game.venue?.address || '';
       document.getElementById('game-capacity').value = game.capacity;
       document.getElementById('game-price').value = game.price;
+      document.getElementById('game-skill').value = game.skillLevel || 'all';
+      document.getElementById('game-format').value = game.format || '';
+      document.getElementById('game-description').value = game.description || '';
+      renderTagCheckboxes(game.tags || []);
+      setPhotoRows(game.photos || []);
       document.getElementById('game-status').value = game.status || 'open';
       document.getElementById('status-field').classList.remove('hidden');
       document.getElementById('modal-error').classList.add('hidden');
@@ -616,6 +780,286 @@
 
     function closeGameModal() {
       document.getElementById('game-modal').classList.add('hidden');
+    }
+
+    // ---- Game detail field helpers (tags + photos) ----
+    function renderTagCheckboxes(selected = []) {
+      const container = document.getElementById('game-tags-container');
+      if (!container) return;
+      const set = new Set(selected);
+      container.innerHTML = GAME_TAGS.map(tag => `
+        <label class="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">
+          <input type="checkbox" class="game-tag-checkbox rounded border-zinc-300 text-green-600 focus:ring-green-500" value="${tag.id}" ${set.has(tag.id) ? 'checked' : ''}>
+          <span>${escapeHtml(tag.label)}</span>
+        </label>
+      `).join('');
+    }
+
+    function getSelectedTags() {
+      return Array.from(document.querySelectorAll('.game-tag-checkbox:checked')).map(c => c.value);
+    }
+
+    function addPhotoRow(value = '') {
+      const list = document.getElementById('game-photos-list');
+      if (!list) return;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2';
+
+      const input = document.createElement('input');
+      input.type = 'url';
+      input.className = 'game-photo-url flex-1 bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none';
+      input.placeholder = 'https://raw.githubusercontent.com/.../field.jpg';
+      input.value = value;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'p-2 text-zinc-400 hover:text-red-600 shrink-0';
+      removeBtn.setAttribute('aria-label', 'Remove photo URL');
+      removeBtn.innerHTML = '<span class="iconify" data-icon="lucide:trash-2" aria-hidden="true"></span>';
+      removeBtn.onclick = () => row.remove();
+
+      row.appendChild(input);
+      row.appendChild(removeBtn);
+      list.appendChild(row);
+    }
+
+    function setPhotoRows(urls = []) {
+      const list = document.getElementById('game-photos-list');
+      if (!list) return;
+      list.innerHTML = '';
+      (urls || []).forEach(u => addPhotoRow(u));
+    }
+
+    function getPhotoUrls() {
+      return Array.from(document.querySelectorAll('.game-photo-url'))
+        .map(i => i.value.trim())
+        .filter(u => isValidPhotoUrl(u));
+    }
+
+    // ============================================
+    // TEMPLATES (Quick Create / Macros)
+    // ============================================
+    async function loadTemplates() {
+      try {
+        const response = await adminFetch('/api/admin/templates');
+        templatesData = await response.json();
+      } catch (err) {
+        console.error('Failed to load templates:', err);
+        templatesData = [];
+      }
+      renderQuickCreatePills();
+      renderTemplatesList();
+    }
+
+    function renderQuickCreatePills() {
+      const pills = document.getElementById('quick-create-pills');
+      if (!pills) return;
+      if (!templatesData.length) {
+        pills.innerHTML = '<span class="text-xs text-green-700/70">No templates yet — add one in the Templates tab.</span>';
+        return;
+      }
+      pills.innerHTML = templatesData.map(t => `
+        <button onclick="createFromTemplate('${t._id}')" class="text-xs font-bold text-green-700 bg-white hover:bg-green-100 px-3 py-1.5 rounded border border-green-300 transition-colors">
+          🎮 ${escapeHtml(t.name)}
+        </button>
+      `).join('');
+    }
+
+    function renderTemplatesList() {
+      const list = document.getElementById('templates-list');
+      const countEl = document.getElementById('template-count');
+      const newBtn = document.getElementById('new-template-btn');
+      if (countEl) countEl.textContent = templatesData.length;
+      if (newBtn) {
+        const atMax = templatesData.length >= 10;
+        newBtn.disabled = atMax;
+        newBtn.classList.toggle('opacity-50', atMax);
+        newBtn.classList.toggle('cursor-not-allowed', atMax);
+      }
+      if (!list) return;
+      if (!templatesData.length) {
+        list.innerHTML = '<div class="p-8 text-center text-zinc-500">No templates yet. Create one to enable Quick Create.</div>';
+        return;
+      }
+      list.innerHTML = templatesData.map(t => {
+        const priceLabel = (Number(t.price) === 0) ? 'Free' : `$${Number(t.price ?? 0).toFixed(2)}`;
+        const tagCount = (t.tags || []).length;
+        const photoCount = (t.photos || []).length;
+        return `
+          <div class="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-zinc-50">
+            <div>
+              <div class="font-bold text-zinc-900">${escapeHtml(t.name)}</div>
+              <div class="text-sm text-zinc-500">${escapeHtml(t.dayOfWeek)} · ${escapeHtml(t.time)} · ${escapeHtml(t.venue?.name || 'TBD')}</div>
+              <div class="text-xs text-zinc-400 mt-1">${escapeHtml(priceLabel)} · cap ${t.capacity ?? 24}${tagCount ? ` · ${tagCount} tags` : ''}${photoCount ? ` · ${photoCount} photos` : ''}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="showEditTemplateModal('${t._id}')" class="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded" aria-label="Edit template" title="Edit">
+                <span class="iconify" data-icon="lucide:pencil" aria-hidden="true"></span>
+              </button>
+              <button onclick="deleteTemplate('${t._id}')" class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded" aria-label="Delete template" title="Delete">
+                <span class="iconify" data-icon="lucide:trash-2" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Template tag/photo helpers (separate DOM containers from the game form)
+    function renderTemplateTagCheckboxes(selected = []) {
+      const container = document.getElementById('tpl-tags-container');
+      if (!container) return;
+      const set = new Set(selected);
+      container.innerHTML = GAME_TAGS.map(tag => `
+        <label class="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">
+          <input type="checkbox" class="tpl-tag-checkbox rounded border-zinc-300 text-green-600 focus:ring-green-500" value="${tag.id}" ${set.has(tag.id) ? 'checked' : ''}>
+          <span>${escapeHtml(tag.label)}</span>
+        </label>
+      `).join('');
+    }
+
+    function getTemplateSelectedTags() {
+      return Array.from(document.querySelectorAll('.tpl-tag-checkbox:checked')).map(c => c.value);
+    }
+
+    function addTemplatePhotoRow(value = '') {
+      const list = document.getElementById('tpl-photos-list');
+      if (!list) return;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2';
+
+      const input = document.createElement('input');
+      input.type = 'url';
+      input.className = 'tpl-photo-url flex-1 bg-zinc-50 border border-zinc-200 rounded-md px-3 py-2 text-sm focus:border-green-500 outline-none';
+      input.placeholder = 'https://raw.githubusercontent.com/.../field.jpg';
+      input.value = value;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'p-2 text-zinc-400 hover:text-red-600 shrink-0';
+      removeBtn.setAttribute('aria-label', 'Remove photo URL');
+      removeBtn.innerHTML = '<span class="iconify" data-icon="lucide:trash-2" aria-hidden="true"></span>';
+      removeBtn.onclick = () => row.remove();
+
+      row.appendChild(input);
+      row.appendChild(removeBtn);
+      list.appendChild(row);
+    }
+
+    function setTemplatePhotoRows(urls = []) {
+      const list = document.getElementById('tpl-photos-list');
+      if (!list) return;
+      list.innerHTML = '';
+      (urls || []).forEach(u => addTemplatePhotoRow(u));
+    }
+
+    function getTemplatePhotoUrls() {
+      return Array.from(document.querySelectorAll('.tpl-photo-url'))
+        .map(i => i.value.trim())
+        .filter(u => isValidPhotoUrl(u));
+    }
+
+    function showCreateTemplateModal() {
+      if (templatesData.length >= 10) {
+        alert('Template limit reached (max 10). Delete one to add another.');
+        return;
+      }
+      document.getElementById('template-modal-title').textContent = 'New Template';
+      document.getElementById('template-submit-btn').textContent = 'Create Template';
+      document.getElementById('template-form').reset();
+      document.getElementById('edit-template-id').value = '';
+      document.getElementById('tpl-capacity').value = '24';
+      document.getElementById('tpl-price').value = '5.99';
+      document.getElementById('tpl-skill').value = 'all';
+      renderTemplateTagCheckboxes([]);
+      setTemplatePhotoRows([]);
+      document.getElementById('template-modal-error').classList.add('hidden');
+      document.getElementById('template-modal').classList.remove('hidden');
+    }
+
+    function showEditTemplateModal(id) {
+      const t = templatesData.find(x => x._id === id);
+      if (!t) return;
+      document.getElementById('template-modal-title').textContent = 'Edit Template';
+      document.getElementById('template-submit-btn').textContent = 'Save Changes';
+      document.getElementById('edit-template-id').value = id;
+      document.getElementById('tpl-name').value = t.name || '';
+      document.getElementById('tpl-day').value = t.dayOfWeek || 'Sunday';
+      document.getElementById('tpl-time').value = t.time || '';
+      document.getElementById('tpl-venue-name').value = t.venue?.name || '';
+      document.getElementById('tpl-venue-address').value = t.venue?.address || '';
+      document.getElementById('tpl-capacity').value = t.capacity ?? 24;
+      document.getElementById('tpl-price').value = t.price ?? 5.99;
+      document.getElementById('tpl-skill').value = t.skillLevel || 'all';
+      document.getElementById('tpl-format').value = t.format || '';
+      document.getElementById('tpl-description').value = t.description || '';
+      renderTemplateTagCheckboxes(t.tags || []);
+      setTemplatePhotoRows(t.photos || []);
+      document.getElementById('template-modal-error').classList.add('hidden');
+      document.getElementById('template-modal').classList.remove('hidden');
+    }
+
+    function closeTemplateModal() {
+      document.getElementById('template-modal').classList.add('hidden');
+    }
+
+    document.getElementById('template-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('template-submit-btn');
+      const errorDiv = document.getElementById('template-modal-error');
+      const editId = document.getElementById('edit-template-id').value;
+      const isEdit = !!editId;
+
+      const payload = {
+        name: document.getElementById('tpl-name').value.trim(),
+        dayOfWeek: document.getElementById('tpl-day').value,
+        time: document.getElementById('tpl-time').value.trim(),
+        venue: {
+          name: document.getElementById('tpl-venue-name').value.trim(),
+          address: document.getElementById('tpl-venue-address').value.trim()
+        },
+        capacity: parseInt(document.getElementById('tpl-capacity').value) || 24,
+        price: parseFloat(document.getElementById('tpl-price').value) || 0,
+        skillLevel: document.getElementById('tpl-skill').value,
+        format: document.getElementById('tpl-format').value.trim(),
+        description: document.getElementById('tpl-description').value.trim(),
+        tags: getTemplateSelectedTags(),
+        photos: getTemplatePhotoUrls()
+      };
+
+      btn.disabled = true;
+      btn.textContent = isEdit ? 'Saving...' : 'Creating...';
+      errorDiv.classList.add('hidden');
+
+      try {
+        const url = isEdit ? `/api/admin/templates/${editId}` : '/api/admin/templates';
+        const method = isEdit ? 'PUT' : 'POST';
+        const response = await adminFetch(url, { method, body: JSON.stringify(payload) });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to save template');
+        }
+        closeTemplateModal();
+        await loadTemplates();
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = isEdit ? 'Save Changes' : 'Create Template';
+      }
+    });
+
+    async function deleteTemplate(id) {
+      const t = templatesData.find(x => x._id === id);
+      if (!confirm(`Delete template "${t ? t.name : id}"? This cannot be undone.`)) return;
+      try {
+        const response = await adminFetch(`/api/admin/templates/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete template');
+        await loadTemplates();
+      } catch (err) {
+        alert('Failed to delete template: ' + err.message);
+      }
     }
 
     // Game form submit
@@ -637,7 +1081,12 @@
           address: document.getElementById('game-venue-address').value
         },
         capacity: parseInt(document.getElementById('game-capacity').value),
-        price: parseFloat(document.getElementById('game-price').value)
+        price: parseFloat(document.getElementById('game-price').value),
+        skillLevel: document.getElementById('game-skill').value,
+        format: document.getElementById('game-format').value.trim(),
+        description: document.getElementById('game-description').value.trim(),
+        tags: getSelectedTags(),
+        photos: getPhotoUrls()
       };
 
       // Include status when editing
@@ -704,6 +1153,12 @@
       document.getElementById('game-venue-address').value = game.venue?.address || '';
       document.getElementById('game-capacity').value = game.capacity;
       document.getElementById('game-price').value = game.price;
+      document.getElementById('game-skill').value = game.skillLevel || 'all';
+      document.getElementById('game-format').value = game.format || '';
+      document.getElementById('game-description').value = game.description || '';
+      renderTagCheckboxes(game.tags || []);
+      setPhotoRows(game.photos || []);
+      document.getElementById('status-field').classList.add('hidden');
       document.getElementById('modal-error').classList.add('hidden');
       document.getElementById('game-modal').classList.remove('hidden');
     }

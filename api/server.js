@@ -1646,11 +1646,46 @@ app.get('/api/admin/games/:gameId/rsvps', adminLimiter, adminSessionAuth, async 
 });
 
 // Admin - Update game
+// 🔒 Whitelists for admin-editable game detail fields (defense against arbitrary input)
+const ALLOWED_TAG_IDS = ['lights', 'parking', 'restrooms', 'water', 'turf-shoes', 'no-metal-studs', 'bibs', 'indoor', 'goalkeeper', 'age-16'];
+const ALLOWED_SKILL_LEVELS = ['all', 'beginner', 'intermediate', 'advanced'];
+const MAX_PHOTOS = 12;
+
+/**
+ * Sanitize the optional game detail fields (description, skillLevel, format, tags, photos).
+ * Only returns keys that were present in the request body so PUT can do partial updates.
+ * Tags are restricted to the known catalog and photos to http(s) URLs to prevent injection.
+ */
+function sanitizeGameDetailFields(body) {
+  const out = {};
+  if (body.description !== undefined) {
+    out.description = String(body.description || '').replace(/<[^>]*>/g, '').trim().slice(0, 1000);
+  }
+  if (body.skillLevel !== undefined) {
+    out.skillLevel = ALLOWED_SKILL_LEVELS.includes(body.skillLevel) ? body.skillLevel : 'all';
+  }
+  if (body.format !== undefined) {
+    out.format = String(body.format || '').replace(/<[^>]*>/g, '').trim().slice(0, 20);
+  }
+  if (body.tags !== undefined) {
+    const arr = Array.isArray(body.tags) ? body.tags : [];
+    out.tags = [...new Set(arr.filter(t => ALLOWED_TAG_IDS.includes(t)))];
+  }
+  if (body.photos !== undefined) {
+    const arr = Array.isArray(body.photos) ? body.photos : [];
+    out.photos = arr
+      .map(u => String(u || '').trim())
+      .filter(u => /^https?:\/\/.+/i.test(u))
+      .slice(0, MAX_PHOTOS);
+  }
+  return out;
+}
+
 app.put('/api/admin/games/:gameId', adminLimiter, adminSessionAuth, async (req, res) => {
   try {
     const { title, time, date, capacity, status, venue, price } = req.body;
 
-    const updateData = {};
+    const updateData = { ...sanitizeGameDetailFields(req.body) };
     if (title) updateData.title = title;
     if (time) updateData.time = time;
     if (date) updateData.date = new Date(date);
@@ -1731,7 +1766,8 @@ app.post('/api/admin/games', adminLimiter, adminSessionAuth, async (req, res) =>
       capacity: parseInt(capacity) || 24,
       spotsRemaining: parseInt(capacity) || 24,
       price: (price != null && price !== '') ? parseFloat(price) : 5.99,
-      status: 'open'
+      status: 'open',
+      ...sanitizeGameDetailFields(req.body)
     });
 
     await game.save();
@@ -1813,6 +1849,102 @@ app.post('/api/templates', adminLimiter, async (req, res) => {
   }
 });
 
+// ============================================
+// ADMIN TEMPLATE CRUD (Quick Create / Macros)
+// Session-authenticated; used by the admin dashboard Templates tab.
+// ============================================
+const MAX_TEMPLATES = 10;
+
+/**
+ * Build a sanitized GameTemplate payload from a request body.
+ * Reuses sanitizeGameDetailFields() for the shared detail fields.
+ */
+function buildTemplatePayload(body) {
+  const payload = { ...sanitizeGameDetailFields(body) };
+  if (body.name !== undefined) payload.name = String(body.name || '').replace(/<[^>]*>/g, '').trim().slice(0, 80);
+  if (body.dayOfWeek !== undefined) payload.dayOfWeek = body.dayOfWeek;
+  if (body.time !== undefined) payload.time = String(body.time || '').replace(/<[^>]*>/g, '').trim().slice(0, 20);
+  if (body.venue !== undefined) {
+    payload.venue = {
+      name: String(body.venue?.name || '').replace(/<[^>]*>/g, '').trim().slice(0, 120),
+      address: String(body.venue?.address || '').replace(/<[^>]*>/g, '').trim().slice(0, 200)
+    };
+    if (body.venue?.mapsUrl) {
+      const url = String(body.venue.mapsUrl).trim().slice(0, 500);
+      if (/^https?:\/\/.+/i.test(url)) payload.venue.mapsUrl = url;
+    }
+  }
+  if (body.price !== undefined && body.price !== '') payload.price = parseFloat(body.price);
+  if (body.capacity !== undefined && body.capacity !== '') payload.capacity = parseInt(body.capacity);
+  if (body.isActive !== undefined) payload.isActive = !!body.isActive;
+  return payload;
+}
+
+// List all templates (active + inactive)
+app.get('/api/admin/templates', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const templates = await GameTemplate.find({}).sort({ createdAt: 1 });
+    res.json(templates);
+  } catch (err) {
+    console.error('Fetch admin templates error:', err);
+    res.status(500).json({ error: 'Failed to fetch templates' });
+  }
+});
+
+// Create a template (enforces a hard cap)
+app.post('/api/admin/templates', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const count = await GameTemplate.countDocuments({});
+    if (count >= MAX_TEMPLATES) {
+      return res.status(400).json({ error: `Template limit reached (max ${MAX_TEMPLATES}). Delete one to add another.` });
+    }
+
+    const payload = buildTemplatePayload(req.body);
+    if (!payload.name || !payload.dayOfWeek || !payload.time || !payload.venue?.name || !payload.venue?.address) {
+      return res.status(400).json({ error: 'Missing required fields: name, dayOfWeek, time, venue name & address' });
+    }
+
+    const template = new GameTemplate(payload);
+    await template.save();
+    console.log(`✅ Admin created template "${template.name}"`);
+    res.status(201).json(template);
+  } catch (err) {
+    console.error('Admin create template error:', err);
+    res.status(500).json({ error: 'Failed to create template' });
+  }
+});
+
+// Update a template
+app.put('/api/admin/templates/:id', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const payload = buildTemplatePayload(req.body);
+    const template = await GameTemplate.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+    console.log(`📝 Admin updated template "${template.name}"`);
+    res.json(template);
+  } catch (err) {
+    console.error('Admin update template error:', err);
+    res.status(500).json({ error: 'Failed to update template' });
+  }
+});
+
+// Delete a template
+app.delete('/api/admin/templates/:id', adminLimiter, adminSessionAuth, async (req, res) => {
+  try {
+    const template = await GameTemplate.findByIdAndDelete(req.params.id);
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+    console.log(`🗑️  Admin deleted template "${template.name}"`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin delete template error:', err);
+    res.status(500).json({ error: 'Failed to delete template' });
+  }
+});
+
 // Generate games for next week from templates
 // 🔒 SECURITY: Rate limited to prevent abuse
 app.post('/api/games/generate-week', adminLimiter, async (req, res) => {
@@ -1873,7 +2005,12 @@ app.post('/api/games/generate-week', adminLimiter, async (req, res) => {
           price: template.price,
           capacity: template.capacity,
           spotsRemaining: template.capacity,
-          status: 'open'
+          status: 'open',
+          description: template.description || '',
+          skillLevel: template.skillLevel || 'all',
+          format: template.format || '',
+          tags: Array.isArray(template.tags) ? template.tags : [],
+          photos: Array.isArray(template.photos) ? template.photos : []
         });
 
         await game.save();

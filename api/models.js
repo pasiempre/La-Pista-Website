@@ -48,6 +48,33 @@ const gameSchema = new mongoose.Schema({
     type: String, 
     enum: ['scheduled', 'open', 'full', 'in-progress', 'completed', 'cancelled'],
     default: 'open' 
+  },
+  // Optional short blurb shown low on the game details page
+  description: {
+    type: String,
+    maxLength: 1000,
+    default: ''
+  },
+  // Skill level guidance shown in the game details header
+  skillLevel: {
+    type: String,
+    enum: ['all', 'beginner', 'intermediate', 'advanced'],
+    default: 'all'
+  },
+  // Free-form format label, e.g. "7v7", "5v5", "11v11"
+  format: {
+    type: String,
+    default: ''
+  },
+  // Amenity/info tags (from a shared predefined list), e.g. "lights", "parking"
+  tags: {
+    type: [String],
+    default: []
+  },
+  // Photo URLs (externally hosted, e.g. GitHub raw links) shown in a carousel
+  photos: {
+    type: [String],
+    default: []
   }
 }, { timestamps: true });
 
@@ -207,6 +234,30 @@ const gameTemplateSchema = new mongoose.Schema({
   capacity: { 
     type: Number, 
     default: 24 
+  },
+  // Default game details carried onto games created from this template.
+  // Games store their own copy, so per-game edits/additions don't affect the template.
+  description: {
+    type: String,
+    maxLength: 1000,
+    default: ''
+  },
+  skillLevel: {
+    type: String,
+    enum: ['all', 'beginner', 'intermediate', 'advanced'],
+    default: 'all'
+  },
+  format: {
+    type: String,
+    default: ''
+  },
+  tags: {
+    type: [String],
+    default: []
+  },
+  photos: {
+    type: [String],
+    default: []
   },
   isActive: {
     type: Boolean,

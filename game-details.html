@@ -22,14 +22,15 @@
 <script src="/js/avatars.js"></script>
 </head>
   <body class="antialiased text-base text-zinc-900 bg-[#FAFAFA] min-h-screen bg-noise flex flex-col">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-md focus:bg-green-600 focus:text-white focus:font-bold focus:shadow-lg">Skip to main content</a>
     <!-- Mobile Menu Overlay -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 hidden transition-opacity duration-300" onclick="toggleMobileMenu()"></div>
     <!-- Mobile Menu Panel -->
     <aside id="mobile-menu-panel" class="fixed top-0 left-0 bottom-0 w-[300px] bg-zinc-900 z-50 transform -translate-x-full transition-transform duration-300 ease-out border-r border-zinc-800 flex flex-col shadow-2xl">
       <div class="flex items-center justify-between p-6 border-b border-zinc-800">
         <span class="font-display font-bold text-2xl text-white uppercase italic tracking-tighter">LaPista<span class="text-green-500">.ATX</span></span>
-        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors">
-          <span class="iconify text-2xl" data-icon="lucide:x"></span>
+        <button onclick="toggleMobileMenu()" class="text-zinc-500 hover:text-white transition-colors" aria-label="Close menu">
+          <span class="iconify text-2xl" data-icon="lucide:x" aria-hidden="true"></span>
         </button>
       </div>
       <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
@@ -62,8 +63,8 @@
     <header class="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-3 md:px-5 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <!-- Mobile Menu Button -->
-        <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()">
-          <span class="iconify text-2xl" data-icon="lucide:menu"></span>
+        <button class="md:hidden text-zinc-500 mr-2" onclick="toggleMobileMenu()" aria-label="Open menu">
+          <span class="iconify text-2xl" data-icon="lucide:menu" aria-hidden="true"></span>
         </button>
         <a href="index.html" class="flex items-center group">
           <img src="/LaPista Logo 1.png" alt="LaPista Logo" class="h-[50px] w-[50px] object-contain group-hover:scale-110 transition-transform">
@@ -96,7 +97,7 @@
       </div>
     </header>
 
-    <main class="flex-1 w-full max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
+    <main id="main-content" class="flex-1 w-full max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10">
       <!-- Error State: Game Not Found (hidden by default) -->
       <div id="game-error-state" class="hidden">
         <div class="text-center py-16">
@@ -230,9 +231,10 @@
                 <div class="text-xs font-bold text-zinc-400 uppercase tracking-wide" data-i18n="gameDetails.skillLevel">
                   Skill Level
                 </div>
-                <div class="text-sm font-bold text-zinc-900 uppercase" data-i18n="gameDetails.allLevels">
+                <div id="skill-level-value" class="text-sm font-bold text-zinc-900 uppercase" data-i18n="gameDetails.allLevels">
                   Open to all skill levels
                 </div>
+                <div id="game-format-value" class="text-xs font-medium text-zinc-500 hidden"></div>
               </div>
             </div>
           </div>
@@ -249,10 +251,11 @@
             <!-- Will be populated by JavaScript based on game data -->
             <!-- Default expectations shown until game loads -->
             <li class="flex items-start gap-3">
-              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em"></span>
+              <span class="iconify text-green-500 mt-1" data-icon="lucide:check-circle-2" data-width="1.2em" aria-hidden="true"></span>
               <span class="text-sm font-medium text-zinc-700">Loading...</span>
             </li>
           </ul>
+          <div id="amenities-tags" class="hidden flex-wrap gap-2 mt-5 pt-5 border-t border-zinc-200"></div>
         </div>
       </div>
 
@@ -533,6 +536,31 @@
                 You'll receive a confirmation email shortly.
               </p>
             </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- About This Game (description + photo carousel) -->
+      <div id="about-game-section" class="mb-12 hidden">
+        <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest font-display mb-4" data-i18n="gameDetails.aboutGame">
+          About This Game
+        </h3>
+        <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-6 space-y-6">
+          <p id="game-description-text" class="hidden text-sm font-medium text-zinc-700 leading-relaxed whitespace-pre-line"></p>
+
+          <div id="game-photos-carousel" class="hidden">
+            <div class="relative overflow-hidden rounded-lg bg-zinc-100">
+              <div id="carousel-track" class="flex transition-transform duration-500 ease-out"></div>
+              <button type="button" id="carousel-prev" onclick="moveCarousel(-1)" aria-label="Previous photo"
+                      class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow">
+                <span class="iconify text-zinc-700" data-icon="lucide:chevron-left" aria-hidden="true"></span>
+              </button>
+              <button type="button" id="carousel-next" onclick="moveCarousel(1)" aria-label="Next photo"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-9 h-9 flex items-center justify-center shadow">
+                <span class="iconify text-zinc-700" data-icon="lucide:chevron-right" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="carousel-dots" class="flex justify-center gap-2 mt-3"></div>
           </div>
         </div>
       </div>
@@ -836,6 +864,9 @@
           
           // Update venue information
           updateVenueDisplay();
+
+          // Render admin-editable extras: skill level, tags, description, photos
+          renderGameExtras();
           
           // Update availability gauge
           updateAvailabilityDisplay();
@@ -981,6 +1012,156 @@
           li.appendChild(text);
           expectationsList.appendChild(li);
         });
+      }
+
+      // ============================================
+      // Admin-editable extras: skill level, amenity tags,
+      // description, and photo carousel.
+      // ============================================
+      function renderGameExtras() {
+        if (!gameData) return;
+
+        // --- Skill level + format ---
+        const skillEl = document.getElementById('skill-level-value');
+        if (skillEl && gameData.skillLevel && gameData.skillLevel !== 'all') {
+          const def = (typeof SKILL_LEVELS !== 'undefined')
+            ? SKILL_LEVELS.find(s => s.id === gameData.skillLevel)
+            : null;
+          skillEl.removeAttribute('data-i18n'); // dynamic value overrides the i18n default
+          skillEl.textContent = def ? def.label : gameData.skillLevel;
+        }
+        const formatEl = document.getElementById('game-format-value');
+        if (formatEl && gameData.format) {
+          formatEl.textContent = gameData.format;
+          formatEl.classList.remove('hidden');
+        }
+
+        // --- Amenity / info tags ---
+        const tagsEl = document.getElementById('amenities-tags');
+        const tags = Array.isArray(gameData.tags) ? gameData.tags : [];
+        if (tagsEl && tags.length) {
+          tagsEl.innerHTML = '';
+          tags.forEach(id => {
+            const def = (typeof getTagDef === 'function') ? getTagDef(id) : { label: id, icon: 'lucide:tag' };
+            const pill = document.createElement('span');
+            pill.className = 'inline-flex items-center gap-1.5 bg-white border border-zinc-200 text-zinc-700 text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full';
+
+            const icon = document.createElement('span');
+            icon.className = 'iconify text-green-500';
+            icon.setAttribute('data-icon', def.icon || 'lucide:tag');
+            icon.setAttribute('aria-hidden', 'true');
+
+            const label = document.createElement('span');
+            label.textContent = def.label;
+
+            pill.appendChild(icon);
+            pill.appendChild(label);
+            tagsEl.appendChild(pill);
+          });
+          tagsEl.classList.remove('hidden');
+          tagsEl.classList.add('flex');
+        } else if (tagsEl) {
+          tagsEl.classList.add('hidden');
+          tagsEl.classList.remove('flex');
+        }
+
+        // --- Description + photo carousel (About This Game) ---
+        const aboutSection = document.getElementById('about-game-section');
+        const descEl = document.getElementById('game-description-text');
+        const hasDescription = !!(gameData.description && gameData.description.trim());
+        if (descEl) {
+          if (hasDescription) {
+            descEl.textContent = gameData.description.trim();
+            descEl.classList.remove('hidden');
+          } else {
+            descEl.classList.add('hidden');
+          }
+        }
+
+        const photos = (Array.isArray(gameData.photos) ? gameData.photos : [])
+          .filter(u => typeof isValidPhotoUrl === 'function' ? isValidPhotoUrl(u) : /^https?:\/\//i.test(u));
+        const hasPhotos = photos.length > 0;
+        renderCarousel(photos);
+
+        if (aboutSection) {
+          aboutSection.classList.toggle('hidden', !hasDescription && !hasPhotos);
+        }
+      }
+
+      // ---- Photo carousel ----
+      let carouselIndex = 0;
+      let carouselCount = 0;
+
+      function renderCarousel(photos) {
+        const wrap = document.getElementById('game-photos-carousel');
+        const track = document.getElementById('carousel-track');
+        const dots = document.getElementById('carousel-dots');
+        if (!wrap || !track) return;
+
+        carouselIndex = 0;
+        carouselCount = photos.length;
+        track.innerHTML = '';
+        if (dots) dots.innerHTML = '';
+
+        if (!photos.length) {
+          wrap.classList.add('hidden');
+          return;
+        }
+
+        photos.forEach((url, i) => {
+          const slide = document.createElement('div');
+          slide.className = 'w-full shrink-0';
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = `${gameData.venue?.name || 'Game'} photo ${i + 1}`;
+          img.loading = 'lazy';
+          img.className = 'w-full h-64 sm:h-80 object-cover';
+          img.onerror = () => { slide.remove(); };
+          slide.appendChild(img);
+          track.appendChild(slide);
+
+          if (dots) {
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.setAttribute('aria-label', `Go to photo ${i + 1}`);
+            dot.className = 'w-2 h-2 rounded-full bg-zinc-300';
+            dot.onclick = () => goToSlide(i);
+            dots.appendChild(dot);
+          }
+        });
+
+        // Hide nav controls when there's only one photo
+        const single = photos.length <= 1;
+        ['carousel-prev', 'carousel-next'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('hidden', single);
+        });
+        if (dots) dots.classList.toggle('hidden', single);
+
+        wrap.classList.remove('hidden');
+        updateCarousel();
+      }
+
+      function goToSlide(i) {
+        if (carouselCount === 0) return;
+        carouselIndex = (i + carouselCount) % carouselCount;
+        updateCarousel();
+      }
+
+      function moveCarousel(dir) {
+        goToSlide(carouselIndex + dir);
+      }
+
+      function updateCarousel() {
+        const track = document.getElementById('carousel-track');
+        const dots = document.getElementById('carousel-dots');
+        if (track) track.style.transform = `translateX(-${carouselIndex * 100}%)`;
+        if (dots) {
+          Array.from(dots.children).forEach((dot, i) => {
+            dot.classList.toggle('bg-green-500', i === carouselIndex);
+            dot.classList.toggle('bg-zinc-300', i !== carouselIndex);
+          });
+        }
       }
 
       // Update availability display
