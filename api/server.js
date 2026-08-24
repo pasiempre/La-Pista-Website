@@ -319,6 +319,16 @@ const optionalAuth = (req, res, next) => {
 // Apply rate limiting to API routes
 app.use('/api/', apiLimiter);
 
+// 🔒 Freshness: API reads are dynamic (squad lists, availability, etc.).
+// Prevent the browser from serving a stale cached copy so newly signed-up
+// players and updated spot counts always appear immediately.
+app.use('/api/', (req, res, next) => {
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+  next();
+});
+
 // Parse JSON for all routes except webhook
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/webhook') {
